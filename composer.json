@@ -1,0 +1,13 @@
+{
+     "repositories": {
+        "packagist": {
+            "type": "composer",
+            "url": "https://packagist.phpcomposer.com"
+        }
+    },
+     "require": {
+          "aliyuncs/oss-sdk-php": "^2.0",
+          "predis/predis": "dev-master",
+          "jenssegers/blade": "^1.0"
+     }
+}
