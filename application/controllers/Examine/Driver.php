@@ -12,5 +12,17 @@ class Examine_DriverController extends Rpc {
         
     }
 
+    //获取司机信息
+    public function getDriverInfoFunc($serach){
+        $D = new Examine_DriverModel(Yaf_Registry::get("db"));
+        return $D->getDriverInfo($serach);
+    }
+
+    //更新审核状态
+    public function updateStatusFunc($status,$where){
+        $D = new Examine_DriverModel(Yaf_Registry::get("db"));
+        return $D->updateStatus($status,$where);	
+    }
+
 
 }
