@@ -18,6 +18,17 @@ class Bootstrap extends Yaf_Bootstrap_Abstract
     {
         $config = Yaf_Application::app()->getConfig();
         Yaf_Registry::set("config",$config);
+
+
+        $db = $config->get("db");
+        Yaf_Registry::set("db", new MySQL(
+            $db->host,
+            $db->port,
+            $db->username,
+            $db->password,
+            $db->default,
+            $db->charset
+        ));
     }
 
     /**
