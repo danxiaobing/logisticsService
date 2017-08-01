@@ -1,10 +1,7 @@
 <?php
 
 /**
- * Created by PhpStorm.
- * User: Dujiangjiang
- * Date: 2016/8/11 0011
- * Time: 18:32
+ * User: Jeff
  */
 class Examine_CarModel
 {
@@ -21,40 +18,46 @@ class Examine_CarModel
     }
 
 
-    public function getPage($params, $rows, $page)
+    public function getPage($params)
     {
         $filed = array();
-        $where = " WHERE tcs.`status`=3 ";
+        $where = "  ";
 
-        if (isset($params['shopname']) && $params['shopname'] != '') {
-            $filed[] = " tcs.`title` LIKE '%" . trim($params['shopname']) . "%'";
+        if (isset($params['number']) && $params['number'] != '') {
+            $filed[] = " gc.`number` LIKE '%" . trim($params['number']) . "%'";
+        }
+        if (isset($params['vins']) && $params['vins'] != '') {
+            $filed[] = " gc.`vins` LIKE '%" . trim($params['vins']) . "%'";
+        }
+        if (isset($params['company_name']) && $params['company_name'] != '') {
+            $filed[] = " cc.`company_name` LIKE '%" . trim($params['company_name']) . "%'";
         }
         if (count($filed) > 0) {
-            $where .= " AND" . implode(" AND ", $filed);
+            $where .= " WHERE " . implode(" AND ", $filed);
         }
 
         $result = array(
-            'total' => 0,
-            'data' => array()
+            'totalRow' => 0,
+            'list' => array()
         );
 
-        $sql = "SELECT count(tcs.`id`)
-                FROM `td_companies_shop` AS tcs
-                LEFT JOIN `td_companies` AS tc ON tc.`id`=tcs.`companiesid` AND tc.`delete`=0
+        $sql = "SELECT count(gc.`id`)
+                FROM `gl_cars` AS gc
+                LEFT JOIN `gl_companies` AS cc ON cc.`id`=gc.`company_id`
                 {$where}";
-        $result['total'] = $this->dbh->select_one($sql);
+        $result['totalRow'] = $this->dbh->select_one($sql);
 
-        $this->dbh->set_page_num($page ? $page : 1);
-        $this->dbh->set_page_rows($rows ? $rows : 15);
+        $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
+        $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
-        $sql = "SELECT tcs.*,tc.`companyno`,tc.`company_name`,tc.`company_telephone`,tc.`organization_code`,tc.`company_address`,tc.`level`
-                FROM `td_companies_shop` AS tcs
-                LEFT JOIN `td_companies` AS tc ON tc.`id`=tcs.`companiesid` AND tc.`delete`=0
-                {$where} ORDER BY tcs.`shoplevel` DESC, tcs.`lastupdated_at` DESC";
-
-        //error_log($sql."\n", 3, 'print_log.txt');
-        $result['data'] = $this->dbh->select_page($sql);
-
+        $sql = "SELECT gc.* , cc.`id`,cc.`company_name`
+                FROM `gl_cars` AS gc
+                LEFT JOIN `gl_companies` AS cc ON cc.`id`=gc.`company_id`
+                {$where} 
+                ORDER BY gc.`updated_at` DESC";
+        //
+        $result['list'] = $this->dbh->select_page($sql);
+        //print_r($result);die;
         return $result;
     }
 
