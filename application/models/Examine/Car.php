@@ -50,7 +50,7 @@ class Examine_CarModel
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
-        $sql = "SELECT gc.* , cc.`id`,cc.`company_name`
+        $sql = "SELECT gc.*,cc.`company_name`
                 FROM `gl_cars` AS gc
                 LEFT JOIN `gl_companies` AS cc ON cc.`id`=gc.`company_id`
                 {$where} 
@@ -62,9 +62,9 @@ class Examine_CarModel
     }
 
 
-    public function Update($params, $id)
+    public function update($params, $where)
     {
-        return $this->dbh->update('td_companies_shop_pro', $params, 'shop_id=' . intval($id));
+        return $this->dbh->update('gl_cars', $params, $where );
     }
 
 
