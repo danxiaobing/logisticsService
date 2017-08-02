@@ -27,7 +27,7 @@ class Examine_DriverModel
             $filter[] = " name like '%{$serach['name']}%' ";
         }
         if(isset($serach['mobile']) && $serach['mobile'] != ''){
-            $filter[] = " mobile = '{$serach['mobile']}' ";
+            $filter[] = " mobile  like '%{$serach['mobile']}%' ";
         }
         $WHERE = " WHERE 1 ";
        
@@ -61,5 +61,11 @@ class Examine_DriverModel
        return $this->dbh->update('gl_driver',$status,$where); 
     }
 
+
+    //证件查看
+    public function getPic($id){
+        $sql = " SELECT driver_license,certificate_pic,other_pic FROM gl_driver WHERE id =  ".intval($id);
+        return $this->dbh->select_row($sql);
+    }
 
 }

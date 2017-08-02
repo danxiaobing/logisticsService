@@ -24,5 +24,11 @@ class Examine_DriverController extends Rpc {
         return $D->updateStatus($status,$where);	
     }
 
+    //证件查看
+    public function getPicFunc($id){
+    	$D = new Examine_DriverModel(Yaf_Registry::get("db"));
+    	return $D->getPic($id);
+    }
+
 
 }
