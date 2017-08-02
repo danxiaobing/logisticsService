@@ -61,6 +61,12 @@ class Examine_CarModel
         return $result;
     }
 
+    public function showfile($id)
+    {
+        $sql = "SELECT * FROM `gl_cars` WHERE id = ".$id;
+        $res = $this->dbh->select_row($sql);
+        return $res;
+    }
 
     public function update($params, $where)
     {
