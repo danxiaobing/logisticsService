@@ -18,7 +18,7 @@ class Examine_CarrierController extends Rpc {
      * @param array $params
      * @return array $data
      */
-    public function getCarrierList($params){
+    public function getCarrierListFunc($params){
         $Carrier = new Examine_CarrierModel(Yaf_Registry::get("db"));
         $data = $Carrier->getCarrierList($params);
         return $data;
@@ -29,9 +29,28 @@ class Examine_CarrierController extends Rpc {
      * @param int $params
      * @return array $data
      */
-    public function getCarrier($id){
+    public function getCarrierFunc($id){
         $Carrier = new Examine_CarrierModel(Yaf_Registry::get("db"));
         $data = $Carrier->getCarrierList(intval($id));
         return $data;
     }
+
+    /**
+     * 审核
+     * @param array  $status
+     * @param integer $where
+     * @return array
+     */
+    public function updateCarrierFunc($status,$where){
+        $Carrier = new Examine_CarrierModel(Yaf_Registry::get("db"));
+        $data = $Carrier->updateCarrier($status,$where);
+        return $data;
+    }
+
+    public  function showfileFunc($id){
+        $Carrier = new Examine_CarrierModel(Yaf_Registry::get("db"));
+        $data = $Carrier->showfile($id);
+        return $data;
+    }
+
 }
