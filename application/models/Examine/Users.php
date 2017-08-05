@@ -62,9 +62,9 @@ class Examine_UsersModel
         #sql语句
         $sql = "SELECT gl_user_info.*,gl_companies.company_code,gl_companies.province_id,gl_companies.company_name,gl_companies.city_id,gl_companies.area_id,gl_companies.company_address,gl_companies.company_user,gl_companies.company_telephone,conf_area.area,conf_province.province,conf_city.city FROM gl_user_info
                 LEFT JOIN gl_companies ON gl_companies.id = gl_user_info.cid
-                LEFT JOIN conf_area ON conf_area.sysno = gl_companies.area_id
-                LEFT JOIN conf_province ON conf_province.sysno = gl_companies.province_id
-                LEFT JOIN conf_city ON conf_city.sysno = gl_companies.city_id WHERE 
+                LEFT JOIN conf_area ON conf_area.areaid = gl_companies.area_id
+                LEFT JOIN conf_province ON conf_province.provinceid = gl_companies.province_id
+                LEFT JOIN conf_city ON conf_city.cityid = gl_companies.city_id WHERE 
                ".$where;
 
         $countSql = "SELECT COUNT(1) FROM gl_companies WHERE is_del = 0";
@@ -115,9 +115,9 @@ class Examine_UsersModel
 
         $sql = "SELECT gl_user_info.*,gl_companies.company_code,gl_companies.province_id,gl_companies.company_name,gl_companies.city_id,gl_companies.area_id,gl_companies.company_address,gl_companies.company_user,gl_companies.company_telephone,conf_area.area,conf_province.province,conf_city.city FROM gl_user_info
                 LEFT JOIN gl_companies ON gl_companies.id = gl_user_info.cid
-                LEFT JOIN conf_area ON conf_area.sysno = gl_companies.area_id
-                LEFT JOIN conf_province ON conf_province.sysno = gl_companies.province_id
-                LEFT JOIN conf_city ON conf_city.sysno = gl_companies.city_id WHERE 
+                LEFT JOIN conf_area ON conf_area.areaid = gl_companies.area_id
+                LEFT JOIN conf_province ON conf_province.provinceid = gl_companies.province_id
+                LEFT JOIN conf_city ON conf_city.cityid = gl_companies.city_id WHERE 
                 ".$where;
 
         $data =  $this->dbh->select($sql);
