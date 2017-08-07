@@ -14,7 +14,7 @@ class Examine_CarrierController extends Rpc {
     }
 
     /**
-     * 获取供应商列表
+     * 获取承运商列表
      * @param array $params
      * @return array $data
      */
@@ -25,7 +25,7 @@ class Examine_CarrierController extends Rpc {
     }
 
     /**
-     * 获取供应商
+     * 获取承运商
      * @param int $params
      * @return array $data
      */
@@ -36,7 +36,7 @@ class Examine_CarrierController extends Rpc {
     }
 
     /**
-     * 审核
+     * 修改
      * @param array  $status
      * @param integer $where
      * @return array

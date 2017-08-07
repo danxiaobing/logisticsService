@@ -60,12 +60,13 @@ class Examine_UsersModel
         $pageSize = isset($params['pageSize'])? intval($params['pageSize']) : 9;
 
         #sql语句
-        $sql = "SELECT gl_user_info.*,gl_companies.company_code,gl_companies.province_id,gl_companies.company_name,gl_companies.city_id,gl_companies.area_id,gl_companies.company_address,gl_companies.company_user,gl_companies.company_telephone,conf_area.area,conf_province.province,conf_city.city FROM gl_user_info
+        $sql = "SELECT gl_user_info.id,gl_user_info.is_del,gl_user_info.user_name,gl_user_info.mobile,gl_user_info.email,gl_companies.company_code,gl_companies.province_id,gl_companies.company_name,gl_companies.city_id,gl_companies.area_id,gl_companies.company_address,gl_companies.company_user,gl_companies.company_telephone,conf_area.area,conf_province.province,conf_city.city FROM gl_user_info
                 LEFT JOIN gl_companies ON gl_companies.id = gl_user_info.cid
                 LEFT JOIN conf_area ON conf_area.areaid = gl_companies.area_id
                 LEFT JOIN conf_province ON conf_province.provinceid = gl_companies.province_id
                 LEFT JOIN conf_city ON conf_city.cityid = gl_companies.city_id WHERE 
-               ".$where;
+                {$where} 
+                ORDER BY gl_user_info.`updated_at` DESC";
 
         $countSql = "SELECT COUNT(1) FROM gl_companies WHERE is_del = 0";
 
@@ -113,7 +114,7 @@ class Examine_UsersModel
             $where .= ' AND gl_user_info`password` ='.$password;
         }
 
-        $sql = "SELECT gl_user_info.*,gl_companies.company_code,gl_companies.province_id,gl_companies.company_name,gl_companies.city_id,gl_companies.area_id,gl_companies.company_address,gl_companies.company_user,gl_companies.company_telephone,conf_area.area,conf_province.province,conf_city.city FROM gl_user_info
+        $sql = "SELECT gl_user_info.user_name,gl_user_info.mobile,gl_user_info.email,gl_companies.company_code,gl_companies.province_id,gl_companies.company_name,gl_companies.city_id,gl_companies.area_id,gl_companies.company_address,gl_companies.company_user,gl_companies.company_telephone,conf_area.area,conf_province.province,conf_city.city FROM gl_user_info
                 LEFT JOIN gl_companies ON gl_companies.id = gl_user_info.cid
                 LEFT JOIN conf_area ON conf_area.areaid = gl_companies.area_id
                 LEFT JOIN conf_province ON conf_province.provinceid = gl_companies.province_id
