@@ -24,23 +24,34 @@ class Examine_DriverModel
 
         $filter = array();
         if(isset($serach['name']) &&  $serach['name'] != ''){
-            $filter[] = " name like '%{$serach['name']}%' ";
+            $filter[] = " gd.name like '%{$serach['name']}%' ";
         }
         if(isset($serach['mobile']) && $serach['mobile'] != ''){
-            $filter[] = " mobile  like '%{$serach['mobile']}%' ";
+            $filter[] = " gd.mobile  like '%{$serach['mobile']}%' ";
         }
+
+        if(isset($serach['type']) && $serach['type'] != ''){
+            $filter[] = " gd.type = {$serach['type']} ";
+        }
+
+        if(isset($serach['status']) && $serach['status'] != ''){
+            $filter[] = " gd.status  ={$serach['status']} ";
+        }
+
+        if(isset($serach['companyid']) && $serach['companyid'] !=''){
+            $filter[] = " gd.company_id = {$serach['companyid']} ";
+        }
+
         $WHERE = " WHERE 1 ";
        
-
         if(count($filter) > 0){
             $WHERE .= ' AND '.implode('AND', $filter);
         }
 
-        $sql = " SELECT count(*) FROM gl_driver {$WHERE}";
+        $sql = " SELECT count(*) FROM gl_driver gd {$WHERE}";
         //获取总的记录数
         $result['totalRow'] = $this->dbh->select_one($sql);
         $result['list'] = array();
-
         if($result['totalRow']){
             //总的页数
             $result['totalPage']  = ceil($result['totalRow'] / $serach['pageSize']);  
@@ -48,7 +59,7 @@ class Examine_DriverModel
             $this ->dbh ->set_page_num($serach['pageCurrent']);
             $this ->dbh ->set_page_rows($serach['pageSize']); 
             //数据获取
-            $sql = "SELECT * FROM gl_driver {$WHERE} ORDER BY updated_at DESC "; 
+            $sql = "SELECT * FROM gl_driver gd {$WHERE} ORDER BY updated_at DESC ";
             $result['list'] = $this->dbh->select($sql);
         }
 
@@ -68,4 +79,10 @@ class Examine_DriverModel
         return $this->dbh->select_row($sql);
     }
 
+
+    //隶属公司
+    public function getCompany($companyid){
+        $sql = 'SELECT gc.id,gc.company_name from gl_companies gc where (gc.id='.intval($companyid).' or gc.pid='.intval($companyid).')  and gc.status=2';
+        return $this->dbh->select($sql);
+    }
 }

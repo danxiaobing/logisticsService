@@ -30,5 +30,11 @@ class Examine_DriverController extends Rpc {
     	return $D->getPic($id);
     }
 
+    //隶属公司
+    public function getCompanyFunc($companyid){
+        $D = new Examine_DriverModel(Yaf_Registry::get("db"));
+        return $D->getCompany($companyid);
+    }
+
 
 }
