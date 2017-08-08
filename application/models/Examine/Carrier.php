@@ -29,7 +29,7 @@ class Examine_CarrierModel
      * @param array $params
      * @return array $data
      */
-    public function getCarrierList($params){
+    public function getCarrierList($params,$pid =''){
 
         $filter = array();
         $where = '';
@@ -44,9 +44,11 @@ class Examine_CarrierModel
         if (isset($params['company_code']) && $params['company_code'] != '') {
             $filter[] = " gl_companies.`company_code`   LIKE '%{$params['company_code']}%' ";
         }
+        if($pid != ''){
+            $filter[] = " gl_companies.`pid` != 0";
+        }
 
         $where .= ' gl_companies.`status` != 0 ';
-        $where .= ' AND gl_companies_business.`is_del` = 0 ';
         #条件
         if (0 != count($filter)) {
             $where .= ' AND ' . implode(' AND ', $filter);
@@ -59,9 +61,7 @@ class Examine_CarrierModel
 
 
         #sql语句
-        $sql = "SELECT gl_companies.id,gl_companies.company_code,gl_companies.province_id,gl_companies.company_name,gl_companies.city_id,gl_companies.area_id,gl_companies.company_address,gl_companies.company_user,gl_companies.company_telephone,gl_companies.status,conf_area.area,conf_province.province,conf_city.city,gl_companies_business.type as business,gl_companies_products.type as products FROM gl_companies 
-                LEFT JOIN gl_companies_business ON gl_companies_business.cid = gl_companies.id 
-                LEFT JOIN gl_companies_products ON gl_companies_products.cid = gl_companies.id 
+        $sql = "SELECT gl_companies.id,gl_companies.company_code,gl_companies.province_id,gl_companies.company_name,gl_companies.city_id,gl_companies.area_id,gl_companies.company_address,gl_companies.company_user,gl_companies.company_telephone,gl_companies.status,conf_area.area,conf_province.province,conf_city.city,gl_companies.business,gl_companies.products FROM gl_companies 
                 LEFT JOIN conf_area ON conf_area.areaid = gl_companies.area_id
                 LEFT JOIN conf_province ON conf_province.provinceid = gl_companies.province_id
                 LEFT JOIN conf_city ON conf_city.cityid = gl_companies.city_id WHERE 
@@ -87,16 +87,54 @@ class Examine_CarrierModel
     public function getCarrier($id){
         $where = ' gl_companies.id = '.intval($id);
         $where .= ' AND gl_companies.`is_del` = 0 ';
-        $where .= ' AND gl_products.`is_del` = 0 ';
 
         #sql语句
-        $sql = "SELECT gl_companies.id,gl_companies.company_code,gl_companies.province_id,gl_companies.company_name,gl_companies.city_id,gl_companies.area_id,gl_companies.company_address,gl_companies.company_user,gl_companies.company_telephone,gl_companies.status,gl_products.type FROM gl_companies 
-                LEFT JOIN gl_products ON gl_products.cid = gl_companies.id WHERE 
+        $sql = "SELECT gl_companies.id,gl_companies.company_code,gl_companies.province_id,gl_companies.company_name,gl_companies.city_id,gl_companies.area_id,gl_companies.company_address,gl_companies.company_user,gl_companies.company_telephone,gl_companies.status,conf_area.area,conf_province.province,conf_city.city,gl_companies.business,gl_companies.products FROM gl_companies 
+                LEFT JOIN conf_area ON conf_area.areaid = gl_companies.area_id
+                LEFT JOIN conf_province ON conf_province.provinceid = gl_companies.province_id
+                LEFT JOIN conf_city ON conf_city.cityid = gl_companies.city_id WHERE  
                ".$where;
-
-        $data =  $this->dbh->select($sql);
+        var_dump($sql);die;
+        $data =  $this->dbh->select_row($sql);
 
         return $data;
+    }
+
+
+    /**
+     * 修改
+     * @param array $params
+     * @param integer $id
+     * @return bool
+     */
+    public function updateCarrier($params,$id){
+        $status = $params['status'];
+        $carrier = array(
+            'company_name'      =>$params['company_name'],
+            'province_id'       =>$params['province_id'],
+            'city_id'           =>$params['city_id'],
+            'area_id'           =>$params['area_id'],
+            'company_address'   =>$params['company_address'],
+            'company_user'      =>$params['company_user'],
+            'company_telephone' =>$params['company_telephone'],
+            'danger_file'       =>$params['danger_file'],
+            'other_file'        =>$params['other_file'],
+            'danger_file'       =>$params['danger_file'],
+            'status'            =>$params['status'],
+            'business'          => $params['business'],
+            'products'          => $params['products']
+        );
+
+
+
+
+//        #修改公司
+//        $carrier = $this->dbh->update('gl_companies', $carrier,'id='.intval($id));
+
+
+
+
+
     }
 
     /**
@@ -104,7 +142,7 @@ class Examine_CarrierModel
      * @param array $params
      * @return array $data
      */
-    public function updateCarrier($status,$where){
+    public function examineCarrier($status,$where){
         return $this->dbh->update('gl_companies', $status, $where );
     }
 
