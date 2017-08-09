@@ -31,14 +31,14 @@ class Bootstrap extends Yaf_Bootstrap_Abstract
         ));
 
         //连接gouyie数据库
-        $db2 = $config->get("db2");
-        Yaf_Registry::set("db2", new MySQL(
-            $db2->host,
-            $db2->port,
-            $db2->username,
-            $db2->password,
-            $db2->default,
-            $db2->charset
+        $gy_db = $config->get("gy_db");
+        Yaf_Registry::set("gy_db", new MySQL(
+            $gy_db->host,
+            $gy_db->port,
+            $gy_db->username,
+            $gy_db->password,
+            $gy_db->default,
+            $gy_db->charset
         ));
     }
 
