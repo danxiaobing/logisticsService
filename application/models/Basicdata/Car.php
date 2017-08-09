@@ -1,9 +1,7 @@
 <?php
+
 /**
- * Created by PhpStorm.
  * User: Jeff
- * Date: 2016/8/11 0011
- * Time: 18:32
  */
 class Basicdata_CarModel
 {
@@ -18,89 +16,62 @@ class Basicdata_CarModel
     {
         $this->dbh = $dbh;
     }
-    
-    /**
-     * 根据条件检索人工找货
-     * @return 数组
-     * @author Tina
-     */
+
+
     public function getList($params)
     {
-        $filter = array();
-        $filter[] = " `is_del` = 0";
-        $orders = "order by id desc";
-        $where = " WHERE `is_del` = 0  ";
-        $filter = array();
-        if (isset($params['name']) && $params['name'] != '' && $params['name'] != '0') {
-            $filter[] = " `name` LIKE '%{$params['name']}%' ";
+        $filed = array();
+        $where = "  ";
+
+        if (isset($params['number']) && $params['number'] != '') {
+            $filed[] = " gc.`number` LIKE '%" . trim($params['number']) . "%'";
+        }
+        if (isset($params['vins']) && $params['vins'] != '') {
+            $filed[] = " gc.`vins` LIKE '%" . trim($params['vins']) . "%'";
+        }
+        if (isset($params['company_name']) && $params['company_name'] != '') {
+            $filed[] = " cc.`company_name` LIKE '%" . trim($params['company_name']) . "%'";
+        }
+        if (count($filed) > 0) {
+            $where .= " WHERE " . implode(" AND ", $filed);
         }
 
-        if (1 <= count($filter)) {
-            $where .= ' AND ' . implode(' AND ', $filter);
-        }
+        $result = array(
+            'totalRow' => 0,
+            'list' => array()
+        );
 
-        
-        $sql = "SELECT COUNT(*) FROM gl_cars_type {$where}";
-        //
-        $result = $params;
+        $sql = "SELECT count(gc.`id`)
+                FROM `gl_cars` AS gc
+                LEFT JOIN `gl_companies` AS cc ON cc.`id`=gc.`company_id`
+                {$where}";
         $result['totalRow'] = $this->dbh->select_one($sql);
+
+        $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
+        $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
+
+        $sql = "SELECT gc.*,cc.`company_name`
+                FROM `gl_cars` AS gc
+                LEFT JOIN `gl_companies` AS cc ON cc.`id`=gc.`company_id`
+                {$where} 
+                ORDER BY gc.`updated_at` DESC";
         //
-        $result['list'] = array();
-
-        if ($result['totalRow']) {
-            $result['totalPage'] = ceil($result['totalRow'] / $params['pageSize']);
-            $this->dbh->set_page_num($params['pageCurrent']);
-            $this->dbh->set_page_rows($params['pageSize']);
-
-            $sql = "SELECT * FROM gl_cars_type {$where} {$orders}";
-            //print_r($sql);die; 
-            $arr = $this->dbh->select_page($sql);
-            
-            $result['list'] = $arr;
-        }
+        $result['list'] = $this->dbh->select_page($sql);
+        //print_r($result);die;
         return $result;
     }
 
-    /**
-     * 数据添加
-     * @return boolean
-     * @author Tina
-     */
-    public function add($data)
+    public function showfile($id)
     {
-        //print_r($data);die;
-        return $this->dbh->insert('gl_cars_type', $data);
-    }
-
-
-    /**
-     * 根据id获得细节
-     * id: 权限id
-     * @return 数组
-     */
-    public function getInfo($id = 0)
-    {
-        $sql = "SELECT * FROM gl_cars_type WHERE id=".$id;
-        return $this->dbh->select_row($sql);
-    }
-
-    /**
-     * 更新
-     */
-
-    public function update($id = 0, $data = array())
-    {
-        //print_r($data);die;
-        $res = $this->dbh->update('gl_cars_type', $data, 'id = ' . intval($id));
+        $sql = "SELECT * FROM `gl_cars` WHERE id = ".$id;
+        $res = $this->dbh->select_row($sql);
         return $res;
     }
 
-    /**
-     * 删除
-     */
-    public function del($id,$data){
-        $res = $this->dbh->update('gl_cars_type',$data,'id = ' . intval($id));
-        return $res;
+    public function update($params, $where)
+    {
+        return $this->dbh->update('gl_cars', $params, $where );
     }
+
 
 }
