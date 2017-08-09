@@ -30,8 +30,6 @@ class CityModel
         //县
         $sql = ' SELECT areaid,area,father xpid FROM conf_area';
         $area = $this->dbh->select($sql);
-
-
         //数据处理
         $arr = array();
        
@@ -55,7 +53,8 @@ class CityModel
              }
              $arr[] =  array('id'=>$v['provinceid'],'name'=>$v['province'],'isParent'=>true,'children'=>$children2);
          }
-        return array('res'=>$arr,'province'=>$province);
+         $data = json_encode($arr,JSON_UNESCAPED_UNICODE);
+        return array('res'=>$data,'province'=>$province);
     }
 
 }
