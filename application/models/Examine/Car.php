@@ -21,19 +21,25 @@ class Examine_CarModel
     public function getPage($params)
     {
         $filed = array();
+        $filter[] = " WHERE c.`is_del` = 0";
         $where = "  ";
 
+        if (isset($params['keyworks']) && $params['keyworks'] != '') {
+            $filed[] = " c.`number` LIKE '%" .trim($params['keyworks']). "%' OR d.`name` LIKE '%" .trim($params['keyworks']). "%' OR f.`name` LIKE '%" .trim($params['keyworks']). "%'";
+        }
+
+
         if (isset($params['number']) && $params['number'] != '') {
-            $filed[] = " gc.`number` LIKE '%" . trim($params['number']) . "%'";
+            $filter[] = " c.`number` LIKE '%" . trim($params['number']) . "%'";
         }
         if (isset($params['vins']) && $params['vins'] != '') {
-            $filed[] = " gc.`vins` LIKE '%" . trim($params['vins']) . "%'";
+            $filter[] = " c.`vins` LIKE '%" . trim($params['vins']) . "%'";
         }
         if (isset($params['company_name']) && $params['company_name'] != '') {
-            $filed[] = " cc.`company_name` LIKE '%" . trim($params['company_name']) . "%'";
+            $filter[] = " com.`company_name` LIKE '%" . trim($params['company_name']) . "%'";
         }
-        if (count($filed) > 0) {
-            $where .= " WHERE " . implode(" AND ", $filed);
+        if (count($filter) > 0) {
+            $where .= implode(" AND ", $filter);
         }
 
         $result = array(
@@ -41,21 +47,35 @@ class Examine_CarModel
             'list' => array()
         );
 
-        $sql = "SELECT count(gc.`id`)
-                FROM `gl_cars` AS gc
-                LEFT JOIN `gl_companies` AS cc ON cc.`id`=gc.`company_id`
+        $sql = "SELECT count(c.`id`)
+                FROM `gl_cars` AS c
+                LEFT JOIN `gl_companies` AS com ON com.`id` = c.`company_id`
+                LEFT JOIN `gl_fleets` AS f ON f.`id` = c.`fleets_id`
+                LEFT JOIN `gl_driver` AS d ON d.`id` = c.`driver_id`
+                LEFT JOIN `gl_driver` AS d2 ON d2.`id` = c.`escort_id`
                 {$where}";
+        //
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
-        $sql = "SELECT gc.*,cc.`company_name`
-                FROM `gl_cars` AS gc
-                LEFT JOIN `gl_companies` AS cc ON cc.`id`=gc.`company_id`
+        $sql = "SELECT 
+                c.*,
+                com.`company_name`,
+                f.`name` as fleets_name,
+                d.`name` as driver_name,
+                d.`mobile` as driver_mobile,
+                d2.`name` as escort_name,
+                d2.`mobile` as escort_mobile
+                FROM `gl_cars` AS c
+                LEFT JOIN `gl_companies` AS com ON com.`id` = c.`company_id`
+                LEFT JOIN `gl_fleets` AS f ON f.`id` = c.`fleets_id`
+                LEFT JOIN `gl_driver` AS d ON d.`id` = c.`driver_id`
+                LEFT JOIN `gl_driver` AS d2 ON d2.`id` = c.`escort_id`
                 {$where} 
-                ORDER BY gc.`updated_at` DESC";
-        //
+                ORDER BY c.`updated_at` DESC";
+        //print_r($sql);die;
         $result['list'] = $this->dbh->select_page($sql);
         //print_r($result);die;
         return $result;
