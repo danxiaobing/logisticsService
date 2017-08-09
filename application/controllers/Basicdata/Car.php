@@ -15,6 +15,7 @@ class Basicdata_CarController extends Rpc {
      */
     public function getListFunc($params)
     {
+
         $L = new Basicdata_CarModel(Yaf_Registry::get("db"));
         $data = $L->getList($params);
         return $data;

@@ -17,7 +17,7 @@ class Roster_CompaniesController extends Rpc {
      * @return array
      */
     public function getListFunc($where){
-        $Cus = new CompaniesModel(Yaf_Registry::get("db2"));
+        $Cus = new CompaniesModel(Yaf_Registry::get("gy_db"));
         $res = $Cus->getList('id,company_name,en_companyname',$where);
         return $res;
     }
@@ -25,7 +25,7 @@ class Roster_CompaniesController extends Rpc {
      * 获取单个公司信息
      */
      public function getOneFunc($where){
-         $Cus = new CompaniesModel(Yaf_Registry::get("db2"));
+         $Cus = new CompaniesModel(Yaf_Registry::get("gy_db"));
          $res = $Cus->getList('id,company_name,en_companyname',$where);
          return $res;
      }
