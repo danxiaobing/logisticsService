@@ -21,8 +21,8 @@ class Examine_UsersModel
      */
     public function __construct($dbh, $mc = null)
     {
-        $rpc=Yaf_Registry::get("msg");
-        $this->Verify=Client::create( $rpc->host.'Verify',false);
+//        $rpc=Yaf_Registry::get("msg");
+//        $this->Verify=Client::create( $rpc->host.'Verify',false);
 
         $this->dbh = $dbh;
     }
