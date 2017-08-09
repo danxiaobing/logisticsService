@@ -34,11 +34,11 @@ class Examine_DriverModel
             $filter[] = " gd.type = {$serach['type']} ";
         }
 
-        if(isset($serach['status']) && $serach['status'] != ''){
+        if(isset($serach['status']) && $serach['status'] != '-100'){
             $filter[] = " gd.status  ={$serach['status']} ";
         }
 
-        if(isset($serach['companyid']) && $serach['companyid'] !=''){
+        if(isset($serach['companyid']) && $serach['companyid'] !='-100'){
             $filter[] = " gd.company_id = {$serach['companyid']} ";
         }
 
@@ -60,7 +60,7 @@ class Examine_DriverModel
             $this ->dbh ->set_page_rows($serach['pageSize']); 
             //数据获取
             $sql = "SELECT * FROM gl_driver gd {$WHERE} ORDER BY updated_at DESC ";
-            $result['list'] = $this->dbh->select($sql);
+            $result['list'] = $this->dbh->select_page($sql);
         }
 
         return $result;
