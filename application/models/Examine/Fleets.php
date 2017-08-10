@@ -1,9 +1,9 @@
 <?php
 
 /**
- * User: Jeff
+ * User: Daley
  */
-class Examine_CarModel
+class Examine_FleetsModel
 {
     public $dbh = null;
 
@@ -25,15 +25,7 @@ class Examine_CarModel
         $where = "  ";
 
         if (isset($params['keyworks']) && $params['keyworks'] != '') {
-            $filter[] = " 
-                ( 
-                    c.`number` LIKE '%" .trim($params['keyworks']). "%' 
-                    OR d.`name` LIKE '%" .trim($params['keyworks']). "%' 
-                    OR d.`mobile` LIKE '%" .trim($params['keyworks']). "%'
-                    OR d2.`name` LIKE '%" .trim($params['keyworks']). "%'
-                    OR d2.`mobile` LIKE '%" .trim($params['keyworks']). "%'
-                    OR f.`name` LIKE '%" .trim($params['keyworks']). "%'
-                )";
+            $filed[] = " c.`number` LIKE '%" .trim($params['keyworks']). "%' OR d.`name` LIKE '%" .trim($params['keyworks']). "%' OR f.`name` LIKE '%" .trim($params['keyworks']). "%'";
         }
 
 
@@ -46,9 +38,6 @@ class Examine_CarModel
         if (isset($params['company_name']) && $params['company_name'] != '') {
             $filter[] = " com.`company_name` LIKE '%" . trim($params['company_name']) . "%'";
         }
-        if (isset($params['fleets_id']) && $params['fleets_id'] != '') {
-             $filter[] = " c.`fleets_id`=" . $params['fleets_id'];
-        }
         if (count($filter) > 0) {
             $where .= implode(" AND ", $filter);
         }
@@ -58,7 +47,7 @@ class Examine_CarModel
             'list' => array()
         );
 
-        $sql = "SELECT count(1)
+        $sql = "SELECT count(c.`id`)
                 FROM `gl_cars` AS c
                 LEFT JOIN `gl_companies` AS com ON com.`id` = c.`company_id`
                 LEFT JOIN `gl_fleets` AS f ON f.`id` = c.`fleets_id`
@@ -72,13 +61,7 @@ class Examine_CarModel
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
         $sql = "SELECT 
-                c.`id`,
-                c.`number`,
-                c.`type`,
-                c.`vins`,
-                c.`register`,
-                c.`is_use`,
-
+                c.*,
                 com.`company_name`,
                 f.`name` as fleets_name,
                 d.`name` as driver_name,
@@ -100,44 +83,31 @@ class Examine_CarModel
 
     public function showfile($id)
     {
-        $sql = "SELECT * FROM `gl_cars` WHERE id = ".$id;
+        $sql = "SELECT * FROM `gl_fleets` WHERE id = ".$id;
         $res = $this->dbh->select_row($sql);
         return $res;
     }
+   /**
+    * 获取承运商列表
+    * @param string $fields
+    * @param string $where
+    * @return array
+    */
+    public function getCompany($fields=null,$where=null){
+        $sql = "SELECT $fields FROM `gl_companies` WHERE `is_del`= 0 ";
+            if($where)$sql .= "AND $where";
+            return $this->dbh->select($sql);
+    }
 
+    //添加信息
+    public function addInfo($params)
+    {
+        return $this->dbh->insert('gl_fleets',$params);
+    }
+    //修改信息
     public function update($params, $where)
     {
-        return $this->dbh->update('gl_cars', $params, $where );
-    }
-    /**
-     * 数据添加
-     * @return boolean
-     * @author Tina
-     */
-    public function add($data)
-    {
-        //echo "<pre>";print_r($data);echo "</pre>";die; 
-        return $this->dbh->insert('gl_cars', $data);
-    }
-
-
-    /**
-     * 根据id获得细节
-     * id: 权限id
-     * @return 数组
-     */
-    public function getInfo($id = 0)
-    {
-        $sql = "SELECT * FROM gl_cars WHERE id=".$id;
-        return $this->dbh->select_row($sql);
-    }
-
-    /**
-     * 删除
-     */
-    public function del($id,$data){
-        $res = $this->dbh->update('gl_cars',$data,'id = ' . intval($id));
-        return $res;
+        return $this->dbh->update('gl_fleets', $params, $where );
     }
 
 
