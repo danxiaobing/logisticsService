@@ -37,4 +37,18 @@ class Examine_DriverController extends Rpc {
     }
 
 
+    //前台页面根据id获取数据
+    public function getInfoByIdFunc($id){
+        $D = new Examine_DriverModel(Yaf_Registry::get("db"));
+        return $D->getInfoById($id);
+    }
+
+
+    //启用功能
+    public function enabledFunc($id,$param){
+        $D = new Examine_DriverModel(Yaf_Registry::get("db"));
+        return $D->enabled($id,$param);
+    }
+
+
 }
