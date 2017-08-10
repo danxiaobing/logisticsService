@@ -81,8 +81,14 @@ class Examine_DriverModel
 
 
     //隶属公司
-    public function getCompany($companyid){
-        $sql = 'SELECT gc.id,gc.company_name from gl_companies gc where (gc.id='.intval($companyid).' or gc.pid='.intval($companyid).')  and gc.status=2';
+    public function getCompany($companyid,$include_self = true){
+
+        $where = ' gc.pid = '.intval($companyid) ;
+        if($include_self){
+            $where = '(gc.id='.intval($companyid).' or gc.pid='.intval($companyid).')';
+        }
+
+        $sql = 'SELECT gc.id,gc.company_name from gl_companies gc where '.$where.'  and gc.status=2';
         return $this->dbh->select($sql);
     }
 }
