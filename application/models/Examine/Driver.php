@@ -48,7 +48,7 @@ class Examine_DriverModel
             $WHERE .= ' AND '.implode('AND', $filter);
         }
 
-        $sql = " SELECT count(*) FROM gl_driver gd {$WHERE}";
+        $sql = " SELECT count(1) FROM gl_driver gd {$WHERE}";
         //获取总的记录数
         $result['totalRow'] = $this->dbh->select_one($sql);
         $result['list'] = array();
@@ -59,7 +59,7 @@ class Examine_DriverModel
             $this ->dbh ->set_page_num($serach['pageCurrent']);
             $this ->dbh ->set_page_rows($serach['pageSize']); 
             //数据获取
-            $sql = "SELECT * FROM gl_driver gd {$WHERE} ORDER BY updated_at DESC ";
+            $sql = "SELECT id,name,mobile,sex,cid,type,driver_start,driver_end,practitioners,driver_status,driver_license,certificate_pic,other_pic,company_id,is_use FROM gl_driver gd {$WHERE} ORDER BY updated_at DESC ";
             $result['list'] = $this->dbh->select_page($sql);
         }
 
@@ -91,4 +91,17 @@ class Examine_DriverModel
         $sql = 'SELECT gc.id,gc.company_name from gl_companies gc where '.$where.'  and gc.status=2';
         return $this->dbh->select($sql);
     }
+
+    //前台页面根据id获取数据
+    public function getInfoById($id){
+        $sql = " SELECT id,name,mobile,sex,cid,type,driver_start,driver_end,practitioners,driver_status,driver_license,certificate_pic,other_pic,company_id,is_use FROM gl_driver WHERE id= ".intval($id);
+        return $this->dbh->select_row($sql);
+    }
+
+    //启用功能
+    public function enabled($id,$param){
+        return $this->dbh->update('gl_driver',$param,'id ='.intval($id));
+    }
+
+
 }
