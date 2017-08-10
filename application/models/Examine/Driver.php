@@ -30,7 +30,7 @@ class Examine_DriverModel
             $filter[] = " gd.mobile  like '%{$serach['mobile']}%' ";
         }
 
-        if(isset($serach['type']) && $serach['type'] != ''){
+        if(isset($serach['type']) && $serach['type'] != '-100'){
             $filter[] = " gd.type = {$serach['type']} ";
         }
 
