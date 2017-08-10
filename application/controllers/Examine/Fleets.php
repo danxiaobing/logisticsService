@@ -33,24 +33,41 @@ class Examine_FleetsController extends Rpc {
         $list = $S->addInfo($data);
         return $list;
     }
-    /**
-     * 获取承运商
-     * @param $params
-     * @param $where
-     * @return mixed
-     */
-    public function getCompanyFunc(){
-
+    public function getInfoFunc($id){
+        $S = new Examine_FleetsModel(Yaf_Registry::get("db"));
+        $data = $S->getInfo($id);
+        return $data;
     }
     /**
+     * 更新车队信息
      * @param $params
      * @param $where
      * @return mixed
      */
-    public function updateFunc($params,$where)
+    public function updateFunc($params,$id)
     {
         $L = new Examine_FleetsModel(Yaf_Registry::get("db"));
-        $data = $L->update($params,$where);
+        $data = $L->update($params,$id);
+        return $data;
+    }
+    /**
+     * 删除车队信息
+     */
+    public function delFunc($id){
+        $L = new Examine_FleetsModel(Yaf_Registry::get("db"));
+        $data = $L->del($id);
+        return $data;
+    }
+    /**
+     * 获取运营商
+     * @param $params
+     * @param $where
+     * @return mixed
+     */
+    public function getCompanyFunc($params,$where)
+    {
+        $L = new Examine_FleetsModel(Yaf_Registry::get("db"));
+        $data = $L->getCompany($params,$where);
         return $data;
     }
 }

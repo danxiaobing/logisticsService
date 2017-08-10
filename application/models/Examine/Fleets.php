@@ -20,64 +20,68 @@ class Examine_FleetsModel
 
     public function getPage($params)
     {
+
         $filed = array();
-        $filter[] = " WHERE c.`is_del` = 0";
+        $filter[] = " WHERE 1=1";
         $where = "  ";
 
-        if (isset($params['keyworks']) && $params['keyworks'] != '') {
-            $filed[] = " c.`number` LIKE '%" .trim($params['keyworks']). "%' OR d.`name` LIKE '%" .trim($params['keyworks']). "%' OR f.`name` LIKE '%" .trim($params['keyworks']). "%'";
-        }
-
-
-        if (isset($params['number']) && $params['number'] != '') {
-            $filter[] = " c.`number` LIKE '%" . trim($params['number']) . "%'";
-        }
-        if (isset($params['vins']) && $params['vins'] != '') {
-            $filter[] = " c.`vins` LIKE '%" . trim($params['vins']) . "%'";
+        if (isset($params['type']) && $params['type'] != '') {
+            $filter[] = " fs.`fleets_type`=" . $params['type'];
         }
         if (isset($params['company_name']) && $params['company_name'] != '') {
             $filter[] = " com.`company_name` LIKE '%" . trim($params['company_name']) . "%'";
         }
+        if (isset($params['fleets_user']) && $params['fleets_user'] != '') {
+            $filter[] = " fs.`fleet_user` LIKE '%" . trim($params['fleets_user']) . "%'";
+        }
+        if (isset($params['company_id']) && $params['company_id'] != '') {
+
+            $sql = "select id FROM `gl_companies` where pid=".$params['company_id'];
+            $data = $this->dbh->select($sql);
+            $newArr = array();
+            if(!empty($data)){
+                foreach($data as $key=>$val){
+                    $newArr[]= $val['id'];
+                }
+            }
+            $newArr[]= $params['company_id'];
+            $filter[] = " fs.`company_id` in (" .  implode(",", array_values($newArr)) . ")";
+        }
         if (count($filter) > 0) {
             $where .= implode(" AND ", $filter);
         }
-
         $result = array(
             'totalRow' => 0,
             'list' => array()
         );
 
-        $sql = "SELECT count(c.`id`)
-                FROM `gl_cars` AS c
-                LEFT JOIN `gl_companies` AS com ON com.`id` = c.`company_id`
-                LEFT JOIN `gl_fleets` AS f ON f.`id` = c.`fleets_id`
-                LEFT JOIN `gl_driver` AS d ON d.`id` = c.`driver_id`
-                LEFT JOIN `gl_driver` AS d2 ON d2.`id` = c.`escort_id`
+        $sql = "SELECT count(1)
+                FROM `gl_fleets` AS fs
+                LEFT JOIN `gl_companies` AS com ON com.`id` = fs.`company_id`
                 {$where}";
-        //
+
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
-        $sql = "SELECT 
-                c.*,
-                com.`company_name`,
-                f.`name` as fleets_name,
-                d.`name` as driver_name,
-                d.`mobile` as driver_mobile,
-                d2.`name` as escort_name,
-                d2.`mobile` as escort_mobile
-                FROM `gl_cars` AS c
-                LEFT JOIN `gl_companies` AS com ON com.`id` = c.`company_id`
-                LEFT JOIN `gl_fleets` AS f ON f.`id` = c.`fleets_id`
-                LEFT JOIN `gl_driver` AS d ON d.`id` = c.`driver_id`
-                LEFT JOIN `gl_driver` AS d2 ON d2.`id` = c.`escort_id`
-                {$where} 
-                ORDER BY c.`updated_at` DESC";
-        //print_r($sql);die;
+        $sql = "SELECT
+                fs.`id`,
+                fs.`name` as fleet_name,
+                fs.`fleet_user`,
+                fs.`fleet_phone`,
+                fs.`fleets_type`,
+                fs.`is_use`,
+                fs.`company_id`,
+
+                com.`company_name`
+                FROM `gl_fleets` AS fs
+                LEFT JOIN `gl_companies` AS com ON com.`id` = fs.`company_id`
+                {$where}
+                ORDER BY fs.`updated_at` DESC";
+
         $result['list'] = $this->dbh->select_page($sql);
-        //print_r($result);die;
+
         return $result;
     }
 
@@ -99,15 +103,26 @@ class Examine_FleetsModel
             return $this->dbh->select($sql);
     }
 
+    public function getInfo($id){
+
+        $sql = "SELECT fs.`id`,fs.`name`, fs.`fleet_user`, fs.`fleet_phone`, fs.`fleets_type`,  fs.`is_use`, fs.`company_id`, com.`company_name` FROM `gl_fleets` AS fs
+                LEFT JOIN `gl_companies` AS com ON com.`id` = fs.`company_id` WHERE fs.id=".$id;
+        return $this->dbh->select($sql);
+    }
     //添加信息
     public function addInfo($params)
     {
         return $this->dbh->insert('gl_fleets',$params);
     }
     //修改信息
-    public function update($params, $where)
+    public function update($params, $id)
     {
-        return $this->dbh->update('gl_fleets', $params, $where );
+        return $this->dbh->update('gl_fleets',$params,'id=' . intval($id));
+    }
+    //删除
+    public function del($id)
+    {
+        return $this->dbh->delete('gl_fleets','id=' . intval($id));
     }
 
 
