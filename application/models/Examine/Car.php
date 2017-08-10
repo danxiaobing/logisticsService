@@ -25,7 +25,15 @@ class Examine_CarModel
         $where = "  ";
 
         if (isset($params['keyworks']) && $params['keyworks'] != '') {
-            $filed[] = " c.`number` LIKE '%" .trim($params['keyworks']). "%' OR d.`name` LIKE '%" .trim($params['keyworks']). "%' OR f.`name` LIKE '%" .trim($params['keyworks']). "%'";
+            $filter[] = " 
+                ( 
+                    c.`number` LIKE '%" .trim($params['keyworks']). "%' 
+                    OR d.`name` LIKE '%" .trim($params['keyworks']). "%' 
+                    OR d.`mobile` LIKE '%" .trim($params['keyworks']). "%'
+                    OR d2.`name` LIKE '%" .trim($params['keyworks']). "%'
+                    OR d2.`mobile` LIKE '%" .trim($params['keyworks']). "%'
+                    OR f.`name` LIKE '%" .trim($params['keyworks']). "%'
+                )";
         }
 
 
@@ -47,7 +55,7 @@ class Examine_CarModel
             'list' => array()
         );
 
-        $sql = "SELECT count(c.`id`)
+        $sql = "SELECT count(1)
                 FROM `gl_cars` AS c
                 LEFT JOIN `gl_companies` AS com ON com.`id` = c.`company_id`
                 LEFT JOIN `gl_fleets` AS f ON f.`id` = c.`fleets_id`
@@ -61,7 +69,13 @@ class Examine_CarModel
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
         $sql = "SELECT 
-                c.*,
+                c.`id`,
+                c.`number`,
+                c.`type`,
+                c.`vins`,
+                c.`register`,
+                c.`is_use`,
+
                 com.`company_name`,
                 f.`name` as fleets_name,
                 d.`name` as driver_name,
