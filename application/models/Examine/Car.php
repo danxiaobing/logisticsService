@@ -106,6 +106,35 @@ class Examine_CarModel
     {
         return $this->dbh->update('gl_cars', $params, $where );
     }
+    /**
+     * 数据添加
+     * @return boolean
+     * @author Tina
+     */
+    public function add($data)
+    {
+        //echo "<pre>";print_r($data);echo "</pre>";die; 
+        return $this->dbh->insert('gl_cars', $data);
+    }
 
+
+    /**
+     * 根据id获得细节
+     * id: 权限id
+     * @return 数组
+     */
+    public function getInfo($id = 0)
+    {
+        $sql = "SELECT * FROM gl_cars WHERE id=".$id;
+        return $this->dbh->select_row($sql);
+    }
+
+    /**
+     * 删除
+     */
+    public function del($id,$data){
+        $res = $this->dbh->update('gl_cars',$data,'id = ' . intval($id));
+        return $res;
+    }
 
 }
