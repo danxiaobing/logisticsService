@@ -77,6 +77,9 @@ class Examine_CarModel
                 c.`type`,
                 c.`vins`,
                 c.`register`,
+                c.`engine_number`,
+                c.`material`,
+                c.`car_position`,
                 c.`is_use`,
 
                 com.`company_name`,
