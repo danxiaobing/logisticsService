@@ -46,13 +46,12 @@ class Examine_CarModel
         if (isset($params['company_name']) && $params['company_name'] != '') {
             $filter[] = " com.`company_name` LIKE '%" . trim($params['company_name']) . "%'";
         }
-        if (isset($params['fleets_id']) && $params['fleets_id'] != '') {
-             $filter[] = " c.`fleets_id`=" . $params['fleets_id'];
+        if (isset($params['fleets_id'])) {
+             $filter[] = " c.`fleets_id`=" .  intval($params['fleets_id']);
         }
         if (count($filter) > 0) {
             $where .= implode(" AND ", $filter);
         }
-
         $result = array(
             'totalRow' => 0,
             'list' => array()
