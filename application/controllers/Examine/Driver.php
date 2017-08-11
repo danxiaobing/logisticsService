@@ -43,6 +43,12 @@ class Examine_DriverController extends Rpc {
         return $D->getInfoById($id);
     }
 
+    //删除信息
+    public function delByIdFunc($id){
+        $D = new Examine_DriverModel(Yaf_Registry::get("db"));
+        return $D->delById($id);       
+    }
+
 
     //启用功能
     public function enabledFunc($id,$param){
