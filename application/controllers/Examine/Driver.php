@@ -57,4 +57,11 @@ class Examine_DriverController extends Rpc {
     }
 
 
+    //前台司机新增
+    public function insertDataFunc($input){
+        $D = new Examine_DriverModel(Yaf_Registry::get("db"));
+        return $D->insertData($input);   
+    }
+
+
 }

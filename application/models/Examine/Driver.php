@@ -116,4 +116,48 @@ class Examine_DriverModel
     }
 
 
+    //前台司机新增
+    public function insertData($input){
+        //基本信息
+        $data = $input;
+        unset($data['driver_license']);
+        unset($data['certificate_pic']);
+        unset($data['other_pic']);
+        //事务
+        $this->dbh->begin();
+        try{
+            //gl_driver 插入基本信息
+            $id = $this->dbh->insert('gl_driver',$data);
+            if(!$id){
+                //回滚
+               $this->dbh->rollback();
+               return false;
+            }
+
+            //gl_driver_pic  插入图片信息
+            $arr = array(
+                '0' => array('cid'=>$id,'type' =>1,'path'=>$input['driver_license'],'created_at'=>'=NOW()','updated_at'=>'=NOW()'),
+                '1' => array('cid'=>$id,'type' =>2,'path'=>$input['certificate_pic'],'created_at'=>'=NOW()','updated_at'=>'=NOW()'),
+                '2' => array('cid'=>$id,'type' =>3,'path'=>$input['other_pic'],'created_at'=>'=NOW()','updated_at'=>'=NOW()'),
+            );
+            $ids = array();
+            foreach ($arr as $k => $val){
+                $ids[] = $this->dbh->insert('gl_driver_pic',$val);
+            }
+            if(!empty($ids)){
+                $this->dbh->commit();
+                return $id;
+            }else{
+                $this->dbh->rollback();
+                return false;
+            }
+
+        }catch (Exception $e) {
+            $this->dbh->rollback();
+            return false;
+        }
+    }
+
+
+
 }
