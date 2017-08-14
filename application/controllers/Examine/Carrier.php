@@ -64,4 +64,10 @@ class Examine_CarrierController extends Rpc {
         return $data;
     }
 
+    public function delFileFunc($status,$where){
+        $Carrier = new Examine_CarrierModel(Yaf_Registry::get("db"));
+        $data = $Carrier->delFile($status,$where);
+        return $data;
+    }
+
 }

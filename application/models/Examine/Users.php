@@ -102,7 +102,7 @@ class Examine_UsersModel
     public function getUser($param,$password = ''){
         $where = '';
 
-        if(strlen(is_numeric($param) >10)){
+        if(is_numeric($param) && strlen($param) >10){
             $where = ' gl_user_info.`mobile` = '.$param;
         }elseif(preg_match('/^[0-9a-zA-Z]+@(([0-9a-zA-Z]+)[.])+[a-z]{2,4}$/i',$param)){
             $where = " gl_user_info.`email` = '{$param}'";
@@ -110,18 +110,22 @@ class Examine_UsersModel
             $where = " gl_user_info.`id` = '{$param}'";
         }
 
-        if(!empty($password)){
-            $where .= ' AND gl_user_info`password` ='.$password;
+
+
+        $sql = "SELECT gl_user_info.user_name, gl_user_info.id,gl_user_info.password,gl_user_info.mobile,gl_user_info.email,gl_companies.company_code,gl_companies.id as cid,gl_companies.company_name FROM gl_user_info
+                LEFT JOIN gl_companies ON gl_companies.id = gl_user_info.cid WHERE 
+                ".$where;
+        $data =  $this->dbh->select_row($sql);
+
+        if(!empty($password)) {
+            $hash = $data['password'];
+            if (password_verify($password, $hash)) {
+                return $data;
+            } else {
+                return false;
+            }
         }
 
-        $sql = "SELECT gl_user_info.user_name,gl_user_info.mobile,gl_user_info.email,gl_companies.company_code,gl_companies.province_id,gl_companies.company_name,gl_companies.city_id,gl_companies.area_id,gl_companies.company_address,gl_companies.company_user,gl_companies.company_telephone,conf_area.area,conf_province.province,conf_city.city FROM gl_user_info
-                LEFT JOIN gl_companies ON gl_companies.id = gl_user_info.cid
-                LEFT JOIN conf_area ON conf_area.areaid = gl_companies.area_id
-                LEFT JOIN conf_province ON conf_province.provinceid = gl_companies.province_id
-                LEFT JOIN conf_city ON conf_city.cityid = gl_companies.city_id WHERE 
-                ".$where;
-
-        $data =  $this->dbh->select($sql);
         return $data;
     }
 

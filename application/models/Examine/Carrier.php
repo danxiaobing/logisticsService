@@ -89,14 +89,15 @@ class Examine_CarrierModel
         $where .= ' AND gl_companies.`is_del` = 0 ';
 
         #sql语句
-        $sql = "SELECT gl_companies.id,gl_companies.company_code,gl_companies.code,gl_companies.province_id,gl_companies.company_name,gl_companies.city_id,gl_companies.area_id,gl_companies.company_address,gl_companies.company_user,gl_companies.company_telephone,gl_companies.status,conf_area.area,conf_province.province,conf_city.city,gl_companies.business,gl_companies.products,gl_companies.danger_file,gl_companies.business_license,gl_companies.other_file FROM gl_companies 
+        $sql = "SELECT gl_companies.id,gl_companies.company_code,gl_companies.code,gl_companies.province_id,gl_companies.company_name,gl_companies.city_id,gl_companies.area_id,gl_companies.company_address,gl_companies.company_user,gl_companies.company_telephone,gl_companies.status,conf_area.area,conf_province.province,conf_city.city,gl_companies.business,gl_companies.products FROM gl_companies 
                 LEFT JOIN conf_area ON conf_area.areaid = gl_companies.area_id
                 LEFT JOIN conf_province ON conf_province.provinceid = gl_companies.province_id
                 LEFT JOIN conf_city ON conf_city.cityid = gl_companies.city_id WHERE  
                ".$where;
 
         $data =  $this->dbh->select_row($sql);
-
+        $res = $this->showfile($data['id']);
+        $data = array_merge($data, $res);
         return $data;
     }
 
@@ -108,8 +109,8 @@ class Examine_CarrierModel
      * @return bool
      */
     public function updateCarrier($params,$id){
-        $status = $params['status'];
-        $carrier = array(
+        $id = intval($id);
+        $carrier_arr = array(
             'company_name'      =>$params['company_name'],
             'province_id'       =>$params['province_id'],
             'city_id'           =>$params['city_id'],
@@ -117,21 +118,58 @@ class Examine_CarrierModel
             'company_address'   =>$params['company_address'],
             'company_user'      =>$params['company_user'],
             'company_telephone' =>$params['company_telephone'],
-            'danger_file'       =>$params['danger_file'],
-            'other_file'        =>$params['other_file'],
-            'danger_file'       =>$params['danger_file'],
             'status'            =>$params['status'],
             'business'          => $params['business'],
             'products'          => $params['products']
         );
 
+        #开启事物
+        $this->dbh->begin();
+        try{
+        #修改公司
+            $carrier = $this->dbh->update('gl_companies', $carrier_arr,'id='.$id);
+            if(empty($carrier)){
+                $this->dbh->rollback();
+                return false;
+            }
+
+            $res = $this->dbh->update('gl_companies_pic',['is_del'=>1],'cid='.$id);
+            if(empty($res)){
+                $this->dbh->rollback();
+                return false;
+            }
+
+            $pic = array(
+                0=>['path'=>$params['danger_file'],'type'=>2,'cid'=>$id,'created_at'=>'=NOW()','updated_at'=>'=NOW()'],
+                1=>['path'=>$params['business_license'],'type'=>1,'cid'=>$id,'created_at'=>'=NOW()','updated_at'=>'=NOW()']
+            ) ;
+
+            $n = 2;
+            if(1 <= count($params['other_file'])){
+                foreach ($params['other_file'] as $v){
+                    $pic[$n] = ['path'=>$v,'type'=>3,'cid'=>$id,'created_at'=>'=NOW()','updated_at'=>'=NOW()'];
+                    $n++;
+                }
+            }
+
+            $data = '';
+            foreach ($pic as $v){
+                $data = $this->dbh->insert('gl_companies_pic',$v);
+                if(!empty($data)){
+                    $this->dbh->rollback();
+                    return false;
+                }
+            }
 
 
 
-//        #修改公司
-//        $carrier = $this->dbh->update('gl_companies', $carrier,'id='.intval($id));
+            $this->dbh->commit();
+            return true;
 
-
+        } catch (Exception $e) {
+            $this->dbh->rollback();
+            return false;
+        }
 
 
 
@@ -148,9 +186,28 @@ class Examine_CarrierModel
 
 
     public function showfile($id){
-        $sql = "SELECT  danger_file,business_license,other_file FROM gl_companies WHERE id = ".intval($id);
-        $res = $this->dbh->select_row($sql);
-        return $res;
+        $sql = "SELECT  gl_companies_pic.`type`,gl_companies_pic.`path` FROM gl_companies_pic WHERE is_del = 0  AND cid = ".intval($id);
+        $res = $this->dbh->select($sql);
+        $data['danger_file'] = '';
+        $data['other_file'] = '';
+        $data['business_license'] = '';
+        if($res){
+            foreach ($res as $key=>$value){
+                if( 1 == intval($value['type'])){
+                    $data['business_license'] = $value['path'];
+                }else if( 2 == intval($value['type'])){
+                    $data['danger_file'] = $value['path'];
+                }else{
+                    $data['other_file'][$key] = $value['path'];
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    public function delFile($status,$where){
+        return $this->dbh->update('gl_companies_pic', $status, $where );
     }
 
 }
