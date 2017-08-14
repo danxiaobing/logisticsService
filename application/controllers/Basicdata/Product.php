@@ -9,7 +9,11 @@ class Basicdata_ProductController extends Rpc {
         parent::init();
         
     }
-
+    //获取所有
+    public function getByCateIdAll($id){
+      $C = new Basicdata_ProductModel(Yaf_Registry::get("db"));
+      return $C->getByCateIdAll($id);
+    }
 
     //列表信息
     public function getProductFunc($serach){
@@ -42,9 +46,9 @@ class Basicdata_ProductController extends Rpc {
    	}
 
    	//获取数据By Id
-   	public function getProductByIdFunc($id){
+   	public function getProductByCateIdFunc($id){
    		$P = new Basicdata_ProductModel(Yaf_Registry::get("db"));
-    	return $P->getProductById($id);
+    	return $P->getProductByCateId($id);
    	}
 
    	//查看MSDS证件

@@ -56,6 +56,11 @@ class Basicdata_ProductModel
         return $result;
     }
 
+    //获取所有
+    public function getProductByCateId($id){
+        $sql = " SELECT id,zh_name,en_name FROM gl_products WHERE `delete` = 0 AND  `cateid` = ".intval($id);
+        return $this->dbh->select($sql);
+    }
 
     //新增数据
     public function addProduct($input){
