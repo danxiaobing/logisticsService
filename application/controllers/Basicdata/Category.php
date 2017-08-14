@@ -10,7 +10,12 @@ class Basicdata_CategoryController extends Rpc {
         
     }
 
-
+    //获取所有
+    public function getAllFunc(){
+      $C = new Basicdata_CategoryModel(Yaf_Registry::get("db"));
+      return $C->getAll();
+    }
+    
     //列表信息
     public function getCateInfoFunc($serach){
     	$C = new Basicdata_CategoryModel(Yaf_Registry::get("db"));

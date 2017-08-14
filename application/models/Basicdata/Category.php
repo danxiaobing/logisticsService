@@ -19,6 +19,11 @@ class Basicdata_CategoryModel
         $this->dbh = $dbh;
     }
 
+    //获取所有
+    public function getAll(){
+        $sql = " SELECT id,name FROM gl_category WHERE `is_del` = 0 ";
+        return $this->dbh->select($sql);
+    }
 
     //列表详情
     public function getCateInfo($serach){
