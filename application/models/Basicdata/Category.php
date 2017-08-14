@@ -28,8 +28,8 @@ class Basicdata_CategoryModel
         }
         if(isset($serach['covered']) && $serach['covered'] != ''){
             //根据涵盖产品名 查找所属的类别id
-            // $join = ' LEFT JOIN gl_goods gd ON gc.id = gd.cateid ';
-            $str = "SELECT GROUP_CONCAT(c.id SEPARATOR ',') from (SELECT gc.id id from gl_goods gd LEFT JOIN gl_category gc ON gd.cateid=gc.id  where gd.zh_name like '%{$serach['covered']}%' GROUP BY gc.id) c";
+            // $join = ' LEFT JOIN gl_products gd ON gc.id = gd.cateid ';
+            $str = "SELECT GROUP_CONCAT(c.id SEPARATOR ',') from (SELECT gc.id id from gl_products gd LEFT JOIN gl_category gc ON gd.cateid=gc.id  where gd.zh_name like '%{$serach['covered']}%' GROUP BY gc.id) c";
             $ids = $this->dbh->select_one($str);
             if(is_null($ids)){
                 $ids = '0';
@@ -57,7 +57,7 @@ class Basicdata_CategoryModel
             $this ->dbh ->set_page_num($serach['pageCurrent']);
             $this ->dbh ->set_page_rows($serach['pageSize']); 
             //数据获取
-            $sql = " SELECT gc.id,gc.name,substring_index(GROUP_CONCAT(gd.zh_name separator ','),',',3) as collect,count(gd.cateid) total,gc.mark FROM gl_goods gd LEFT JOIN gl_category  gc ON gd.cateid=gc.id {$WHERE} GROUP BY gd.cateid "; 
+            $sql = " SELECT gc.id,gc.name,substring_index(GROUP_CONCAT(gd.zh_name separator ','),',',3) as collect,count(gd.cateid) total,gc.mark FROM gl_products gd LEFT JOIN gl_category  gc ON gd.cateid=gc.id {$WHERE} GROUP BY gd.cateid "; 
             $result['list'] = $this->dbh->select($sql);
         }
         return $result;

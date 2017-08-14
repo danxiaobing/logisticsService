@@ -39,7 +39,7 @@ class Basicdata_ProductModel
             $WHERE .= ' AND '.implode('AND', $filter);
         }
 
-        $sql = " SELECT count(*) FROM gl_goods gd LEFT JOIN gl_category gc ON gd.`cateid` = gc.`id` {$WHERE} ";
+        $sql = " SELECT count(*) FROM gl_products gd LEFT JOIN gl_category gc ON gd.`cateid` = gc.`id` {$WHERE} ";
         //获取总的记录数
         $result['totalRow'] = $this->dbh->select_one($sql);
         $result['list'] = array();
@@ -50,7 +50,7 @@ class Basicdata_ProductModel
             $this ->dbh ->set_page_num($serach['pageCurrent']);
             $this ->dbh ->set_page_rows($serach['pageSize']); 
             //数据获取
-            $sql = " SELECT gd.*,gc.`name` catename FROM gl_goods gd LEFT JOIN gl_category gc ON gd.`cateid` = gc.`id` {$WHERE} ORDER BY gd.`updated_at` DESC "; 
+            $sql = " SELECT gd.*,gc.`name` catename FROM gl_products gd LEFT JOIN gl_category gc ON gd.`cateid` = gc.`id` {$WHERE} ORDER BY gd.`updated_at` DESC "; 
             $result['list'] = $this->dbh->select($sql);
         }
         return $result;
@@ -59,18 +59,18 @@ class Basicdata_ProductModel
 
     //新增数据
     public function addProduct($input){
-        return $this->dbh->insert('gl_goods',$input);
+        return $this->dbh->insert('gl_products',$input);
     }
 
 
     //更新数据
     public function updateProduct($id,$input){
-        return $this->dbh->update('gl_goods',$input,'id='.intval($id));
+        return $this->dbh->update('gl_products',$input,'id='.intval($id));
     }
 
     //删除产品信息
     public function  deleteProduct($params,$where){
-        return $this->dbh->update('gl_goods',$params,$where);
+        return $this->dbh->update('gl_products',$params,$where);
     }
 
 
@@ -82,20 +82,20 @@ class Basicdata_ProductModel
 
     //根据id查找
     public function getProductById($id){
-        $sql = " SELECT * FROM gl_goods WHERE id= ".intval($id);
+        $sql = " SELECT * FROM gl_products WHERE id= ".intval($id);
         return $this->dbh->select_row($sql);
     }
 
 
     //查看MSDS证件
     public function getImgSrc($id){
-        $sql = " SELECT msds FROM gl_goods WHERE id= ".intval($id);
+        $sql = " SELECT msds FROM gl_products WHERE id= ".intval($id);
         return $this->dbh->select_one($sql);
     }
 
     //删除图片
     public function deleteImg($id,$params){
-        return $this->dbh->update('gl_goods',$params,'id='.intval($id));
+        return $this->dbh->update('gl_products',$params,'id='.intval($id));
     }
 
 
