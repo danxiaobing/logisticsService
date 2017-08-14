@@ -57,4 +57,52 @@ class CityModel
         return array('res'=>$data,'province'=>$province);
     }
 
+
+    /**
+     *  获取省的参数
+     */
+    public function getprovince()
+    {
+        $sql = "SELECT * FROM conf_province WHERE 1";
+        return $this->dbh->select($sql);
+    }
+
+    /**
+     * 根据ID省市区信息
+     */
+    public function getInfo($where,$table)
+    {
+        $sql = "SELECT * FROM {$table} WHERE $where";
+        $data = $this->dbh->select_row($sql);
+        return $data;
+    }
+
+    /**
+     * 根据省ID 查市
+     */
+    public function getcity($id,$table)
+    {
+        $sql = "SELECT * FROM ".$table." WHERE father=".$id;
+        return $this->dbh->select($sql);
+    }
+
+    /**
+     * 获取市的参数
+     */
+    public function getcityById($id)
+    {
+        $sql = " SELECT * FROM conf_city WHERE father=".$id;
+        $data = $this->dbh->select($sql);
+        return $data;
+    }
+
+    /**
+     * 获取县的参数
+     */
+    public function getareaById($id)
+    {
+        $sql = "SELECT * FROM  conf_area WHERE father = ".$id;
+        $data = $this->dbh->select($sql);
+        return $data;
+    }
 }
