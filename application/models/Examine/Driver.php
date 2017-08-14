@@ -158,6 +158,12 @@ class Examine_DriverModel
         }
     }
 
+    //司机图片
+    public function getDiverPic($id){
+        $sql = 'SELECT type,`path` FROM gl_driver_pic where cid='.intval($id).' AND is_del=0 ORDER BY updated_at DESC';
+        return $this->dbh->select($sql);
+    }
+
 
 
 }
