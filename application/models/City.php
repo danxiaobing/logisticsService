@@ -20,7 +20,7 @@ class CityModel
     }
 
     //省市县数据获取
-    public function getCity(){
+    public function getPlaceList(){
         //获取省
         $sql = ' SELECT provinceid,province FROM conf_province ';
         $province = $this->dbh->select($sql);

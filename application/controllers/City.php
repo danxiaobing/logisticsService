@@ -12,18 +12,11 @@ class CityController extends Rpc {
         
     }
 
-    //省市县
-    public function getCityFunc(){
+    //获取省市县json输出
+    public function getPlaceListFunc(){
       $C = new CityModel(Yaf_Registry::get("db"));
-      return $C->getCity();
+      return $C->getPlaceList();
     }
-
-    //省市县
-    public function getCityFunc(){
-      $C = new CityModel(Yaf_Registry::get("db"));
-      return $C->getCity();
-    }
-
 
     /**
      *  查找省的参数
