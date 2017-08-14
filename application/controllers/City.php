@@ -12,12 +12,6 @@ class CityController extends Rpc {
         
     }
 
-    //获取省市县json输出
-    public function getPlaceListFunc(){
-      $C = new CityModel(Yaf_Registry::get("db"));
-      return $C->getPlaceList();
-    }
-
     /**
      *  查找省的参数
      */
@@ -25,26 +19,6 @@ class CityController extends Rpc {
     {
     	$C = new CityModel(Yaf_Registry::get("db"));
         $data = $C->getprovince();
-        return $data;
-    }
-    /**
-     * 根据省的ID 查找市级别
-     */
-    public function getcityFunc($id,$table)
-    {
-    	$C = new CityModel(Yaf_Registry::get("db"));
-        if($table == 'conf_city'){
-            //查询省信息
-            $info = $C->getInfo("provinceid = $id", 'conf_province');
-            $sysno = $info['provinceid'];
-        }
-        if($table == 'conf_area'){
-            //查询市信息
-            $info = $C->getInfo("cityid = $id", 'conf_city');
-            $sysno = $info['cityid'];
-        }
-        $data = $C->getcity($sysno,$table);
-
         return $data;
     }
 
@@ -66,5 +40,11 @@ class CityController extends Rpc {
     	$C = new CityModel(Yaf_Registry::get("db"));
         $data = $C->getareaById($id);
         return $data;
+    }
+
+    //获取省市县json输出
+    public function getPlaceListFunc(){
+      $C = new CityModel(Yaf_Registry::get("db"));
+      return $C->getPlaceList();
     }
 }
