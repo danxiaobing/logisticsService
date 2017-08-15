@@ -61,6 +61,11 @@ class Basicdata_ProductModel
         $sql = " SELECT id,zh_name,en_name FROM gl_products WHERE `delete` = 0 AND  `cateid` = ".intval($id);
         return $this->dbh->select($sql);
     }
+     //获取所有品名
+    public function getProductAll(){
+        $sql = " SELECT id,zh_name,en_name FROM gl_products WHERE `delete` = 0 ";
+        return $this->dbh->select($sql);
+    }
 
     //新增数据
     public function addProduct($input){

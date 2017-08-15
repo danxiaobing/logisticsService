@@ -68,6 +68,7 @@ class Transmanage_ReturnCarModel
                        `start_weight`,
                        `end_weight`,
                        `cid`,
+                       `pid`,
                        `freight`,
                        `status`
                      FROM `gl_return_car`

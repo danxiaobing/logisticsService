@@ -14,6 +14,11 @@ class Basicdata_ProductController extends Rpc {
       $C = new Basicdata_ProductModel(Yaf_Registry::get("db"));
       return $C->getByCateIdAll($id);
     }
+     //获取所有p
+    public function getProductAllFunc(){
+      $C = new Basicdata_ProductModel(Yaf_Registry::get("db"));
+      return $C->getProductAll();
+    }
 
     //列表信息
     public function getProductFunc($serach){
