@@ -1,5 +1,6 @@
 <?php
-/**
+/*
+ *运力范围管理
  * Created by PhpStorm.
  * User: Andy
  * Date: 2016/8/14
@@ -23,7 +24,6 @@ class TransRange_TransModel
     //获取运力管理范围list
     public function getTransList($search){
         $filter = array();
-
         if(isset($search['areaname']) && $search['areaname'] != ''){
             $filter[] = " gcr.areaname like '%{$search['areaname']}%'";
         }
@@ -51,15 +51,17 @@ class TransRange_TransModel
             $this->dbh->set_page_num($search['pageCurrent']);
             $this->dbh->set_page_rows($search['pageSize']);
             //数据获取
-            $sql = "SELECT gcr.`id`,gcr.`areaname`,gcr.`user`,gcr.`mobile`,gcr.`is_black`,gcrr.`province_id` FROM gl_companies_range gcr LEFT JOIN  gl_companies_range_region gcrr ON gcrr.`r_id` = gcr.`id` {$where} order by gcr.`updated_at` DESC";
-            $res = $this->dbh->select_page($sql);
+            $sql = "SELECT gcr.`id`,gcr.`areaname`,gcr.`user`,gcr.`mobile`,gcr.`is_black`,IFNULL(gcrr.`province_id`,0) province_id FROM gl_companies_range gcr LEFT JOIN  gl_companies_range_region gcrr ON gcrr.`r_id` = gcr.`id` {$where} order by gcr.`updated_at` DESC";
+            $datas = $this->dbh->select_page($sql);
+            $res = $datas ? $datas :[];
             //获取省名
             foreach ($res as $k => $val) {
                 $sql = "SELECT GROUP_CONCAT(cp.`province`) FROM conf_province cp where cp.`provinceid` in({$val['province_id']})";
-                $res[$k]['province'] = $this->dbh->select_one($sql);
+                $data = $this->dbh->select_one($sql);
+                $res[$k]['province'] = $data ? $data:'';
             }
             $result['list'] = $res;
-            
+           
         }
         return $result;
     }
@@ -95,6 +97,46 @@ class TransRange_TransModel
             $this->dbh->rollback();
             return false;
         }
+    }
+
+
+    //获取信息 by id
+    public function getTransInfo($id){
+        $sql = 'SELECT gcr.`areaname`,gcr.`user`,gcr.`mobile`,gcr.`is_black`  FROM gl_companies_range gcr where id='.intval($id);
+        return $this->dbh->select_row($sql);
+    }
+
+    //更新运力范围
+    public function updateTrans($id,$input,$arr){
+        //事务
+        $this->dbh->begin();
+        try{
+            $res = $this->dbh->update('gl_companies_range',$input,'id='.intval($id));
+            if(!$res){
+               //回滚
+               $this->dbh->rollback();
+               return false;   
+            }
+
+            $result = $this->dbh->update('gl_companies_range_region',$arr,'r_id='.intval($id));
+            if($result){
+                $this->dbh->commit();
+                return true;
+            }else{
+                $this->dbh->rollback();
+                return false;
+            }
+
+        }catch (Exception $e) {
+            $this->dbh->rollback();
+            return false;
+        }
+
+    }
+
+    //删除操作
+    public function delTrans($id){
+        return $this->dbh->update('gl_companies_range',array('is_del' => 1),'id='.intval($id));
     }
 
 
