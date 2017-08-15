@@ -86,10 +86,15 @@ class Examine_UsersModel
      * @param array $params
      * @return boolean $data
      */
-    public function updateUser($id,$params)
+    public function updateUser($id,$params,$where ='')
     {
+        $data = false;
+        if(intval($id)){
+            $data = $this->dbh->update('gl_user_info',$params,'id =' . intval($id));
+        }elseif($where != ''){
+            $data = $this->dbh->update('gl_user_info',$params,$where);
+        }
 
-        $data = $this->dbh->update('gl_user_info',$params,'id =' . intval($id));
         return $data;
     }
 
@@ -199,5 +204,15 @@ class Examine_UsersModel
 //
 //    }
 
+
+    /**
+     * 测试 接口连通
+     */
+    public  function  getCode($mobile,$code)
+    {
+
+        $sql = "SELECT * FROM sms WHERE `mobile`=".$mobile." AND `code` =".$code;
+        return $this->dbh->select($sql);
+    }
 
 }

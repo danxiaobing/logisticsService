@@ -28,14 +28,14 @@ class Examine_UserInfoController extends Rpc
     }
 
     /**
-     * 修改承运商信息
+     * 修改用户信息
      * @param integer $id
      * @param array $params
      * @return bool
      */
-    public function updateUserInfoFunc($id,$params){
+    public function updateUserInfoFunc($id,$params,$where=''){
         $User = new Examine_UsersModel(Yaf_Registry::get("db"));
-        $data = $User->updateUser($id,$params);
+        $data = $User->updateUser($id,$params,$where);
         return $data;
     }
 
@@ -60,6 +60,15 @@ class Examine_UserInfoController extends Rpc
     public function registerPostFunc($params){
         $User = new Examine_UsersModel(Yaf_Registry::get("db"));
         $data = $User->register($params);
+        return $data;
+    }
+
+
+
+    public function getCodeFunc($mobile,$code){
+
+        $L = new Examine_UsersModel(Yaf_Registry::get("sms"));
+        $data = $L->getCode($mobile,$code);
         return $data;
     }
 

@@ -70,4 +70,16 @@ class Examine_CarrierController extends Rpc {
         return $data;
     }
 
+    public function cooperateCarrierFunc($params){
+        $Carrier = new Examine_CarrierModel(Yaf_Registry::get("db"));
+        $data = $Carrier->cooperateCarrier($params);
+        return $data;
+    }
+
+    public function addCooperateFunc($params){
+        $Carrier = new Examine_CarrierModel(Yaf_Registry::get("db"));
+        $data = $Carrier->addCooperate($params);
+        return $data;
+    }
+
 }
