@@ -34,19 +34,12 @@ class TransRange_TransModel
             }
 
             //gl_companies_range_region  插入关联信息
-            $ids = [];
-            foreach ($data as $k => $val) {
-                $arr = explode(',', $val);
-                $input1['r_id'] = $id;
-                $input1['province_id'] = $arr[0];
-                $input1['city_id'] = $arr[1];
-                $input1['area_id'] = $arr[2];
-                $input1['created_at'] = '=NOW()';
-                $input1['updated_at'] = '=NOW()';
-                $ids[] = $this->dbh->insert('gl_companies_range_region',$input1);
+            //方案一
+    
+            $data['r_id'] = $id;
+            $res =  $this->dbh->insert('gl_companies_range_region_bak',$data);
 
-            }
-            if(!empty($ids)){
+            if($res){
                 $this->dbh->commit();
                 return true;
             }else{

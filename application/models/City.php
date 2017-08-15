@@ -66,19 +66,18 @@ class CityModel
         $arr = array();
        
         $ownPid = array();
-        $ownCid ='';
-        $ownAid ='';
-        if($id){
-            //根据id获取当前省市县
-            $sql = 'SELECT GROUP_CONCAT(DISTINCT province_id) FROM gl_companies_range_region WHERE r_id='.intval($id);
-            $ownPid = $this->dbh->select_one($sql);
-            $ownPid = explode(',', $ownPid);
-            $sql = 'SELECT DISTINCT GROUP_CONCAT(DISTINCT city_id) FROM gl_companies_range_region WHERE r_id='.intval($id);
-            $ownCid = $this->dbh->select_one($sql);
+        $ownCid = array();
+        $ownAid = array();
 
-            $sql = 'SELECT DISTINCT GROUP_CONCAT(DISTINCT area_id) FROM gl_companies_range_region WHERE r_id='.intval($id);
-            $ownAid = $this->dbh->select_one($sql);
+        //方案一
+        if($id){
+            $sql = 'SELECT province_id,city_id,area_id FROM gl_companies_range_region_bak WHERE r_id='.intval($id);
+            $res = $this->dbh->select_row($sql);
+            $ownPid = explode(',', $res['province_id']);
+            $ownCid = explode(',', $res['city_id']);
+            $ownAid = explode(',', $res['area_id']);
         }
+
 
         //省循环
          foreach ($province as $k => $v) {
@@ -91,18 +90,18 @@ class CityModel
                      foreach ($area as $k2 => $v2) {
                          if($v2['xpid'] == $v1['cityid']){
                              //保存县数据
-                             if(strpos($ownAid,$v2['areaid'])){
+                             if(in_array($v2['areaid'],$ownAid)){
                                 $children3[] = array('id'=>$v2['areaid'],'name'=>$v2['area'],'checked'=>true);
                              }else{
-                                $children3[] = array('id'=>$v2['areaid'],'name'=>$v2['area']);
+                                $children3[] = array('id'=>$v2['areaid'],'name'=>$v2['area'],'checked'=>false);
                              }
                          }
                      }
                      //保存市数据
-                     if(strpos($ownCid,$v1['cityid'])){
+                     if(in_array($v1['cityid'],$ownCid)){
                         $children2[] =  array('id'=>$v1['cityid'],'name'=>$v1['city'],'isParent'=>true,'children'=>$children3,'checked'=>true);
                      }else{
-                        $children2[] =  array('id'=>$v1['cityid'],'name'=>$v1['city'],'isParent'=>true,'children'=>$children3);
+                        $children2[] =  array('id'=>$v1['cityid'],'name'=>$v1['city'],'isParent'=>true,'children'=>$children3,'checked'=>false);
                      }
                      
                  }
@@ -111,9 +110,8 @@ class CityModel
              if(in_array($v['provinceid'],$ownPid)){
                 $arr[] =  array('id'=>$v['provinceid'],'name'=>$v['province'],'isParent'=>true,'children'=>$children2,'checked'=>true);
              }else{
-                $arr[] =  array('id'=>$v['provinceid'],'name'=>$v['province'],'isParent'=>true,'children'=>$children2);
+                $arr[] =  array('id'=>$v['provinceid'],'name'=>$v['province'],'isParent'=>true,'children'=>$children2,'checked'=>falses);
              }
-             
          }
          $data = json_encode($arr,JSON_UNESCAPED_UNICODE);
         return array('res'=>$data,'province'=>$province);
