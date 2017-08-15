@@ -51,7 +51,7 @@ class Basicdata_ProductModel
             $this ->dbh ->set_page_rows($serach['pageSize']); 
             //数据获取
             $sql = " SELECT gd.*,gc.`name` catename FROM gl_products gd LEFT JOIN gl_category gc ON gd.`cateid` = gc.`id` {$WHERE} ORDER BY gd.`updated_at` DESC "; 
-            $result['list'] = $this->dbh->select($sql);
+            $result['list'] = $this->dbh->select_page($sql);
         }
         return $result;
     }

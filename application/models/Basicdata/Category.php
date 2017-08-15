@@ -63,7 +63,7 @@ class Basicdata_CategoryModel
             $this ->dbh ->set_page_rows($serach['pageSize']); 
             //数据获取
             $sql = " SELECT gc.id,gc.name,substring_index(GROUP_CONCAT(gd.zh_name separator ','),',',3) as collect,count(gd.cateid) total,gc.mark FROM gl_category  gc  LEFT JOIN gl_products gd ON gd.cateid=gc.id {$WHERE} GROUP BY gc.id "; 
-            $result['list'] = $this->dbh->select($sql);
+            $result['list'] = $this->dbh->select_page($sql);
         }
         return $result;
     }

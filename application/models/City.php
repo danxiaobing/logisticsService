@@ -71,7 +71,7 @@ class CityModel
 
         //方案一
         if($id){
-            $sql = 'SELECT province_id,city_id,area_id FROM gl_companies_range_region_bak WHERE r_id='.intval($id);
+            $sql = 'SELECT province_id,city_id,area_id FROM gl_companies_range_region WHERE r_id='.intval($id);
             $res = $this->dbh->select_row($sql);
             $ownPid = explode(',', $res['province_id']);
             $ownCid = explode(',', $res['city_id']);
