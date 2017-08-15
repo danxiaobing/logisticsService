@@ -84,13 +84,6 @@ class Examine_FleetsModel
 
         return $result;
     }
-
-    public function showfile($id)
-    {
-        $sql = "SELECT * FROM `gl_fleets` WHERE id = ".$id;
-        $res = $this->dbh->select_row($sql);
-        return $res;
-    }
    /**
     * 获取承运商列表
     * @param string $fields

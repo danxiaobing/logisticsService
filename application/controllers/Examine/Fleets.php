@@ -17,13 +17,6 @@ class Examine_FleetsController extends Rpc {
         $data = $L->getPage($params);
         return $data;
     }
-
-    public function showfileFunc($id)
-    {
-        $L = new Examine_FleetsModel(Yaf_Registry::get("db"));
-        $data = $L->showfile($id);
-        return $data;
-    }
     /**
      * 新增车队信息
      */
