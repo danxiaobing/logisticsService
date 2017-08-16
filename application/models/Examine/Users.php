@@ -162,7 +162,7 @@ class Examine_UsersModel
             'updated_at'          => '=NOW()'
         );
 
-        $carrier['company_code'] =   COMMON ::getCodeId('GY56-');
+        $carrier['company_code'] =   COMMON ::getCodeId('ZY56-');
 
         #开启事物
         $this->dbh->begin();
