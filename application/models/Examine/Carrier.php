@@ -120,7 +120,10 @@ class Examine_CarrierModel
             'company_telephone' =>$params['company_telephone'],
             'status'            =>$params['status'],
             'business'          => $params['business'],
+            'created_at'        => '=NOW()',
+            'updated_at'        => '=NOW()',
             'products'          => $params['products']
+
         );
 
         #开启事物
@@ -281,7 +284,9 @@ class Examine_CarrierModel
             'company_user'      =>$params['company_user'],
             'company_telephone' =>$params['company_telephone'],
             'status'            =>$params['status'],
-            'pid'               =>12
+            'pid'               =>12,
+            'created_at' => '=NOW()',
+            'updated_at' => '=NOW()',
         );
 
 
