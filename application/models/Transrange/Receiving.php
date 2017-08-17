@@ -62,23 +62,50 @@ class Transrange_ReceivingModel
     public function getInfo($id)
     {
         $sql = "SELECT * FROM `gl_rule`  WHERE `id` = {$id} ";
-        //print_r($sql);die;
         return $this->dbh->select_row($sql);
     }
 
     public function add($params)
     {
-        //echo "<pre>";print_r($params);echo "</pre>";die; 
-        return $this->dbh->insert('gl_rule', $params);
+        
+        $products = $params['products'];
+        unset($params['products']);
+        $res = $this->dbh->insert('gl_rule', $params);
+        if( $res ){
+            foreach ($products as $key => $value) {
+                $value['rule_id'] = $res;
+                $this->dbh->insert('gl_rule_product', $value );
+            }
+            return $res;
+        }
+        return false;
     }
 
     public function update($params, $id)
     {
-        return $this->dbh->update('gl_rule', $params, 'id=' . $id);
+        $products = $params['products'];
+        unset($params['products']);
+        $res = $this->dbh->update('gl_rule', $params, 'id ='.$id);
+        if( $res ){
+            $res = $this->dbh->update('gl_rule_product', array('is_del'=>1), 'rule_id ='.$id);
+            foreach ($products as $key => $value) {
+                $value['rule_id'] = $res;
+                $this->dbh->insert('gl_rule_product', $value );
+            }
+            return $res;
+        }
+        return false;
     }
 
     public function del($id)
     {
         return $this->dbh->delete('gl_rule','id = ' . intval($id));
     }
+
+    //获取所有
+    public function getRualProducus($id){
+        $sql = " SELECT category_id,product_id FROM gl_rule_product WHERE `is_del` = 0 AND `rule_id` = ".$id;
+        return $this->dbh->select($sql);
+    }
+    
 }
