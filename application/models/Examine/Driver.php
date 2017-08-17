@@ -171,6 +171,70 @@ class Examine_DriverModel
         }
     }
 
+    //司机编辑
+    public function updateData($input){
+        //基本信息
+        $data = $input;
+        unset($data['driver_license']);
+        unset($data['certificate_pic']);
+        unset($data['other_pic']);
+        unset($data['id']);
+        //事务
+        $this->dbh->begin();
+        try{
+            //gl_driver 更新基本信息
+            $id = $this->dbh->update('gl_driver',$data,'id='.intval($input['id']));
+
+            if(!$id){
+                //回滚
+               $this->dbh->rollback();
+               return false;
+            }
+
+            //将先前图片delete=1
+            $del = $this->dbh->update('gl_driver_pic',array('is_del' => 1),'cid='.intval($input['id']));
+            if(!$del){
+                $this->dbh->rollback();
+                return false;
+            }
+
+            //gl_driver_pic  插入图片信息
+            $arr = array();
+            if($input['driver_license'] != ''){
+                $arr[] = array('cid'=>$input['id'],'type' =>1,'path'=>$input['driver_license'],'created_at'=>'=NOW()','updated_at'=>'=NOW()');
+            }
+            if($input['certificate_pic'] != ''){
+                $arr[] =  array('cid'=>$input['id'],'type' =>2,'path'=>$input['certificate_pic'],'created_at'=>'=NOW()','updated_at'=>'=NOW()');
+            }
+            if(count($input['other_pic'])>0){
+               foreach ($input['other_pic'] as $k => $val) {
+                    if($val != ''){
+                        $arr[] = array('cid'=>$input['id'],'type' =>3,'path'=>$val,'created_at'=>'=NOW()','updated_at'=>'=NOW()');
+                    }
+                } 
+            }
+
+            //更新图片
+            $ids = array();
+            foreach ($arr as $k => $val){
+                $ids[] = $this->dbh->insert('gl_driver_pic',$val);
+            }
+
+
+            if(!empty($ids)){
+                $this->dbh->commit();
+                return $id;
+            }else{
+                $this->dbh->rollback();
+                return false;
+            }
+
+        }catch (Exception $e) {
+            $this->dbh->rollback();
+            return false;
+        }        
+    }
+
     //司机图片
     public function getDiverPic($id){
         $sql = 'SELECT type,`path` FROM gl_driver_pic where cid='.intval($id).' AND is_del=0 ORDER BY updated_at DESC';

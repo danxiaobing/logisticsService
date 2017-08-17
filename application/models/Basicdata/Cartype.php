@@ -62,6 +62,18 @@ class Basicdata_CartypeModel
     }
 
     /**
+     * 获取所有的车辆类型
+     * @return data
+     * @author Daley
+     */
+    public function getAll(){
+
+        $sql = "SELECT `id`,`name`,`load` FROM gl_cars_type WHERE `is_del`= 0";
+        $result = $this->dbh->select($sql);
+        return $result;
+
+    }
+    /**
      * 数据添加
      * @return boolean
      * @author Tina

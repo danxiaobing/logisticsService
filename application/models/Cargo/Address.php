@@ -2,7 +2,7 @@
 /**
  * User: Daley
  */
-class Cargo_UcenterModel
+class Cargo_AddressModel
 {
     public $dbh = null;
 
@@ -27,6 +27,15 @@ class Cargo_UcenterModel
         $filter = $filed = array();
         if (isset($params['type']) && $params['type'] != '') {
             $filter[] = " type = " . $params['type'];
+        }
+
+        if (isset($params['key']) && $params['key'] != '') {
+            $filter[] = "
+                (
+                    `name` LIKE '%" .trim($params['key']). "%'
+                    OR `mobile` LIKE '%" .trim($params['key']). "%'
+
+                )";
         }
         if (1 <= count($filter)) {
             $where .= ' AND ' . implode(' AND ', $filter);

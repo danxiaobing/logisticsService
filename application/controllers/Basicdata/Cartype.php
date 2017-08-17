@@ -20,6 +20,15 @@ class Basicdata_CartypeController extends Rpc {
         return $data;
     }
 
+    /**
+     * 获得所有车辆类型
+     *  @author Daley
+     */
+    public function getAllFunc(){
+        $L = new Basicdata_CartypeModel(Yaf_Registry::get("db"));
+        $data = $L->getAll();
+        return $data;
+    }
 
     /**
      * 新增
