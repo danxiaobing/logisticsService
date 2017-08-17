@@ -63,6 +63,12 @@ class Examine_DriverController extends Rpc {
         return $D->insertData($input);   
     }
 
+    //司机编辑
+    public function updateDataFunc($input){
+        $D = new Examine_DriverModel(Yaf_Registry::get("db"));
+        return $D->updateData($input);     
+    }
+
     //司机编辑图片展示
     public function getDiverPicFunc($id){
         $D = new Examine_DriverModel(Yaf_Registry::get("db"));
