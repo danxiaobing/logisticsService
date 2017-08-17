@@ -2,7 +2,7 @@
 /**
  * User: Daley
  */
-class Cargo_UcenterModel
+class Cargo_AddressModel
 {
     public $dbh = null;
 

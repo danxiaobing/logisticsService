@@ -2,12 +2,12 @@
 
 /**
  * 货主用户中心-
- * Class ucenter
+ * Class Address
  *  @author  Daley
  * @date    2017-8-4
  * @version $Id$
  */
-class Cargo_UcenterController extends Rpc {
+class Cargo_AddressController extends Rpc {
 
     public function init() {
         parent::init();
@@ -21,7 +21,7 @@ class Cargo_UcenterController extends Rpc {
     public function getListFunc($params,$uid)
     {
 
-        $L = new Cargo_UcenterModel(Yaf_Registry::get("db"));
+        $L = new Cargo_AddressModel(Yaf_Registry::get("db"));
         $data = $L->getCargoAddreslist($params,$uid);
         return $data;
     }
@@ -31,7 +31,7 @@ class Cargo_UcenterController extends Rpc {
     public function addFunc($data)
     {
         //print_r($data);die;
-        $S = new Cargo_UcenterModel(Yaf_Registry:: get("db"));
+        $S = new Cargo_AddressModel(Yaf_Registry:: get("db"));
         $list = $S->addCargoAddress($data);
         return $list;
     }
@@ -41,7 +41,7 @@ class Cargo_UcenterController extends Rpc {
      */
     public function getInfoFunc($id = 0)
     {
-        $S = new Cargo_UcenterModel(Yaf_Registry:: get("db"));
+        $S = new Cargo_AddressModel(Yaf_Registry:: get("db"));
         $data = $S->getCargoAddressInfo($id);
         return $data;
     }
@@ -51,7 +51,7 @@ class Cargo_UcenterController extends Rpc {
      */
     public function updateFunc($id = 0, $data = array())
     {
-        $L = new Cargo_UcenterModel(Yaf_Registry::get("db"));
+        $L = new Cargo_AddressModel(Yaf_Registry::get("db"));
         $data = $L->updataCargoAddress($data,$id);
         return $data;
     }
@@ -61,7 +61,7 @@ class Cargo_UcenterController extends Rpc {
      */
     public function delFunc($id = 0)
     {
-        $L = new Cargo_UcenterModel(Yaf_Registry::get("db"));
+        $L = new Cargo_AddressModel(Yaf_Registry::get("db"));
         $data = $L->deleteCargoAddress($id);
         return $data;
     }
