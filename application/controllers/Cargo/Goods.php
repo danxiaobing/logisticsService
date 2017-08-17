@@ -3,7 +3,7 @@
 /**
  * 货主--货源管理
  * Class ucenter
- *  @author  Daley
+ * @author  Daley
  * @date    2017-8-4
  * @version $Id$
  */
@@ -14,9 +14,8 @@ class Cargo_GoodsController extends Rpc {
     }
 
     /**
-     * 货源列表
+     * 列表
      * @return 数组
-     * @author Tina
      */
     public function getListFunc($params,$cid)
     {

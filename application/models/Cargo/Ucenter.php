@@ -28,6 +28,15 @@ class Cargo_UcenterModel
         if (isset($params['type']) && $params['type'] != '') {
             $filter[] = " type = " . $params['type'];
         }
+
+        if (isset($params['key']) && $params['key'] != '') {
+            $filter[] = "
+                (
+                    `name` LIKE '%" .trim($params['key']). "%'
+                    OR `mobile` LIKE '%" .trim($params['key']). "%'
+
+                )";
+        }
         if (1 <= count($filter)) {
             $where .= ' AND ' . implode(' AND ', $filter);
         }
