@@ -67,7 +67,7 @@ class Transrange_TransModel
     }
 
     //新增运力范围管理
-    public function addTrans($input,$data){
+    public function addTrans($input,$data,$black){
         //事务
         $this->dbh->begin();
         try{
@@ -79,9 +79,17 @@ class Transrange_TransModel
                return false;
             }
 
+            //gl_companies_range_black  黑名单信息
+            $black['cid'] = $id;
+            $black['updated_at'] = '=NOW()';
+            $black['created_at'] = '=NOW()';
+            $bl = $this->dbh->insert('gl_companies_range_black',$black);
+            if(!$bl){
+                $this->dbh->rollback();
+                return false;                
+            }
             //gl_companies_range_region  插入关联信息
             //方案一
-    
             $data['r_id'] = $id;
             $res =  $this->dbh->insert('gl_companies_range_region',$data);
 
@@ -107,7 +115,7 @@ class Transrange_TransModel
     }
 
     //更新运力范围
-    public function updateTrans($id,$input,$arr){
+    public function updateTrans($id,$input,$arr,$black){
         //事务
         $this->dbh->begin();
         try{
@@ -117,6 +125,15 @@ class Transrange_TransModel
                $this->dbh->rollback();
                return false;   
             }
+
+            //更新黑白名单
+            $bl = $this->dbh->update('gl_companies_range_black',$black,'cid='.intval($id));
+            if(!$bl){
+               //回滚
+               $this->dbh->rollback();
+               return false;   
+            }
+
 
             $result = $this->dbh->update('gl_companies_range_region',$arr,'r_id='.intval($id));
             if($result){

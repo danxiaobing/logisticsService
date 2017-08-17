@@ -19,9 +19,9 @@ class Transrange_TransController extends Rpc {
     }
 
     //新增运力范围管理
-    public function addTransFunc($input,$data){
+    public function addTransFunc($input,$data,$black){
         $T = new Transrange_TransModel(Yaf_Registry::get("db"));
-        return $T->addTrans($input,$data);
+        return $T->addTrans($input,$data,$black);
     }
 
     //获取信息 BY id
@@ -31,9 +31,9 @@ class Transrange_TransController extends Rpc {
     }
 
     //更新运力范围管理
-    public function updateTransFunc($id,$input,$arr){
+    public function updateTransFunc($id,$input,$arr,$black){
     	$T = new Transrange_TransModel(Yaf_Registry::get("db"));
-        return $T->updateTrans($id,$input,$arr);  
+        return $T->updateTrans($id,$input,$arr,$black);  
     }
 
 
