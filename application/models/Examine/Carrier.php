@@ -284,7 +284,7 @@ class Examine_CarrierModel
             'company_user'      =>$params['company_user'],
             'company_telephone' =>$params['company_telephone'],
             'status'            =>$params['status'],
-            'pid'               =>12,
+            'pid'               =>$params['pid'],
             'created_at' => '=NOW()',
             'updated_at' => '=NOW()',
         );
