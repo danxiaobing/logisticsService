@@ -87,7 +87,7 @@ class Transrange_ReceivingModel
         unset($params['products']);
         $res = $this->dbh->update('gl_rule', $params, 'id ='.$id);
         if( $res ){
-            $res = $this->dbh->update('gl_rule_product', array('is_del'=>1), 'rule_id ='.$id);
+            $this->dbh->update('gl_rule_product', array('is_del'=>1), 'rule_id ='.$id);
             foreach ($products as $key => $value) {
                 $value['rule_id'] = $res;
                 $this->dbh->insert('gl_rule_product', $value );
