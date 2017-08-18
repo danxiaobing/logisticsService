@@ -33,9 +33,9 @@ class Transmanage_ReturnCarModel
         if (isset($params['status']) && $params['status'] != '') {
             $filter[] = " `status`=" . $params['status'];
         }
-        if (isset($params['company_id']) && $params['company_id'] != '') {
+        if (isset($params['cid']) && $params['cid'] != '') {
 
-            $filter[] = " `company_id`=" . $params['company_id'];
+            $filter[] = " `cid`=" . $params['cid'];
         }
         if (count($filter) > 0) {
             $where .= implode(" AND ", $filter);
@@ -56,20 +56,20 @@ class Transmanage_ReturnCarModel
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
         $sql = "SELECT `id`,
-                       `start_pid`,
-                       `start_cid`,
-                       `start_aid`,
-                       `goal_pid`,
-                       `goal_cid`,
-                       `goal_aid`,
+                       `start_provice_id`,
+                       `start_city_id`,
+                       `start_area_id`,
+                       `end_provice_id`,
+                       `end_city_id`,
+                       `end_area_id`,
                        `start_time`,
                        `end_time`,
-                       `freight_type`,
-                       `start_weight`,
-                       `end_weight`,
-                       `cid`,
-                       `pid`,
-                       `freight`,
+                       `price_type`,
+                       `min_load`,
+                       `max_load`,
+                       `category_id`,
+                       `product_id`,
+                       `price`,
                        `status`
                      FROM `gl_return_car`
                      {$where}
