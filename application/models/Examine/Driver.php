@@ -49,7 +49,7 @@ class Examine_DriverModel
             $filter[] = " gd.company_id = {$serach['companyid']} ";
         }
 
-        $WHERE = " WHERE gd.isdelete = 0 ";
+        $WHERE = " WHERE gd.isdelete = 0 AND gd.status <> 2";
        
         if(count($filter) > 0){
             $WHERE .= ' AND '.implode('AND', $filter);
