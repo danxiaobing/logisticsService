@@ -156,5 +156,11 @@ class Transrange_TransModel
         return $this->dbh->update('gl_companies_range',array('is_del' => 1),'id='.intval($id));
     }
 
+    //获取黑白名单
+    public function getBlacklist($id){
+        $sql = "SELECT blist  FROM gl_companies_range_black WHERE cid=".intval($id);
+        return $this->dbh->select_one($sql);
+    }
+
 
 }

@@ -42,5 +42,12 @@ class Transrange_TransController extends Rpc {
         $T = new Transrange_TransModel(Yaf_Registry::get("db"));
         return $T->delTrans($id);
     }
+
+
+    //获取黑白名单
+    public function getBlackListFunc($id){
+        $T = new Transrange_TransModel(Yaf_Registry::get("db"));
+        return $T->getBlacklist($id);        
+    }
 }
 
