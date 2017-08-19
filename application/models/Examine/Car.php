@@ -105,7 +105,7 @@ class Examine_CarModel
     public function getPageList($params){
         $filed = array();
         $filter_r[] = " WHERE r.`is_del` = 0";//回程车
-        $filter_z[] = " WHERE z.`is_del` = 0 AND z.`set_line` = 2 ";//专线车
+        $filter_z[] = " WHERE z.`is_del` = 0 AND z.`set_line` = 1 ";//专线车
         $where_r = "  ";
         $where_z = "  ";
 
