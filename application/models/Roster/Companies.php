@@ -7,7 +7,7 @@
  * @date    2016-08-08
  * @version $Id$
  */
-class CompaniesModel
+class Roster_CompaniesModel
 {
     public $dbh = null;
 
@@ -39,11 +39,9 @@ class CompaniesModel
     /**
      * 获取合作承运商
      */
-    public function getCompanysIDFunc($id = 0)
-    {
-        $L = new Examine_CarModel(Yaf_Registry::get("db"));
-        $data = $L->getCompanysID($id);
-        return $data;
+    public function getCompanys($id){
+        $sql = "SELECT id,company_name FROM `gl_companies` WHERE `is_del` = 0  AND  `pid` = {$id} ";
+        return $this->dbh->select($sql);
     }
 
 

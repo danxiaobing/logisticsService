@@ -25,10 +25,10 @@ class Examine_CarController extends Rpc {
         return $data;
     }
 
-    public function updateFunc($params,$where)
+    public function updateFunc($params,$id)
     {
         $L = new Examine_CarModel(Yaf_Registry::get("db"));
-        $data = $L->update($params,$where);
+        $data = $L->update($params,$id);
         return $data;
     }
 

@@ -100,28 +100,40 @@ class Examine_CarModel
         return $result;
     }
 
-    public function showfile($id)
+    public function add($params)
     {
-        $sql = "SELECT * FROM `gl_cars` WHERE id = ".$id;
-        $res = $this->dbh->select_row($sql);
-        return $res;
+        
+        $file = $params['file'];
+        unset($params['file']);
+
+        $res = $this->dbh->insert('gl_cars', $params);
+        //echo "<pre>";print_r($res);echo "</pre>";die; 
+        if( $res ){
+            foreach ($file as $key => $value) {
+                $value['cars_id'] = $res;
+                $this->dbh->insert('gl_cars_pic', $value );
+            }
+            return $res;
+        }
+        return false;
     }
 
-    public function update($params, $where)
+    public function update($params, $id)
     {
-        return $this->dbh->update('gl_cars', $params, $where );
-    }
-    /**
-     * 数据添加
-     * @return boolean
-     * @author Tina
-     */
-    public function add($data)
-    {
-        //echo "<pre>";print_r($data);echo "</pre>";die; 
-        return $this->dbh->insert('gl_cars', $data);
-    }
+        $file = $params['file'];
+        unset($params['file']);
 
+        $res = $this->dbh->update('gl_cars', $params, 'id ='.$id);
+        if( $res ){
+            $re = $this->dbh->update('gl_cars_pic', array('is_del'=>1), 'cars_id ='.$id);
+            foreach ($file as $key => $value) {
+                $value['cars_id'] = $id;
+                $this->dbh->insert('gl_cars_pic', $value );
+            }
+            return $res;
+        }
+        return false;
+    }
 
     /**
      * 根据id获得细节
