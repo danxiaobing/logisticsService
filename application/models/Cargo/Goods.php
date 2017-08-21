@@ -24,7 +24,12 @@ class Cargo_GoodsModel
         $order = "updated_at";
 
         if (isset($params['order']) && $params['order'] != '') {
-            $order = $params['order'];
+            if($params['order'] == 'o_s'){
+                $order = 'off_starttime';
+            }
+            if($params['order'] == 'r_s'){
+                $order = 'reach_starttime';
+            }
         }
         if (isset($params['cid']) && $params['cid'] != '') {
             $filter[] = " cid = " . $params['cid'];
