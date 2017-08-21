@@ -17,11 +17,11 @@ class Cargo_GoodsController extends Rpc {
      * 列表
      * @return 数组
      */
-    public function getListFunc($params,$cid)
+    public function getListFunc($params)
     {
 
         $L = new Cargo_GoodsModel(Yaf_Registry::get("db"));
-        $data = $L->getlist($params,$cid);
+        $data = $L->getList($params);
         return $data;
     }
     /**
