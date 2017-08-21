@@ -64,7 +64,7 @@ class Examine_CarModel
                 LEFT JOIN `gl_driver` AS d ON d.`id` = c.`driver_id`
                 LEFT JOIN `gl_driver` AS d2 ON d2.`id` = c.`escort_id`
                 {$where}";
-
+        //
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
@@ -80,6 +80,7 @@ class Examine_CarModel
                 c.`material`,
                 c.`car_position`,
                 c.`is_use`,
+
                 com.`company_name`,
                 f.`name` as fleets_name,
                 d.`name` as driver_name,
@@ -93,17 +94,70 @@ class Examine_CarModel
                 LEFT JOIN `gl_driver` AS d2 ON d2.`id` = c.`escort_id`
                 {$where} 
                 ORDER BY c.`updated_at` DESC";
+        //print_r($sql);die;
         $result['list'] = $this->dbh->select_page($sql);
+        //print_r($result);die;
         return $result;
     }
 
-<<<<<<< HEAD
     public function add($params)
-=======
+    {
+        
+        $file = $params['file'];
+        unset($params['file']);
+
+        $res = $this->dbh->insert('gl_cars', $params);
+        //echo "<pre>";print_r($res);echo "</pre>";die; 
+        if( $res ){
+            foreach ($file as $key => $value) {
+                $value['cars_id'] = $res;
+                $this->dbh->insert('gl_cars_pic', $value );
+            }
+            return $res;
+        }
+        return false;
+    }
+
+    public function update($params, $id)
+    {
+        $file = $params['file'];
+        unset($params['file']);
+
+        $res = $this->dbh->update('gl_cars', $params, 'id ='.$id);
+        if( $res ){
+            $re = $this->dbh->update('gl_cars_pic', array('is_del'=>1), 'cars_id ='.$id);
+            foreach ($file as $key => $value) {
+                $value['cars_id'] = $id;
+                $this->dbh->insert('gl_cars_pic', $value );
+            }
+            return $res;
+        }
+        return false;
+    }
+
+    /**
+     * 根据id获得细节
+     * id: 权限id
+     * @return 数组
+     */
+    public function getInfo($id = 0)
+    {
+        $sql = "SELECT * FROM gl_cars WHERE id=".$id;
+        return $this->dbh->select_row($sql);
+    }
+
+    /**
+     * 删除
+     */
+    public function del($id,$data){
+        $res = $this->dbh->update('gl_cars',$data,'id = ' . intval($id));
+        return $res;
+    }
+
     /**
      * 查询专线车-回程车
      */
-    public function getPageList($params){
+    public function getBackAndLineCarPage($params){
         $filed = array();
         $filter_r[] = " WHERE r.`is_del` = 0";//回程车
         $filter_z[] = " WHERE z.`is_del` = 0 AND z.`set_line` = 1 ";//专线车
@@ -196,64 +250,5 @@ class Examine_CarModel
         $result['list'] = $this->dbh->select_page($sql);
         return $result;
     }
-    public function showfile($id)
->>>>>>> ba035705fe3188c7cd10f89a3fc9e90e194f8ac3
-    {
-        
-        $file = $params['file'];
-        unset($params['file']);
-
-        $res = $this->dbh->insert('gl_cars', $params);
-        //echo "<pre>";print_r($res);echo "</pre>";die; 
-        if( $res ){
-            foreach ($file as $key => $value) {
-                $value['cars_id'] = $res;
-                $this->dbh->insert('gl_cars_pic', $value );
-            }
-            return $res;
-        }
-        return false;
-    }
-
-    public function update($params, $id)
-    {
-<<<<<<< HEAD
-        $file = $params['file'];
-        unset($params['file']);
-
-        $res = $this->dbh->update('gl_cars', $params, 'id ='.$id);
-        if( $res ){
-            $re = $this->dbh->update('gl_cars_pic', array('is_del'=>1), 'cars_id ='.$id);
-            foreach ($file as $key => $value) {
-                $value['cars_id'] = $id;
-                $this->dbh->insert('gl_cars_pic', $value );
-            }
-            return $res;
-        }
-        return false;
-=======
-        return $this->dbh->insert('gl_cars', $data);
->>>>>>> ba035705fe3188c7cd10f89a3fc9e90e194f8ac3
-    }
-
-    /**
-     * 根据id获得细节
-     * id: 权限id
-     * @return 数组
-     */
-    public function getInfo($id = 0)
-    {
-        $sql = "SELECT * FROM gl_cars WHERE id=".$id;
-        return $this->dbh->select_row($sql);
-    }
-
-    /**
-     * 删除
-     */
-    public function del($id,$data){
-        $res = $this->dbh->update('gl_cars',$data,'id = ' . intval($id));
-        return $res;
-    }
-
 
 }
