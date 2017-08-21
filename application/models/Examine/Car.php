@@ -64,7 +64,7 @@ class Examine_CarModel
                 LEFT JOIN `gl_driver` AS d ON d.`id` = c.`driver_id`
                 LEFT JOIN `gl_driver` AS d2 ON d2.`id` = c.`escort_id`
                 {$where}";
-        //
+
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
@@ -93,9 +93,7 @@ class Examine_CarModel
                 LEFT JOIN `gl_driver` AS d2 ON d2.`id` = c.`escort_id`
                 {$where} 
                 ORDER BY c.`updated_at` DESC";
-        //print_r($sql);die;
         $result['list'] = $this->dbh->select_page($sql);
-        //print_r($result);die;
         return $result;
     }
 
@@ -178,44 +176,20 @@ class Examine_CarModel
                 UNION
                 SELECT p.id FROM gl_rule AS z  RIGHT JOIN gl_rule_product AS p ON p.rule_id = z.id{$where_z}) AS tt";
 
-      //  print_r( $sql);die;
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
-        $sql = "SELECT
-                 z.id,
-                 z.cid,
-                 z.car_type,
-                 z.price_type,
-                 z.price,
-                 z.min_load,
-                 z.max_load,
-                 z.loss,
-                 p.product_id,
-                 1 AS ctype,
-                 com.company_name
+        $sql = "SELECT z.id,z.cid,z.car_type,z.price_type,z.price,z.min_load,z.max_load,z.loss,p.product_id,1 AS ctype,com.company_name
                  FROM gl_rule AS z
                  RIGHT JOIN gl_rule_product AS p ON p.rule_id = z.id
                  LEFT JOIN gl_companies AS com ON com.id = z.cid {$where_z}
                 UNION
-                 SELECT
-                 r.id,
-                 r.cid,
-                 0 AS car_type,
-                 r.price_type,
-                 r.price,
-                 r.min_load,
-                 r.max_load,
-                 3 AS loss,
-                 r.product_id,
-                 2 AS ctype,
-                 com.company_name
+                 SELECT r.id,r.cid,0 AS car_type,r.price_type,r.price,r.min_load,r.max_load,3 AS loss,r.product_id,2 AS ctype,com.company_name
                  FROM gl_return_car AS r
                 LEFT JOIN gl_companies AS com ON com.id = r.cid {$where_r}
                 ORDER BY id DESC ";
-       //print_r( $sql);die;
         $result['list'] = $this->dbh->select_page($sql);
         return $result;
     }
@@ -237,7 +211,6 @@ class Examine_CarModel
      */
     public function add($data)
     {
-        //echo "<pre>";print_r($data);echo "</pre>";die; 
         return $this->dbh->insert('gl_cars', $data);
     }
 
