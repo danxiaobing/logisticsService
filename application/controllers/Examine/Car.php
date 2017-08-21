@@ -18,6 +18,19 @@ class Examine_CarController extends Rpc {
         return $data;
     }
 
+    /**
+     * 回程车-专线车查询
+     * @param $params
+     * @author daley
+     * @return array
+     */
+    public function getPageListFunc($params)
+    {
+        $L = new Examine_CarModel(Yaf_Registry::get("db"));
+        $data = $L->getPageList($params);
+        return $data;
+    }
+
     public function showfileFunc($id)
     {
         $L = new Examine_CarModel(Yaf_Registry::get("db"));

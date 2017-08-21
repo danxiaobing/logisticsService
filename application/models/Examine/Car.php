@@ -64,7 +64,7 @@ class Examine_CarModel
                 LEFT JOIN `gl_driver` AS d ON d.`id` = c.`driver_id`
                 LEFT JOIN `gl_driver` AS d2 ON d2.`id` = c.`escort_id`
                 {$where}";
-        //
+
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
@@ -80,7 +80,6 @@ class Examine_CarModel
                 c.`material`,
                 c.`car_position`,
                 c.`is_use`,
-
                 com.`company_name`,
                 f.`name` as fleets_name,
                 d.`name` as driver_name,
@@ -94,13 +93,111 @@ class Examine_CarModel
                 LEFT JOIN `gl_driver` AS d2 ON d2.`id` = c.`escort_id`
                 {$where} 
                 ORDER BY c.`updated_at` DESC";
-        //print_r($sql);die;
         $result['list'] = $this->dbh->select_page($sql);
-        //print_r($result);die;
         return $result;
     }
 
+<<<<<<< HEAD
     public function add($params)
+=======
+    /**
+     * 查询专线车-回程车
+     */
+    public function getPageList($params){
+        $filed = array();
+        $filter_r[] = " WHERE r.`is_del` = 0";//回程车
+        $filter_z[] = " WHERE z.`is_del` = 0 AND z.`set_line` = 1 ";//专线车
+        $where_r = "  ";
+        $where_z = "  ";
+
+        //筛选承运商
+        if (isset($params['cid']) && $params['cid'] != '') {
+            $filter_r[] = " r.`cid` = " . intval($params['cid']);
+            $filter_z[] = " z.`cid` = " . intval($params['cid']);
+        }
+        //筛选起始省份
+        if (isset($params['start_provice_id']) && !empty($params['start_provice_id'])) {
+            $filter_r[] = " r.`start_provice_id` = " . intval($params['start_provice_id']);
+            $filter_z[] = " z.`start_provice_id` = " . intval($params['start_provice_id']);
+        }
+        //筛选起始城市
+        if (isset($params['start_city_id']) && !empty($params['start_city_id'])) {
+            $filter_r[] = " r.`start_city_id` = " . intval($params['start_city_id']);
+            $filter_z[] = " z.`start_city_id` = " . intval($params['start_city_id']);
+        }
+        //筛选起始地区
+        if (isset($params['start_area_id']) && !empty($params['start_area_id'])) {
+            $filter_r[] = " r.`start_area_id` = " . intval($params['start_area_id']);
+            $filter_z[] = " z.`start_area_id` = " . intval($params['start_area_id']);
+        }
+        //筛选目的省份
+        if (isset($params['end_provice_id']) && $params['end_provice_id'] != '') {
+            $filter_r[] = " r.`end_provice_id` = " . intval($params['end_provice_id']);
+            $filter_z[] = " z.`end_provice_id` = " . intval($params['end_provice_id']);
+        }
+        //筛选目的城市
+        if (isset($params['end_city_id']) && $params['end_city_id'] != '') {
+            $filter_r[] = " r.`end_city_id` = " . intval($params['end_city_id']);
+            $filter_z[] = " z.`end_city_id` = " . intval($params['end_city_id']);
+        }
+        //筛选目的地区
+        if (isset($params['end_area_id']) && $params['end_area_id'] != '') {
+            $filter_r[] = " r.`end_area_id` = " . intval($params['end_area_id']);
+            $filter_z[] = " z.`end_area_id` = " . intval($params['end_area_id']);
+        }
+          //筛选分类
+        if (isset($params['category_id']) && !empty($params['category_id'])) {
+            $filter_r[] = " r.`category_id` = " . intval($params['category_id']);
+            $filter_z[] = " p.`category_id` = " . intval($params['category_id']);
+        }
+           //筛选产品
+        if (isset($params['product_id']) && !empty($params['product_id'])) {
+            $filter_r[] = " r.`product_id` = " . intval($params['product_id']);
+            $filter_z[] = " p.`product_id` = " . intval($params['product_id']);
+        }
+         //筛选开始时间
+        if (isset($params['starttime']) && $params['starttime'] != '') {
+            $filter_r[] = " r.`start_time` >= '{$params['starttime']}'";
+        }
+        //筛选结束时间
+        if (isset($params['endtime']) && $params['endtime'] != '') {
+            $filter_r[] = " r.`end_time` <= '{$params['endtime']}'";
+        }
+
+        if (count($filter_r) > 0) {
+            $where_r .= implode(" AND ", $filter_r);
+        }
+        if (count($filter_z) > 0) {
+            $where_z .= implode(" AND ", $filter_z);
+        }
+        $result = array(
+            'totalRow' => 0,
+            'list' => array()
+        );
+
+        $sql = "SELECT COUNT(*) FROM(SELECT r.id FROM gl_return_car AS r {$where_r}
+                UNION
+                SELECT p.id FROM gl_rule AS z  RIGHT JOIN gl_rule_product AS p ON p.rule_id = z.id{$where_z}) AS tt";
+
+        $result['totalRow'] = $this->dbh->select_one($sql);
+
+        $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
+        $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
+
+        $sql = "SELECT z.id,z.cid,z.car_type,z.price_type,z.price,z.min_load,z.max_load,z.loss,p.product_id,1 AS ctype,com.company_name
+                 FROM gl_rule AS z
+                 RIGHT JOIN gl_rule_product AS p ON p.rule_id = z.id
+                 LEFT JOIN gl_companies AS com ON com.id = z.cid {$where_z}
+                UNION
+                 SELECT r.id,r.cid,0 AS car_type,r.price_type,r.price,r.min_load,r.max_load,3 AS loss,r.product_id,2 AS ctype,com.company_name
+                 FROM gl_return_car AS r
+                LEFT JOIN gl_companies AS com ON com.id = r.cid {$where_r}
+                ORDER BY id DESC ";
+        $result['list'] = $this->dbh->select_page($sql);
+        return $result;
+    }
+    public function showfile($id)
+>>>>>>> ba035705fe3188c7cd10f89a3fc9e90e194f8ac3
     {
         
         $file = $params['file'];
@@ -120,6 +217,7 @@ class Examine_CarModel
 
     public function update($params, $id)
     {
+<<<<<<< HEAD
         $file = $params['file'];
         unset($params['file']);
 
@@ -133,6 +231,9 @@ class Examine_CarModel
             return $res;
         }
         return false;
+=======
+        return $this->dbh->insert('gl_cars', $data);
+>>>>>>> ba035705fe3188c7cd10f89a3fc9e90e194f8ac3
     }
 
     /**
