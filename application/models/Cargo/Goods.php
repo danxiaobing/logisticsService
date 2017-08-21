@@ -53,8 +53,8 @@ class Cargo_GoodsModel
 
         $sql = "SELECT
                id,
-               start_pid,
-               end_pid,
+               start_provice_id,
+               end_provice_id,
                cate_id,
                product_id,
                weights,
@@ -67,6 +67,7 @@ class Cargo_GoodsModel
                status
                FROM gl_goods " . $where . "   ORDER BY `{$order}` DESC";
         $result['list'] = $this->dbh->select_page($sql);
+      //  print_r($sql);die;
         return $result;
     }
     /**
@@ -78,8 +79,8 @@ class Cargo_GoodsModel
     {
         $sql = "SELECT
                id,
-               start_pid,
-               end_pid,
+               start_provice_id,
+               end_provice_id,
                cate_id,
                product_id,
                weights,
