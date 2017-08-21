@@ -89,7 +89,7 @@ class Examine_FleetsModel
     {
         $ids = implode(',', $company_ids);
         $sql = "SELECT id,name FROM `gl_fleets`  WHERE `company_id` in ( {$ids} )";
-        return $this->dbh->select_row($sql);
+        return $this->dbh->select($sql);
     }
 
    /**
