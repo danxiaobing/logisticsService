@@ -73,6 +73,19 @@ class Examine_DriverModel
         return $result;
 
     }
+    public function getAllDriver($company_ids)
+    {
+        $ids = implode(',', $company_ids);
+        $sql = "SELECT id,name FROM `gl_driver`  WHERE `type` in (1,3) AND `company_id` in ( {$ids} )";
+        return $this->dbh->select_row($sql);
+    }
+
+    public function getAllEscort($company_ids)
+    {
+        $ids = implode(',', $company_ids);
+        $sql = "SELECT id,name FROM `gl_driver`  WHERE `type` in (2,3) AND `company_id` in ( {$ids} )";
+        return $this->dbh->select_row($sql);
+    }
 
     //更新状态
     public function updateStatus($status,$where){

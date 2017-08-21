@@ -84,6 +84,14 @@ class Examine_FleetsModel
 
         return $result;
     }
+    
+    public function getAllFleets($company_ids)
+    {
+        $ids = implode(',', $company_ids);
+        $sql = "SELECT id,name FROM `gl_fleets`  WHERE `company_id` in ( {$ids} )";
+        return $this->dbh->select_row($sql);
+    }
+
    /**
     * 获取承运商列表
     * @param string $fields
@@ -117,6 +125,4 @@ class Examine_FleetsModel
     {
         return $this->dbh->delete('gl_fleets','id=' . intval($id));
     }
-
-
 }
