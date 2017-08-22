@@ -137,7 +137,7 @@ class Cargo_GoodsModel
      */
     public function searchGoods($params){
         $filter = array();
-        $where = 'is_del = 0 AND status = 1 AND ';
+        $where = 'is_del = 0 AND status = 1 ';
 
         if (isset($params['start_provice_id']) && $params['start_provice_id'] != '') {
             $filter[] = " gl_goods.`start_provice_id` =".$params['start_provice_id'];
@@ -186,9 +186,9 @@ class Cargo_GoodsModel
         }
 
         if (count($filter) > 0) {
-            $where .= implode(" AND ", $filter);
+            $where .= ' AND '.implode(" AND ", $filter);
         }
-        
+
         $sql = "SELECT count(1) FROM gl_goods  WHERE {$where}";
 
         $result['totalRow'] = $this->dbh->select_one($sql);
@@ -199,7 +199,11 @@ class Cargo_GoodsModel
         $sql = "SELECT 
                gl_goods.id,
                gl_goods.start_provice_id,
+               gl_goods.start_city_id,
+               gl_goods.start_area_id,
                gl_goods.end_provice_id,
+               gl_goods.end_city_id,
+               gl_goods.end_area_id,
                gl_goods.cate_id,
                gl_goods.product_id,
                gl_goods.weights,
@@ -228,8 +232,60 @@ class Cargo_GoodsModel
                 ORDER BY id DESC 
                 ";
 
-        $result['list'] = $this->dbh->select_page($sql);
+        $data = $this->dbh->select_page($sql);
+        $result['list'] = $this->city($data);
         return $result;
+    }
+
+    private function city($data){
+        $provice = '';
+        $city = '';
+        $area = '';
+
+
+        foreach ($data as $value){
+            if (strpos($provice, $value['start_provice_id']) === false) {
+                $provice .=  "'".$value['start_provice_id']."',";
+            }
+            if (strpos($provice, $value['end_provice_id']) === false) {
+                $provice .=  "'".$value['end_provice_id']."',";
+            }
+            if (strpos($provice, $value['end_city_id']) === false) {
+                $city .=  "'".$value['end_city_id']."',";
+            }
+            if (strpos($provice, $value['start_city_id']) === false) {
+                $city .=  "'".$value['start_city_id']."',";
+            }
+            if (strpos($provice, $value['start_area_id']) === false) {
+                $area .=  "'".$value['start_area_id']."',";
+            }
+            if (strpos($provice, $value['end_area_id']) === false) {
+                $area .=  "'".$value['end_area_id']."',";
+            }
+        }
+
+        $provice = substr($provice,0,strlen($provice)-1);
+        $city    = substr($city,0,strlen($city)-1);
+        $area    = substr($area,0,strlen($area)-1);
+
+        $proviceSql = "SELECT provinceid,province FROM conf_province WHERE provinceid in ({$provice})";
+        $citySql = "SELECT cityid,city FROM conf_city WHERE cityid in ({$city})";
+        $areaSql = "SELECT areaid,area FROM conf_area WHERE areaid in ({$area})";
+
+        $proviceArr = array_column($this->dbh->select($proviceSql),'province','provinceid');
+        $cityArr = array_column($this->dbh->select($citySql),'city','cityid');
+        $areaArr = array_column($this->dbh->select($areaSql),'area','areaid');
+
+        foreach ($data as $key=>$value){
+            $data[$key]['start_provice'] = $proviceArr[$value['start_provice_id']];
+            $data[$key]['end_provice'] = $proviceArr[$value['end_provice_id']];
+            $data[$key]['start_city'] = $cityArr[$value['start_city_id']];
+            $data[$key]['end_city'] = $cityArr[$value['end_city_id']];
+            $data[$key]['start_area'] = $areaArr[$value['start_area_id']];
+            $data[$key]['end_area'] = $areaArr[$value['end_area_id']];
+        }
+
+        return $data;
     }
 
 }
