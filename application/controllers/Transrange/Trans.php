@@ -13,9 +13,9 @@ class Transrange_TransController extends Rpc {
     }
 
     //获取运力范围管理list
-    public function getTransListFunc($search){
+    public function getTransListFunc($search,$id){
     	$T = new Transrange_TransModel(Yaf_Registry::get("db"));
-        return $T->getTransList($search);
+        return $T->getTransList($search,$id);
     }
 
     //新增运力范围管理

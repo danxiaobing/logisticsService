@@ -22,7 +22,7 @@ class Transrange_TransModel
 
 
     //获取运力管理范围list
-    public function getTransList($search){
+    public function getTransList($search,$id){
         $filter = array();
         if(isset($search['areaname']) && $search['areaname'] != ''){
             $filter[] = " gcr.areaname like '%{$search['areaname']}%'";
@@ -36,10 +36,15 @@ class Transrange_TransModel
             $filter[] = " gcr.user ='{$search['mobile']}' "; 
         }
 
-        $where = 'where gcr.`is_del` = 0';
+        //获取合作承运商公司id
+        $sql = "SELECT GROUP_CONCAT(gc.id) FROM gl_companies  gc WHERE id = {$id} or pid= {$id}";
+        $ids = $this->dbh->select_one($sql);
+
+        $where = "where gcr.`is_del` = 0 AND gcr.cid in({$ids})";
         if(count($filter)>0){
             $where .= ' AND '.implode(' AND ',$filter);
         }
+
 
         $sql = "SELECT COUNT(1) FROM gl_companies_range gcr {$where}";
         $result['totalRow'] = $this->dbh->select_one($sql);
