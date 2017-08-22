@@ -189,6 +189,7 @@ class Cargo_GoodsModel
             $where .= ' AND '.implode(" AND ", $filter);
         }
 
+
         $sql = "SELECT count(1) FROM gl_goods  WHERE {$where}";
 
         $result['totalRow'] = $this->dbh->select_one($sql);
@@ -232,8 +233,12 @@ class Cargo_GoodsModel
                 ORDER BY id DESC 
                 ";
 
+
         $data = $this->dbh->select_page($sql);
-        $result['list'] = $this->city($data);
+        if(!empty($data)){
+            $result['list'] = $this->city($data);
+        }
+
         return $result;
     }
 
