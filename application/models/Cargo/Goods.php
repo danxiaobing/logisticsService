@@ -137,7 +137,7 @@ class Cargo_GoodsModel
      */
     public function searchGoods($params){
         $filter = array();
-        $where = 'is_del = 0 AND status = 1';
+        $where = 'is_del = 0 AND status = 1 AND ';
 
         if (isset($params['start_provice_id']) && $params['start_provice_id'] != '') {
             $filter[] = " gl_goods.`start_provice_id` =".$params['start_provice_id'];
@@ -181,14 +181,14 @@ class Cargo_GoodsModel
         }
 
         if (isset($params['product_id']) && $params['product_id'] != '') {
-            $filter[] = "gl_goods.`product_id` in('{$params['product_id']}')";
+            $product = implode(',',$params['product_id']);
+            $filter[] = "gl_goods.`product_id` in({$product})";
         }
 
         if (count($filter) > 0) {
             $where .= implode(" AND ", $filter);
         }
-
-
+        
         $sql = "SELECT count(1) FROM gl_goods  WHERE {$where}";
 
         $result['totalRow'] = $this->dbh->select_one($sql);
@@ -220,8 +220,10 @@ class Cargo_GoodsModel
                gl_goods.consign_user,
                gl_goods.consign_phone,
                gl_goods.desc_str,
-               gl_goods.status
+               gl_goods.status,
+               gl_products.zh_name
                 FROM gl_goods 
+                LEFT JOIN gl_products ON gl_products.id = gl_goods.product_id
                 WHERE  {$where}
                 ORDER BY id DESC 
                 ";
