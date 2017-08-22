@@ -20,7 +20,7 @@ class Examine_DriverModel
     }
 
     //获取司机审核列表
-    public function getDriverInfo($serach){
+    public function getDriverInfo($serach,$id){
 
         $filter = array();
         if(isset($serach['name']) &&  $serach['name'] != ''){
@@ -49,8 +49,10 @@ class Examine_DriverModel
             $filter[] = " gd.company_id = {$serach['companyid']} ";
         }
 
-        $WHERE = " WHERE gd.isdelete = 0 AND gd.status <> 2";
-       
+        //获取合作承运商公司id
+        $sql = "SELECT GROUP_CONCAT(gc.id) FROM gl_companies  gc WHERE id = {$id} or pid= {$id}";
+        $ids = $this->dbh->select_one($sql);
+        $WHERE = " WHERE gd.isdelete = 0 AND gd.status <> 2 AND gd.company_id in ({$ids}) ";
         if(count($filter) > 0){
             $WHERE .= ' AND '.implode('AND', $filter);
         }

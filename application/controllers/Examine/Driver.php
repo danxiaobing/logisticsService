@@ -13,9 +13,9 @@ class Examine_DriverController extends Rpc {
     }
 
     //获取司机信息
-    public function getDriverInfoFunc($serach){
+    public function getDriverInfoFunc($serach,$id){
         $D = new Examine_DriverModel(Yaf_Registry::get("db"));
-        return $D->getDriverInfo($serach);
+        return $D->getDriverInfo($serach,$id);
     }
     public function getAllDriverFunc($company_ids)
     {
