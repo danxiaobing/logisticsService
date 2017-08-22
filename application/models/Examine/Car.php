@@ -54,7 +54,7 @@ class Examine_CarModel
         if (isset($params['fleets_id'])) {
              $filter[] = " c.`fleets_id`=" .  intval($params['fleets_id']);
         }
-        if (isset($params['fleets_type'])) {
+        if ( isset($params['fleets_type']) && $params['fleets_type'] != '' ) {
              $filter[] = " c.`fleets_type`=" .  $params['fleets_type'];
         }
         if (count($filter) > 0) {
