@@ -103,15 +103,17 @@ class Examine_CarModel
     public function add($params)
     {
         
-        $file = $params['file'];
-        unset($params['file']);
-
+        if( isset($params['file']) ){
+            $file = $params['file'];
+            unset($params['file']);
+        }
         $res = $this->dbh->insert('gl_cars', $params);
-        //echo "<pre>";print_r($res);echo "</pre>";die; 
         if( $res ){
-            foreach ($file as $key => $value) {
-                $value['cars_id'] = $res;
-                $this->dbh->insert('gl_cars_pic', $value );
+            if( count($file) ){
+                foreach ($file as $key => $value) {
+                    $value['cars_id'] = $res;
+                    $this->dbh->insert('gl_cars_pic', $value );
+                }
             }
             return $res;
         }
@@ -120,15 +122,18 @@ class Examine_CarModel
 
     public function update($params, $id)
     {
-        $file = $params['file'];
-        unset($params['file']);
-
+        if( isset($params['file']) ){
+            $file = $params['file'];
+            unset($params['file']);
+        }
         $res = $this->dbh->update('gl_cars', $params, 'id ='.$id);
         if( $res ){
-            $re = $this->dbh->update('gl_cars_pic', array('is_del'=>1), 'cars_id ='.$id);
-            foreach ($file as $key => $value) {
-                $value['cars_id'] = $id;
-                $this->dbh->insert('gl_cars_pic', $value );
+            if( count($file) ){
+                $re = $this->dbh->update('gl_cars_pic', array('is_del'=>1), 'cars_id ='.$id);
+                foreach ($file as $key => $value) {
+                    $value['cars_id'] = $id;
+                    $this->dbh->insert('gl_cars_pic', $value );
+                }
             }
             return $res;
         }
@@ -144,6 +149,18 @@ class Examine_CarModel
     {
         $sql = "SELECT * FROM gl_cars WHERE id=".$id;
         return $this->dbh->select_row($sql);
+    }
+
+    //获取文件
+    public function getFileByType($id, $type)
+    {
+        $sql = "SELECT * FROM gl_cars_pic WHERE `is_del` = 0 AND cars_id = {$id} AND type = {$type} ";
+        if( $type == 3 ){
+            return $this->dbh->select($sql);
+        }else{
+            return $this->dbh->select_row($sql);
+        }
+        
     }
 
     /**
