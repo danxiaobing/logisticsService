@@ -24,6 +24,11 @@ class Examine_CarModel
         $filter[] = " WHERE c.`is_del` = 0";
         $where = "  ";
 
+
+        if (isset($params['company_ids']) && count($params['company_ids']) ) {
+            $filter[] = " com.`id` in (".implode(',',$params['company_ids']).")";
+        }
+
         if (isset($params['keyworks']) && $params['keyworks'] != '') {
             $filter[] = " 
                 ( 
@@ -49,6 +54,9 @@ class Examine_CarModel
         if (isset($params['fleets_id'])) {
              $filter[] = " c.`fleets_id`=" .  intval($params['fleets_id']);
         }
+        if (isset($params['fleets_type'])) {
+             $filter[] = " c.`fleets_type`=" .  $params['fleets_type'];
+        }
         if (count($filter) > 0) {
             $where .= implode(" AND ", $filter);
         }
@@ -64,7 +72,7 @@ class Examine_CarModel
                 LEFT JOIN `gl_driver` AS d ON d.`id` = c.`driver_id`
                 LEFT JOIN `gl_driver` AS d2 ON d2.`id` = c.`escort_id`
                 {$where}";
-        //
+        //echo "<pre>";print_r($filter);echo "</pre>";die; 
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
