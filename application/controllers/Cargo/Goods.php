@@ -13,15 +13,29 @@ class Cargo_GoodsController extends Rpc {
         parent::init();
     }
 
+
+
+    /**
+     * 搜索
+     * @param array $paramsa
+     * @author amor
+     */
+    public function searchGoodsFunc($params){
+        $L = new Cargo_GoodsModel(Yaf_Registry::get("db"));
+        $data = $L->searchGoods($params);
+        return $data;
+    }
+
+
     /**
      * 列表
      * @return 数组
      */
-    public function getListFunc($params)
+    public function getListFunc($params,$cid)
     {
 
         $L = new Cargo_GoodsModel(Yaf_Registry::get("db"));
-        $data = $L->getList($params);
+        $data = $L->getlist($params,$cid);
         return $data;
     }
     /**

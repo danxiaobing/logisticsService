@@ -46,6 +46,8 @@ class Examine_CarrierModel
         }
         if($pid != ''){
             $filter[] = " gl_companies.`pid` != 0";
+        }else{
+            $filter[] = " gl_companies.`pid` = 0";
         }
 
         $where .= ' gl_companies.`status` != 0 ';
@@ -119,7 +121,8 @@ class Examine_CarrierModel
             'company_user'      =>$params['company_user'],
             'company_telephone' =>$params['company_telephone'],
             'status'            =>$params['status'],
-            'business'          => $params['business'],
+            'code'              =>$params['code'],
+            'business'          =>$params['business'],
             'created_at'        => '=NOW()',
             'updated_at'        => '=NOW()',
             'products'          => $params['products']
@@ -285,6 +288,7 @@ class Examine_CarrierModel
             'company_telephone' =>$params['company_telephone'],
             'status'            =>$params['status'],
             'pid'               =>$params['pid'],
+            'code'              =>$params['code'],
             'created_at' => '=NOW()',
             'updated_at' => '=NOW()',
         );
