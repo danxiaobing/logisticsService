@@ -105,7 +105,7 @@ class Examine_UsersModel
      * @return array
      */
     public function getUser($param,$password = ''){
-        $where = '';
+        $where = 'gl_user_info.is_del != 1 AND';
 
         if(is_numeric($param) && strlen($param) >10){
             $where = ' gl_user_info.`mobile` = '.$param;

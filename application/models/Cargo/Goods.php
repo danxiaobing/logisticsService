@@ -139,29 +139,29 @@ class Cargo_GoodsModel
         $filter = array();
         $where = 'is_del = 0 AND status = 1';
 
-        if (isset($params['start_pid']) && $params['start_pid'] != '') {
-            $filter[] = " goods.`start_pid` =".$params['start_pid'];
+        if (isset($params['start_provice_id']) && $params['start_provice_id'] != '') {
+            $filter[] = " gl_goods.`start_provice_id` =".$params['start_provice_id'];
         }
 
-        if (isset($params['start_cid']) && $params['start_cid'] != '') {
-            $filter[] = " gl_goods.`start_cid` =".$params['start_cid'];
+        if (isset($params['start_city_id']) && $params['start_city_id'] != '') {
+            $filter[] = " gl_goods.`start_city_id` =".$params['start_city_id'];
         }
 
-        if (isset($params['start_aid']) && $params['start_aid'] != '') {
-            $filter[] = " gl_goods.`start_aid` =".$params['start_aid'];
+        if (isset($params['start_area_id']) && $params['start_area_id'] != '') {
+            $filter[] = " gl_goods.`start_area_id` =".$params['start_area_id'];
         }
 
 
-        if (isset($params['end_pid']) && $params['end_pid'] != '') {
-            $filter[] = " gl_goods.`end_pid` =".$params['end_pid'];
+        if (isset($params['end_provice_id']) && $params['end_provice_id'] != '') {
+            $filter[] = " gl_goods.`end_provice_id` =".$params['end_provice_id'];
         }
 
-        if (isset($params['end_cid']) && $params['end_cid'] != '') {
-            $filter[] = " gl_goods.`end_cid` =".$params['end_cid'];
+        if (isset($params['end_city_id']) && $params['end_city_id'] != '') {
+            $filter[] = " gl_goods.`end_city_id` =".$params['end_city_id'];
         }
 
-        if (isset($params['end_aid']) && $params['end_aid'] != '') {
-            $filter[] = " gl_goods.`end_aid` =".$params['end_aid'];
+        if (isset($params['end_area_id']) && $params['end_area_id'] != '') {
+            $filter[] = " gl_goods.`end_area_id` =".$params['end_area_id'];
         }
 
         if (isset($params['off_endtime']) && $params['off_endtime'] != '') {
@@ -197,7 +197,30 @@ class Cargo_GoodsModel
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
         $sql = "SELECT 
-                gl_goods.id,gl_goods.start_pid,gl_goods.start_cid,gl_goods.start_aid,gl_goods.end_pid,gl_goods.end_cid,gl_goods.end_aid,gl_goods.weights,gl_goods.price,gl_goods.companies_name,gl_goods.off_starttime,gl_goods.off_endtime,gl_goods.reach_starttime,gl_goods.reach_endtime,gl_goods.offer_status,gl_goods.offer_price,gl_goods.loss,gl_goods.describe,gl_goods.off_address,gl_goods.off_user,gl_goods.off_phone,gl_goods.reach_address,gl_goods.consign_user,gl_goods.consign_phone 
+               gl_goods.id,
+               gl_goods.start_provice_id,
+               gl_goods.end_provice_id,
+               gl_goods.cate_id,
+               gl_goods.product_id,
+               gl_goods.weights,
+               gl_goods.price,
+               gl_goods.companies_name,
+               gl_goods.off_starttime,
+               gl_goods.off_endtime,
+               gl_goods.reach_starttime,
+               gl_goods.reach_endtime,
+               gl_goods.cars_type,
+               gl_goods.loss,
+               gl_goods.off_address,
+               gl_goods.off_user,
+               gl_goods.off_phone,
+               gl_goods.reach_address,
+               gl_goods.reach_user,
+               gl_goods.reach_phone,
+               gl_goods.consign_user,
+               gl_goods.consign_phone,
+               gl_goods.desc_str,
+               gl_goods.status
                 FROM gl_goods 
                 WHERE  {$where}
                 ORDER BY id DESC 
