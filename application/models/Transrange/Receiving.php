@@ -70,19 +70,106 @@ class Transrange_ReceivingModel
         
         $products = $params['products'];
         unset($params['products']);
-        $res = $this->dbh->insert('gl_rule', $params);
-        if( $res ){
-            foreach ($products as $key => $value) {
-                $value['rule_id'] = $res;
-                $this->dbh->insert('gl_rule_product', $value );
+
+        $user_list = $input['user_list'];
+        unset($input['user_list']);
+echo "<pre>";print_r($params);echo "</pre>";die; 
+        //事务
+        $this->dbh->begin();
+        try{
+            //gl_companies_range 插入基本信息
+            $id = $this->dbh->insert('gl_rule', $params);
+            if(!$id){
+                //回滚
+               $this->dbh->rollback();
+               return false;
             }
-            return $res;
+
+            //产品
+            foreach ($products as $key => $value) {
+                $value['rule_id'] = $id;
+                $res2 = $this->dbh->insert('gl_rule_product', $value );
+                if(!$res2){
+                    $this->dbh->rollback();
+                    return false;                
+                }
+            }
+
+
+
+            $user_list['rule_id'] = $id;
+            $user_list['updated_at'] = '=NOW()';
+            $user_list['created_at'] = '=NOW()';
+
+            $res3 = $this->dbh->insert('gl_rule_firewall',$user_list);
+            if(!$res3){
+                $this->dbh->rollback();
+                return false;                
+            }
+
+
+            $this->dbh->commit();
+            return true;
+
+        }catch (Exception $e) {
+            $this->dbh->rollback();
+            return false;
         }
-        return false;
     }
 
     public function update($params, $id)
     {
+        $products = $params['products'];
+        unset($params['products']);
+
+        $user_list = $params['user_list'];
+        unset($params['user_list']);
+
+        //事务
+        $this->dbh->begin();
+        try{
+            //gl_companies_range 插入基本信息
+            $res = $this->dbh->update('gl_rule', $params, 'id ='.$id);
+            if(!$res){
+                //回滚
+               $this->dbh->rollback();
+               return false;
+            }
+
+            //产品
+            $re = $this->dbh->update('gl_rule_product', array('is_del'=>1), 'rule_id ='.$id);
+            foreach ($products as $key => $value) {
+                $value['rule_id'] = $id;
+                $res2 = $this->dbh->insert('gl_rule_product', $value );
+                if(!$res2){
+                    $this->dbh->rollback();
+                    return false;                
+                }
+            }
+
+
+            $user = array(
+                'user_list'=>$user_list,
+                'updated_at' => '=NOW()',
+            );
+
+            $res3 = $this->dbh->update('gl_rule_firewall',$user,' rule_id ='.intval($id));
+            if(!$res3){
+                $this->dbh->rollback();
+                return false;                
+            }
+
+
+            $this->dbh->commit();
+            return true;
+
+        }catch (Exception $e) {
+            $this->dbh->rollback();
+            return false;
+        }
+
+
+
         $products = $params['products'];
         unset($params['products']);
         $res = $this->dbh->update('gl_rule', $params, 'id ='.$id);
