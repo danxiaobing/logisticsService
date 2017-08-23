@@ -27,10 +27,17 @@ class Transmanage_InquiryDelController extends Rpc {
         return $L->getGoodsInfo($id);        
     }
 
-    /*生成询价单、询价日志*/
-    public function addReceiptFunc($data=array(),$price){
+
+    /*获取当前询价单的价格状态信息*/
+    public function getInquiryInfoFunc($id){
         $L = new Transmanage_InquiryDelModel(Yaf_Registry::get("db"));
-        return $L->addReceipt($data,$price);  
+        return $L->getInquiryInfo($id);         
+    }
+
+    /*生成询价单、询价日志*/
+    public function addReceiptFunc($data=array(),$price,$goodsid){
+        $L = new Transmanage_InquiryDelModel(Yaf_Registry::get("db"));
+        return $L->addReceipt($data,$price,$goodsid);  
     }
 
 }
