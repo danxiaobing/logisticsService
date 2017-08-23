@@ -112,16 +112,62 @@ class Transmanage_InquiryDelModel
     /*获取询价单基本信息*/
     public function getGoodsInfo($id){
         //goods基本信息
-        $sql  = "SELECT gd.id, gd.cid ,gd.start_provice_id ,gd.start_city_id ,gd.end_provice_id ,gd.end_city_id ,gd.weights ,gd.price ,gd.companies_name ,gd.off_starttime ,gd.off_endtime ,gd.reach_starttime ,gd.reach_endtime ,gd.offer_status,gd.offer_price,gd.loss,gd.desc_str ,gd.off_address ,gd.off_user ,gd.off_phone ,gd.reach_address ,gd.reach_user ,gd.reach_phone ,gd.consign_user ,gd.consign_phone,gp.zh_name,gct.`name`,gd.created_at FROM gl_goods gd LEFT JOIN  gl_products gp ON gp.id = gd.product_id LEFT JOIN gl_cars_type gct ON  gct.id=gd.cars_type WHERE gd.id =".intval($id);
+        $sql  = "SELECT gd.id, gd.cid ,gd.start_provice_id ,gd.start_city_id ,gd.end_provice_id ,gd.end_city_id ,gd.weights ,gd.price ,gd.companies_name ,gd.off_starttime ,gd.off_endtime ,gd.reach_starttime ,gd.reach_endtime ,gd.offer_status,gd.offer_price,gd.loss,gd.desc_str ,gd.off_address ,gd.off_user ,gd.off_phone ,gd.reach_address ,gd.reach_user ,gd.reach_phone ,gd.consign_user ,gd.consign_phone,gp.zh_name,gct.`name`,gd.created_at,gd.`status` FROM gl_goods gd LEFT JOIN  gl_products gp ON gp.id = gd.product_id LEFT JOIN gl_cars_type gct ON  gct.id=gd.cars_type WHERE gd.id =".intval($id);
         $result['info'] = $this->dbh->select_row($sql);
 
         //获取市的信息
         $result['city'] = $this->dbh->select('SELECT cityid,city FROM conf_city');
-        // //该记录 是否存在询价单信息
-        // $result['exist'] = $this->dbh->select_one('select count(1) from gl_inquiry where gid = '.intval($id));
         return $result;
 
+    }
 
+    /*生成询价单信息、询价日志*/
+    public function addReceipt($data,$price){ 
+        //判断是否需要生成询价单
+        if(!empty($data)){
+            //事务
+            $this->dbh->begin();
+            try{
+                //生成询价单 同时更新状态为等待货主报价
+                $data['status'] = 2;
+                $id = $this->dbh->insert('gl_inquiry',$data);
+
+                if(!$id){
+                    $this->dbh->rollback();
+                    return false;
+                } 
+                //生成询价日志信息 记录托运方报价
+                $info = array(
+                    'pid'        => $id,//询价单主键id
+                    'minprice'   => $price['offer_price'],
+                    'type'       => 2,
+                    'created_at' => '=NOW()',
+                    'updated_at' => '=NOW()',
+                );
+                $res = $this->dbh->insert('gl_inquiry_info',$info);
+                //插入承运商报价
+                $info['minprice'] = $price['minprice'];
+                $info['maxprice'] = $price['maxprice'];
+                $info['type']     = 1;
+
+                $result = $this->dbh->insert('gl_inquiry_info',$info);
+                if(!$result){
+                    $this->dbh->rollback();
+                    return false;                    
+                }
+
+                $this->dbh->commit();
+                return true;
+
+
+            }catch (Exception $e) {
+                $this->dbh->rollback();
+                return false;
+            }
+
+
+
+        }
     }
 
 
