@@ -46,6 +46,12 @@ class Transrange_ReceivingController extends Rpc {
         $data = $Dw->update($params, $id);
         return $data;
     }
+    public function updatePostFuncFunc($params, $id)
+    {
+        $Dw = new Transrange_ReceivingModel(Yaf_Registry::get("db"));
+        $data = $Dw->updatePostFunc($params, $id);
+        return $data;
+    }
     
     public function delFunc( $id)
     {

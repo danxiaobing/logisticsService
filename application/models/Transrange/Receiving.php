@@ -23,38 +23,126 @@ class Transrange_ReceivingModel
     public function getPage($params)
     {
         $filed = array();
-        $filter[] = " WHERE `is_del` = 0";
+        $filter[] = " WHERE r.`is_del` = 0";
         $where = "  ";
 
-        if (isset($params['goods_name']) && $params['goods_name'] != '' && $params['goods_name'] != '0') {
-            $filter[] = " `goods_name` LIKE '%{$params['goods_name']}%' ";
+
+        if (isset($params['product']) && $params['product'] != '' ) {
+            $filter[] = " p.`zh_name` LIKE '%{$params['product']}%' ";
         }
-        if (isset($params['date']) && $params['date'] != '' && $params['date'] != '0') {
-            $filter[] = " `date` LIKE '%{$params['date']}%' ";
+
+
+        if (isset($params['min_load']) && $params['min_load'] != '' && $params['min_load'] != '0') {
+            $filter[] = " r.`max_load` >=  '{$params['min_load']}' ";
         }
+
+        if (isset($params['max_load']) && $params['max_load'] != '' && $params['max_load'] != '0') {
+            $filter[] = " r.`min_load` <=  '{$params['max_load']}' ";
+        }
+
+
+
+        if (isset($params['set_line']) && $params['set_line'] != '' ) {
+            $filter[] = " r.`set_line` = '{$params['set_line']}' ";
+        }
+        if (isset($params['set_rule']) && $params['set_rule'] != '' ) {
+            $filter[] = " r.`set_rule` = '{$params['set_rule']}' ";
+        }
+        if (isset($params['price_type']) && $params['price_type'] != '' ) {
+            $filter[] = " r.`price_type` =  '{$params['price_type']}' ";
+        }
+
+        if( isset($params['start_provice_id']) && $params['start_provice_id'] != '' && $params['start_provice_id'] != '0'){
+            if( isset($params['start_city_id']) && $params['start_city_id'] != '' && $params['start_city_id'] != '0'){
+                $filter[] = " ( r.`start_provice_id` = 0 OR r.`start_city_id` = 0 OR r.`start_city_id` = '{$params['start_city_id']}' ) ";
+            }else{
+                //全省
+                $filter[] = " ( r.`start_provice_id` = 0 OR r.`start_provice_id` = '{$params['start_provice_id']}' ) ";
+            }
+        }
+
+        if( isset($params['end_provice_id']) && $params['end_provice_id'] != '' && $params['end_provice_id'] != '0'){
+            if( isset($params['end_city_id']) && $params['end_city_id'] != '' && $params['end_city_id'] != '0'){
+                $filter[] = " ( r.`end_provice_id` = 0 OR r.`end_city_id` = 0 OR r.`end_city_id` = '{$params['end_city_id']}' ) ";
+            }else{
+                //全省
+                $filter[] = " ( r.`end_provice_id` = 0 OR r.`end_provice_id` = '{$params['end_provice_id']}' ) ";
+            }
+        }
+
+
+
         if (1 <= count($filter)) {
             $where .= implode(' AND ', $filter);
         }else{
             $where = "";
         }
 
-        $sql = "SELECT COUNT(*) FROM `gl_rule` {$where}";
-        //print_r($sql);die;   
+        $sql = "
+        select count(*) from (
+        SELECT 
+        COUNT(1)
+        FROM `gl_rule` as r
+        LEFT JOIN  gl_rule_product as rg ON rg.`rule_id` = r.`id`
+        LEFT JOIN  gl_products as p ON p.`id` = rg.`product_id`
+        {$where} 
+        GROUP BY r.`id`
+        ) as count";
+
+        // print_r($sql);die;   
         $result = $params;
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $result['list'] = array();
-
-
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
 
-        $sql = "SELECT * FROM `gl_rule`{$where} ORDER BY `updated_at` DESC";
-        $result['list'] = $this->dbh->select_page($sql);
-        //echo "<pre>";print_r($result);echo "</pre>";die; 
+        $sql = "SELECT 
+        r.*,substring_index(GROUP_CONCAT(p.zh_name separator ','),',',3) as products
+        FROM `gl_rule` as r
+        LEFT JOIN  gl_rule_product as rg ON rg.`rule_id` = r.`id`
+        LEFT JOIN  gl_products as p ON p.`id` = rg.`product_id`
+        {$where} 
+        GROUP BY r.`id`
+        ORDER BY r.`updated_at` DESC";
+        // echo "<pre>";print_r($sql);echo "</pre>";die; 
+        $result['list'] = $this->dbh->select_page($sql); 
+        if( count($result['list']) ){
+            foreach ($result['list'] as $k => $v) {
+
+                // if( $v['start_province_id'] == '0' ){
+                //     break;
+                // }
+                $type = 'area';
+                if( $v['start_area_id'] == 0 ){
+                    if( $v['start_city_id'] == 0 ){
+                        $type = 'province';
+                    }else{
+                        $type = 'city';
+                    }
+                }
+                $name = "start_{$type}_id";
+                $sql = "SELECT GROUP_CONCAT(cp.`{$type}`) FROM conf_{$type} cp where cp.`{$type}id` = {$v[$name]}";
+                $data = $this->dbh->select_one($sql);
+                $result['list'][$k]['start_name'] = $data ? $data:'';
+
+                $type = 'area';
+                if( $v['end_area_id'] == 0 ){
+                    if( $v['end_city_id'] == 0 ){
+                        $type = 'province';
+                    }else{
+                        $type = 'city';
+                    }
+                }
+                $name = "end_{$type}_id";
+                $sql = "SELECT GROUP_CONCAT(cp.`{$type}`) FROM conf_{$type} cp where cp.`{$type}id` = {$v[$name]}";
+                $data = $this->dbh->select_one($sql);
+                $result['list'][$k]['end_name'] = $data ? $data:'';
+            }
+        }
         return $result;
     }
 
@@ -73,7 +161,7 @@ class Transrange_ReceivingModel
 
         $user_list = $input['user_list'];
         unset($input['user_list']);
-echo "<pre>";print_r($params);echo "</pre>";die; 
+
         //事务
         $this->dbh->begin();
         try{
@@ -117,7 +205,7 @@ echo "<pre>";print_r($params);echo "</pre>";die;
         }
     }
 
-    public function update($params, $id)
+    public function updatePost($params, $id)
     {
         $products = $params['products'];
         unset($params['products']);
@@ -184,9 +272,14 @@ echo "<pre>";print_r($params);echo "</pre>";die;
         return false;
     }
 
+    public function update($params,$id)
+    {
+        return $this->dbh->update('gl_rule',$params,'id = ' . intval($id));
+    }
+
     public function del($id)
     {
-        return $this->dbh->delete('gl_rule','id = ' . intval($id));
+        return $this->dbh->update('gl_rule',array('is_del'=>1),'id = ' . intval($id));
     }
 
     //获取所有
