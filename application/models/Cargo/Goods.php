@@ -20,22 +20,22 @@ class Cargo_GoodsModel
     public function getList($params)
     {
         $filter = $filed = array();
-        $where = 'WHERE is_del = 0 ';
-        $order = "updated_at";
+        $where = 'WHERE gl_goods.is_del = 0 ';
+        $order = "gl_goods.updated_at";
 
         if (isset($params['order']) && $params['order'] != '') {
             if($params['order'] == 'o_s'){
-                $order = 'off_starttime';
+                $order = 'gl_goods.off_starttime';
             }
             if($params['order'] == 'r_s'){
-                $order = 'reach_starttime';
+                $order = 'gl_goods.reach_starttime';
             }
         }
         if (isset($params['cid']) && $params['cid'] != '') {
-            $filter[] = " cid = " . $params['cid'];
+            $filter[] = " gl_goods.cid = " . $params['cid'];
         }
         if (isset($params['status']) && !empty($params['status'])) {
-            $filter[] = " `status`=" . $params['status'];
+            $filter[] = " `gl_goods.status`=" . $params['status'];
         }
         if (1 <= count($filter)) {
             $where .= ' AND ' . implode(' AND ', $filter);
@@ -52,22 +52,24 @@ class Cargo_GoodsModel
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
         $sql = "SELECT
-               id,
-               start_provice_id,
-               end_provice_id,
-               cate_id,
-               product_id,
-               weights,
-               price,
-               companies_name,
-               off_starttime,
-               off_endtime,
-               reach_starttime,
-               reach_endtime,
-               status
-               FROM gl_goods " . $where . "   ORDER BY `{$order}` DESC";
+               gl_goods.id,
+               gl_goods.start_provice_id,
+               gl_goods.end_provice_id,
+               gl_goods.cate_id,
+               gl_goods.product_id,
+               gl_goods.weights,
+               gl_goods.price,
+               gl_goods.companies_name,
+               gl_goods.off_starttime,
+               gl_goods.off_endtime,
+               gl_goods.reach_starttime,
+               gl_goods.reach_endtime,
+               gl_goods.status,
+               gl_products.zh_name AS product_name
+               FROM gl_goods
+               LEFT JOIN gl_products ON gl_goods.product_id = gl_products.id
+               " . $where . "   ORDER BY {$order} DESC";
         $result['list'] = $this->dbh->select_page($sql);
-      //  print_r($sql);die;
         return $result;
     }
     /**
@@ -78,31 +80,35 @@ class Cargo_GoodsModel
     public function getInfo($id = 0)
     {
         $sql = "SELECT
-               id,
-               start_provice_id,
-               end_provice_id,
-               cate_id,
-               product_id,
-               weights,
-               price,
-               companies_name,
-               off_starttime,
-               off_endtime,
-               reach_starttime,
-               reach_endtime,
-               cars_type,
-               loss,
-               off_address,
-               off_user,
-               off_phone,
-               reach_address,
-               reach_user,
-               reach_phone,
-               consign_user,
-               consign_phone,
-               desc_str,
-               status
-               FROM gl_goods WHERE id=".$id;
+               gl_goods.id,
+               gl_goods.start_provice_id,
+               gl_goods.end_provice_id,
+               gl_goods.cate_id,
+               gl_goods.product_id,
+               gl_goods.weights,
+               gl_goods.price,
+               gl_goods.companies_name,
+               gl_goods.off_starttime,
+               gl_goods.off_endtime,
+               gl_goods.reach_starttime,
+               gl_goods.reach_endtime,
+               gl_goods.cars_type,
+               gl_goods.loss,
+               gl_goods.off_address,
+               gl_goods.off_user,
+               gl_goods.off_phone,
+               gl_goods.reach_address,
+               gl_goods.reach_user,
+               gl_goods.reach_phone,
+               gl_goods.consign_user,
+               gl_goods.consign_phone,
+               gl_goods.desc_str,
+               gl_goods.status,
+               gl_products.zh_name AS product_name,
+               gl_cars_type.name AS cars_type_name
+               FROM gl_goods
+               LEFT JOIN gl_products ON gl_goods.product_id = gl_products.id
+               LEFT JOIN gl_cars_type ON gl_cars_type.id = gl_goods.cars_type WHERE gl_goods.id=".$id;
 
         return $this->dbh->select_row($sql);
     }
