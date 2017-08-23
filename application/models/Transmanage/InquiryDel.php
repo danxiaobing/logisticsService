@@ -121,8 +121,15 @@ class Transmanage_InquiryDelModel
 
     }
 
+
+    /*获取当前询价单的价格状态信息*/
+    public function getInquiryInfo($id){
+        $sql = "SELECT gi.`id`,gi.`status`,gii.`minprice`,gii.`maxprice`,gii.`type`,gii.`created_at` FROM gl_inquiry gi LEFT JOIN gl_inquiry_info gii ON gi.id = gii.pid WHERE gi.gid=".intval($id)." ORDER BY gii.`created_at` ASC";
+        return $this->dbh->select($sql);
+    }
+
     /*生成询价单信息、询价日志*/
-    public function addReceipt($data,$price){ 
+    public function addReceipt($data,$price,$goodsid){ 
         //判断是否需要生成询价单
         if(!empty($data)){
             //事务
@@ -156,6 +163,12 @@ class Transmanage_InquiryDelModel
                     return false;                    
                 }
 
+                //更改goods表的询价状态
+                $status = $this->dbh->update('gl_goods',array('status' => 2),'id='.intval($goodsid));
+                if(!$status){
+                    $this->dbh->rollback();
+                    return false;                    
+                }                
                 $this->dbh->commit();
                 return true;
 
@@ -164,9 +177,31 @@ class Transmanage_InquiryDelModel
                 $this->dbh->rollback();
                 return false;
             }
+        }else{
+            //直接记录询价日志
+            $this->dbh->begin();
+            try{
+                $price['type'] = 1;
+                $price['created_at'] = '=NOW()';
+                $price['updated_at'] = '=NOW()';
+                $id = $this->dbh->insert('gl_inquiry_info',$price);
+                if(!$id){
+                    $this->dbh->rollback();
+                    return false;
+                }
+                //更新询价状态
+                $status = $this->dbh->update('gl_inquiry',array('status' => 2),'id='.intval($price['pid']));
+                if(!$status){
+                    $this->dbh->rollback();
+                    return false;                    
+                }                
+                $this->dbh->commit();
+                return true;
 
-
-
+            }catch (Exception $e){
+                $this->dbh->rollback();
+                return false;                
+            }
         }
     }
 
