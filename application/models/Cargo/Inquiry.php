@@ -17,7 +17,11 @@ class Cargo_InquiryModel
         $this->dbh = $dbh;
     }
 
-    //列表
+    /**
+     * 货源询价单列表
+     * @param $params
+     * @return mixed
+     */
     public function getGoodsInquiryList($params)
     {
 
@@ -90,7 +94,7 @@ class Cargo_InquiryModel
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
         $sql = "SELECT 
-               gl_goods.id,
+               gl_inquiry.id,
                gl_goods.start_provice_id,
                gl_goods.end_provice_id,
                gl_goods.product_id,
@@ -109,14 +113,62 @@ class Cargo_InquiryModel
         return $result;
     }
 
+
+
     /**
      * 获取货源询价单详情
+     * @param $id
+     * @return mixed
      */
+    public function getGoodsInquiryInfo($id){
 
-    public function getGoodsInquirInfo(){
+        //查询询价单信息
+        $sql = "SELECT
+               gl_inquiry.id,
+               gl_inquiry.gid,
+               gl_inquiry.price,
+               gl_inquiry.status,
+               gl_inquiry.cid,
+               gl_goods.consign_user,
+               gl_goods.consign_phone
+               FROM gl_inquiry
+               LEFT JOIN gl_goods ON gl_goods.id = gl_inquiry.gid
+               WHERE gl_inquiry.is_del = 0 AND gl_inquiry.id=".$id." ORDER BY id DESC";
+        $result['inquiry'] = $this->dbh->select_row($sql);
 
-     return array();
-
-
+       //询价单记录信息
+        $sql = "SELECT
+                id,
+                minprice,
+                maxprice,
+                cid,
+                type,
+                updated_at,
+                created_at
+                FROM gl_inquiry_info WHERE is_del = 0 AND pid=".$id." ORDER BY id ASC";
+        $result['inquiry_info'] = $this->dbh->select($sql);
+        return $result;
     }
+
+    /**
+     * 添加货源询价单记录
+     * @param $params
+     * @return mixed
+     */
+    public function addInquiryInfo($params)
+    {
+        return $this->dbh->insert('gl_inquiry_info',$params);
+    }
+
+    /**
+     * 修改询价单信息
+     * @param $params
+     * @param $id
+     * @return mixed
+     */
+    public function updataInquiry($id,$params)
+    {
+        return $this->dbh->update('gl_inquiry',$params,'id=' . intval($id));
+    }
+
 }
