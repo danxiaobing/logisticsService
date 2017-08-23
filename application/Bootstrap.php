@@ -30,6 +30,16 @@ class Bootstrap extends Yaf_Bootstrap_Abstract
             $db->charset
         ));
 
+        $sms = $config->get("sms");
+        Yaf_Registry::set("sms", new MySQL(
+            $sms->host,
+            $sms->port,
+            $sms->username,
+            $sms->password,
+            $sms->default,
+            $sms->charset
+        ));
+
         //连接gouyie数据库
         $gy_db = $config->get("gy_db");
         Yaf_Registry::set("gy_db", new MySQL(
