@@ -205,7 +205,7 @@ class Transrange_ReceivingModel
         }
     }
 
-    public function update($params, $id)
+    public function updatePost($params, $id)
     {
         $products = $params['products'];
         unset($params['products']);
@@ -270,6 +270,11 @@ class Transrange_ReceivingModel
             return $res;
         }
         return false;
+    }
+
+    public function update($params,$id)
+    {
+        return $this->dbh->update('gl_rule',$params,'id = ' . intval($id));
     }
 
     public function del($id)
