@@ -18,61 +18,95 @@ class Transmanage_InquiryDelModel
         $this->dbh = $dbh;
     }
 
-    /*询价单列表*/
     public function getInquiryList($search){
-        $filter = array(); 
+        $filter = array();
         //创建起始时间
         if(isset($search['starttime']) && $search['starttime'] != ''){
-            $filter[] = " gd.`created_at` >= '{$search['starttime']} 00:00:00'";
+            $filter[] = " l.`created_at` >= '{$search['starttime']} 00:00:00'";
         }
         //创建截止时间
         if(isset($search['endtime']) && $search['endtime'] != ''){
-            $filter[] = " gd.`updated_at` <= '{$search['starttime']} 23:59:59'";
+            $filter[] = " l.`updated_at` <= '{$search['starttime']} 23:59:59'";
         }
         //询价状态
         if(isset($search['status']) && $search['status'] != ''){
-            $filter[] = '';
+            $filter[] = " l.`status` = '{$search['status']} ";
         }
         //起始省
-        if(isset($search['pstart']) && $search['pstart'] != ''){
-            $filter[] = " gd.`start_pid` ={$search['pstart']} ";
+        if(isset($search['start_provice_id']) && $search['start_provice_id'] != ''){
+            $filter[] = " g.`start_provice_id` ={$search['start_provice_id']} ";
         }
         //起始市
-        if(isset($search['cstart']) && $search['cstart'] != ''){
-            $filter[] = " gd.`start_cid` ={$search['cstart']} ";
+        if(isset($search['start_city_id']) && $search['start_city_id'] != ''){
+            $filter[] = " g.`start_city_id` ={$search['start_city_id']} ";
         }
         //目的省
-        if(isset($search['pend']) && $search['pend'] != ''){
-            $filter[] = " gd.`end_pid` ={$search['pend']} ";
-        } 
+        if(isset($search['end_provice_id']) && $search['end_provice_id'] != ''){
+            $filter[] = " g.`end_provice_id` ={$search['end_provice_id']} ";
+        }
         //目的市
-        if(isset($search['cend']) && $search['cend'] != ''){
-            $filter[] = " gd.`end_cid` ={$search['cend']} ";
-        }  
+        if(isset($search['end_city_id']) && $search['end_city_id'] != ''){
+            $filter[] = " g.`end_city_id` ={$search['end_city_id']} ";
+        }
         //重量
         if(isset($search['min']) && $search['min'] != ''){
-            $filter[] = " gd.`weights` >= {$search['min']}";
-        }               
+            $filter[] = " g.`weights` >= {$search['min']}";
+        }
         if(isset($search['max']) && $search['max'] != ''){
-            $filter[] = " gd.`weights` <= {$search['max']}";
+            $filter[] = " g.`weights` <= {$search['max']}";
         }
 
-        $WHERE = " WHERE gd.`is_del` = 0";
+        if(isset($search['cid']) && $search['cid'] != ''){
+            $filter[] = " l.`cid` = {$search['cid']}";
+        }
+
+        $where = " WHERE g.`is_del` = 0 ";
 
         if(count($filter)>0){
-            $WHERE .= ' AND '.implode(' AND ', $filter);
+            $where .= ' AND '.implode(' AND ', $filter);
         }
         //总数
-        $sql = " SELECT count(1) FROM gl_goods gd {$WHERE}";
-        $result['total'] = $this->dbh->select_one($sql);
+        $sql = " SELECT count(1) FROM gl_inquiry WHERE cid = {$search['cid']}";
+        $result['totalRow'] = $this->dbh->select_one($sql);
         $result['list'] = array();
 
-        if($result['total']){
-            $sql = " SELECT  ";
+        $sql = " SELECT 
+            l.`id`,
+            l.`gid`,
+            l.`status`,
+            l.`cid`,
+            l.`created_at`,
+            g.`start_provice_id`,
+            g.`start_city_id`,
+            g.`end_provice_id`,
+            g.`end_city_id`,
+            g.`product_id`,
+            g.`weights`,
+            p.`zh_name`
+            FROM
+            gl_inquiry as l 
+            LEFT JOIN gl_goods as g ON g.id = l.gid
+            LEFT JOIN gl_products as p ON p.id = g.product_id
+            {$where}
+          ORDER BY l.`updated_at` DESC";
+
+        $this->dbh->set_page_num($search['page'] ? $search['page'] : 1);
+        $this->dbh->set_page_rows($search['rows'] ? $search['rows'] : 8);
+
+        $result['list'] = $this->dbh->select_page($sql);
+
+        if(!empty($result['list'])){
+            $city = array_column($this->dbh->select('SELECT cityid,city FROM conf_city'),'city','cityid');
+            foreach($result['list'] as $key=>$value){
+                $result['list'][$key]['start_city'] = $city[$value['start_city_id']];
+                $params['list'][$key]['end_city'] = $city[$value['end_city_id']];
+            }
+            unset($city);
         }
 
-
+        return $result;
     }
+
 
 
     /*获取询价单基本信息*/
