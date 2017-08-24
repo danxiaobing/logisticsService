@@ -185,7 +185,7 @@ class Examine_CarModel
     public function getBackAndLineCarPage($params){
         $filed = array();
         $filter_r[] = " WHERE r.`is_del` = 0";//回程车
-        $filter_z[] = " WHERE z.`is_del` = 0 AND z.`set_line` = 1 ";//专线车
+        $filter_z[] = " WHERE z.`is_del` = 0 AND z.`set_line` = 1 AND p.`is_del` = 0 ";//专线车
         $where_r = "  ";
         $where_z = "  ";
 
@@ -254,10 +254,15 @@ class Examine_CarModel
             'list' => array()
         );
 
-        $sql = "SELECT COUNT(*) FROM(SELECT r.id FROM gl_return_car AS r {$where_r}
+        $sql = "SELECT COUNT(*) FROM(
+                    SELECT r.id FROM gl_return_car AS r
+                    LEFT JOIN gl_companies AS com ON com.id = r.cid  {$where_r}
                 UNION
-                SELECT p.id FROM gl_rule AS z  RIGHT JOIN gl_rule_product AS p ON p.rule_id = z.id{$where_z}) AS tt";
-
+                    SELECT p.id FROM gl_rule AS z
+                    LEFT JOIN gl_rule_product AS p ON p.rule_id = z.id
+                    LEFT JOIN gl_companies AS com ON com.id = z.cid  {$where_z}
+                ) AS tt";
+//print_r($sql);die;
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
@@ -265,7 +270,7 @@ class Examine_CarModel
 
         $sql = "SELECT z.id,z.cid,z.car_type,z.price_type,z.price,z.min_load,z.max_load,z.loss,p.product_id,1 AS ctype,com.company_name
                  FROM gl_rule AS z
-                 RIGHT JOIN gl_rule_product AS p ON p.rule_id = z.id
+                 LEFT JOIN gl_rule_product AS p ON p.rule_id = z.id
                  LEFT JOIN gl_companies AS com ON com.id = z.cid {$where_z}
                 UNION
                  SELECT r.id,r.cid,0 AS car_type,r.price_type,r.price,r.min_load,r.max_load,3 AS loss,r.product_id,2 AS ctype,com.company_name
