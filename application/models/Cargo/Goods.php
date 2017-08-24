@@ -82,7 +82,11 @@ class Cargo_GoodsModel
         $sql = "SELECT
                gl_goods.id,
                gl_goods.start_provice_id,
+               gl_goods.start_city_id,
+               gl_goods.start_area_id,
                gl_goods.end_provice_id,
+               gl_goods.end_city_id,
+               gl_goods.end_area_id,
                gl_goods.cate_id,
                gl_goods.product_id,
                gl_goods.weights,

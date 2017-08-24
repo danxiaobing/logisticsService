@@ -51,7 +51,7 @@ class Cargo_GoodsController extends Rpc {
     /**
      * 细节
      */
-    public function getInfoFunc($id = 0)
+    public function getInfoFunc($id)
     {
         $S = new Cargo_GoodsModel(Yaf_Registry:: get("db"));
         $data = $S->getInfo($id);
@@ -61,7 +61,7 @@ class Cargo_GoodsController extends Rpc {
     /**
      * 更新
      */
-    public function updateFunc($id = 0, $data = array())
+    public function updateFunc($data = array(),$id)
     {
         $L = new Cargo_GoodsModel(Yaf_Registry::get("db"));
         $data = $L->updata($data,$id);
