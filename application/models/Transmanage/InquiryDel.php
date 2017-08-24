@@ -210,11 +210,11 @@ class Transmanage_InquiryDelModel
     public function cancalInquiry($params)
     {
         if (isset($params['id']) && $params['id'] != '') {
-            $filter[] = " id = {$params['id']}";
+            $filter[] = " gl_inquiry.`id` = {$params['id']}";
         }
 
         if(isset($params['cid']) && $params['cid'] != ''){
-            $filter[] = " cid = {$params['cid']}";
+            $filter[] = " gl_inquiry.`cid` = {$params['cid']}";
         }
 
         $where = " gl_inquiry.`is_del` = 0 ";
@@ -223,7 +223,11 @@ class Transmanage_InquiryDelModel
             $where .= ' AND '.implode(' AND ', $filter);
         }
 
-        $sql = "SELECT gl_inquiry.`status`,gl_inquiry.`gid` FROM gl_inquiry  WHERE  {$where}";
+        $sql = "SELECT gl_inquiry.`status`,gl_inquiry.`gid`,gl_goods.`reach_endtime`
+                FROM gl_inquiry  
+                LEFT JOIN gl_goods ON gl_goods.`id` = gl_inquiry.`gid`
+                WHERE  
+                {$where}";
 
         $inquiry = $this->dbh->select_row($sql);
 
@@ -237,6 +241,7 @@ class Transmanage_InquiryDelModel
 
         try{
             $inquiry_up['status'] = 4;
+            $inquiry_up['type']  = $params['type'];
 
             $result = $this->dbh->update('gl_inquiry',$inquiry_up,$where);
 
@@ -244,9 +249,7 @@ class Transmanage_InquiryDelModel
                 $this->dbh->rollback();
                 return false;
             }
-            $goods  = array(
-                'status' => 1,
-            );
+            $goods['status']  = time() > strtotime($inquiry['reach_endtime']) ? 1:3;
             $data = $this->dbh->update('gl_goods',$goods,'id ='.$inquiry['gid']);
             if(empty($data)){
                 $this->dbh->rollback();
