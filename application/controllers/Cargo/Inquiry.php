@@ -49,4 +49,13 @@ class Cargo_InquiryController extends Rpc {
         return $data;
 
     }
+    /**
+     * 货主报价
+     */
+    public function goodsInquiryOfferFunc($id,$params){
+        $L = new Cargo_InquiryModel(Yaf_Registry::get("db"));
+        $data = $L->goodsInquiryOffer($id,$params);
+        return $data;
+
+    }
 }

@@ -171,5 +171,46 @@ class Cargo_InquiryModel
     {
         return $this->dbh->update('gl_inquiry',$params,'id=' . intval($id));
     }
+    /**
+     * 货主报价
+     */
+    public function goodsInquiryOffer($id,$params){
+
+        if(empty($params)) {
+            return false;
+        }
+        if(empty($id)) {
+            return false;
+        }
+        $this->dbh->begin();
+        try{
+            $result =  $this->dbh->insert('gl_inquiry_info',$params);
+
+            if(!$result){
+                $this->dbh->rollback();
+                return false;
+            }
+            $inquiry['status']  = 1;
+            $data = $this->dbh->update('gl_inquiry',$inquiry,'id ='.$id);
+            if(empty($data)){
+                $this->dbh->rollback();
+                return false;
+            }
+
+            $this->dbh->commit();
+            return true;
+
+        }catch (Exception $e){
+            $this->dbh->rollback();
+            return false;
+        }
+
+
+
+
+
+
+
+    }
 
 }
