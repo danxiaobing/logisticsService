@@ -127,6 +127,7 @@ class Cargo_InquiryModel
                gl_inquiry.id,
                gl_inquiry.gid,
                gl_inquiry.price,
+               gl_inquiry.type,
                gl_inquiry.status,
                gl_inquiry.cid,
                gl_goods.consign_user,

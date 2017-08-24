@@ -249,7 +249,7 @@ class Transmanage_InquiryDelModel
                 $this->dbh->rollback();
                 return false;
             }
-            $goods['status']  = time() > strtotime($inquiry['reach_endtime']) ? 1:3;
+            $goods['status']  = time() > strtotime($inquiry['reach_endtime']) ? 3:1;
             $data = $this->dbh->update('gl_goods',$goods,'id ='.$inquiry['gid']);
             if(empty($data)){
                 $this->dbh->rollback();
