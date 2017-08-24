@@ -98,6 +98,8 @@ class Cargo_GoodsModel
                gl_goods.reach_endtime,
                gl_goods.cars_type,
                gl_goods.loss,
+               gl_goods.offer_status,
+               gl_goods.offer_price,
                gl_goods.off_address,
                gl_goods.off_user,
                gl_goods.off_phone,
