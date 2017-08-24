@@ -154,13 +154,12 @@ class Transrange_ReceivingModel
     }
 
     public function add($params)
-    {
-        
+    {        
         $products = $params['products'];
         unset($params['products']);
 
-        $user_list = $input['user_list'];
-        unset($input['user_list']);
+        $user_list = $params['user_list'];
+        unset($params['user_list']);
 
         //事务
         $this->dbh->begin();
@@ -184,12 +183,12 @@ class Transrange_ReceivingModel
             }
 
 
+            $user['user_list'] = $user_list;
+            $user['rule_id'] = $id;
+            $user['updated_at'] = '=NOW()';
+            $user['created_at'] = '=NOW()';
 
-            $user_list['rule_id'] = $id;
-            $user_list['updated_at'] = '=NOW()';
-            $user_list['created_at'] = '=NOW()';
-
-            $res3 = $this->dbh->insert('gl_rule_firewall',$user_list);
+            $res3 = $this->dbh->insert('gl_rule_firewall',$user);
             if(!$res3){
                 $this->dbh->rollback();
                 return false;                
@@ -255,21 +254,6 @@ class Transrange_ReceivingModel
             $this->dbh->rollback();
             return false;
         }
-
-
-
-        $products = $params['products'];
-        unset($params['products']);
-        $res = $this->dbh->update('gl_rule', $params, 'id ='.$id);
-        if( $res ){
-            $re = $this->dbh->update('gl_rule_product', array('is_del'=>1), 'rule_id ='.$id);
-            foreach ($products as $key => $value) {
-                $value['rule_id'] = $id;
-                $this->dbh->insert('gl_rule_product', $value );
-            }
-            return $res;
-        }
-        return false;
     }
 
     public function update($params,$id)
@@ -292,5 +276,12 @@ class Transrange_ReceivingModel
     public function getFileWall($rule_id){
         $sql = "SELECT user_list FROM gl_rule_firewall WHERE `rule_id` = ".intval($rule_id);
         return $this->dbh->select_one($sql);
+    }
+
+
+
+    //智能接单
+    public function matching($params){
+        echo 2222;
     }
 }
