@@ -61,7 +61,7 @@ class Cargo_GoodsController extends Rpc {
     /**
      * 更新
      */
-    public function updateFunc($data = array(),$id)
+    public function updateFunc($id,$data = array())
     {
         $L = new Cargo_GoodsModel(Yaf_Registry::get("db"));
         $data = $L->updata($data,$id);
