@@ -205,6 +205,55 @@ class Transmanage_InquiryDelModel
         }
     }
 
+    public function cancalInquiry($params)
+    {
+        if (isset($params['id']) && $params['id'] != '') {
+            $filter[] = " id = {$params['id']}";
+        }
 
+        if(isset($params['cid']) && $params['cid'] != ''){
+            $filter[] = " cid = {$params['cid']}";
+        }
+
+        $where = " WHERE gl_inquiry.`is_del` = 0 ";
+
+        if(count($filter)>0){
+            $where .= ' AND '.implode(' AND ', $filter);
+        }
+
+        $sql = "SELECT gl_inquiry.`status`,gl_inquiry.`gid` FROM gl_inquiry  {$where}";
+
+        $inquiry = $this->dbh->select_row($sql);
+
+        if(!$inquiry){
+            return false;
+        }
+
+        $this->dbh->begin();
+
+        try{
+            $inquiry['status'] = 4;
+            $result = $this->dbh->update('gl_inquiry',$inquiry,$where);
+            if(!$result){
+                $this->dbh->rollback();
+                return false;
+            }
+            $goods  = array(
+                'status' => 1,
+            );
+            $data = $this->dbh->update('gl_goods',$goods,'id ='.$inquiry['gid']);
+            if(empty($data)){
+                $this->dbh->rollback();
+                return false;
+            }
+
+            $this->dbh->commit();
+            return true;
+
+        }catch (Exception $e){
+            $this->dbh->rollback();
+            return false;
+        }
+    }
 
 }

@@ -40,4 +40,14 @@ class Transmanage_InquiryDelController extends Rpc {
         return $L->addReceipt($data,$price,$goodsid);  
     }
 
+    /**
+     * @param array $params
+     * return bool
+     */
+    public function cancalInquiryFunc($params){
+        $L = new Transmanage_InquiryDelModel(Yaf_Registry::get("db"));
+        return $L->cancalInquiry($params);
+    }
+
+
 }
