@@ -124,7 +124,7 @@ class Transmanage_InquiryDelModel
 
     /*获取当前询价单的价格状态信息*/
     public function getInquiryInfo($id){
-        $sql = "SELECT gi.`id`,gi.`status`,gii.`minprice`,gii.`maxprice`,gii.`type`,gii.`created_at` FROM gl_inquiry gi LEFT JOIN gl_inquiry_info gii ON gi.id = gii.pid WHERE gi.gid=".intval($id)." ORDER BY gii.`id` ASC";
+        $sql = "SELECT gi.`id`,gi.`status`,gii.`minprice`,gii.`maxprice`,gii.`type`,gii.`created_at` FROM gl_inquiry gi LEFT JOIN gl_inquiry_info gii ON gi.id = gii.pid WHERE gi.gid=".intval($id)." AND gi.`is_del`=0 ORDER BY gii.`id` ASC";
         $data =  $this->dbh->select($sql);
         unset($data[0]);
         return $data;
@@ -217,25 +217,29 @@ class Transmanage_InquiryDelModel
             $filter[] = " cid = {$params['cid']}";
         }
 
-        $where = " WHERE gl_inquiry.`is_del` = 0 ";
+        $where = " gl_inquiry.`is_del` = 0 ";
 
         if(count($filter)>0){
             $where .= ' AND '.implode(' AND ', $filter);
         }
 
-        $sql = "SELECT gl_inquiry.`status`,gl_inquiry.`gid` FROM gl_inquiry  {$where}";
+        $sql = "SELECT gl_inquiry.`status`,gl_inquiry.`gid` FROM gl_inquiry  WHERE  {$where}";
 
         $inquiry = $this->dbh->select_row($sql);
+
 
         if(!$inquiry){
             return false;
         }
 
+
         $this->dbh->begin();
 
         try{
-            $inquiry['status'] = 4;
-            $result = $this->dbh->update('gl_inquiry',$inquiry,$where);
+            $inquiry_up['status'] = 4;
+
+            $result = $this->dbh->update('gl_inquiry',$inquiry_up,$where);
+
             if(!$result){
                 $this->dbh->rollback();
                 return false;
