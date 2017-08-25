@@ -309,12 +309,7 @@ class Transmanage_InquiryDelModel
             list($min,$sec) = explode(" ",microtime());
             $orderid = date("Ymd"). substr($sec,3).mt_rand(100,999);
 
-            //更新询价单 托运单：order_id
-            $res = $this->dbh->update('gl_inquiry',array('order_id'=>$orderid),'id='.intval($id));
-            if(!$res){
-                $this->dbh->rollback();
-                return false;                
-            }
+
             //生成托运单
             $order_info = array(
                 'number' => $orderid,
@@ -331,6 +326,15 @@ class Transmanage_InquiryDelModel
                 $this->dbh->rollback();
                 return false;
             }
+
+            //更新询价单 托运单：order_id=$resid
+            $res = $this->dbh->update('gl_inquiry',array('order_id'=>$resid),'id='.intval($id));
+            if(!$res){
+                $this->dbh->rollback();
+                return false;                
+            }
+
+
             //修改goods表状态
             $this->dbh->update('gl_goods',array('status'=>4),'id='.intval($data['goodsid']));  
             $this->dbh->commit();
