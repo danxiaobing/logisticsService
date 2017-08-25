@@ -130,6 +130,7 @@ class Cargo_InquiryModel
                gl_inquiry.type,
                gl_inquiry.status,
                gl_inquiry.cid,
+               gl_inquiry.order_id,
                gl_goods.consign_user,
                gl_goods.consign_phone
                FROM gl_inquiry
@@ -205,11 +206,95 @@ class Cargo_InquiryModel
             return false;
         }
 
+    }
+    /**
+     * 货主同意报价
+     * $id 询价单id
+     * $params 托运单信息
+     */
+    public function agreeOffer($id,$params){
+
+        if (empty($id)) {
+            return false;
+        }
+
+        //获取询价金额
+        $where = " info.`type` = 1 AND info.`is_del` = 0 AND gl_inquiry.`id` = {$id}";
+        $sql = "SELECT info.`id`,info.`minprice`
+                FROM gl_inquiry_info AS info
+                LEFT JOIN gl_inquiry ON info.`pid` = gl_inquiry.`id`
+                WHERE
+                {$where} Order by id DESC limit 1";
 
 
 
+        $inquiry_info = $this->dbh->select_row($sql);
+
+        if(!$inquiry_info){
+            return false;
+        }
+
+        //获取询价单相关信息
+        $where = " gl_inquiry.`is_del` = 0 AND gl_inquiry.`id` = {$id}";
+        $sql = "SELECT gl_inquiry.`cid` AS company_id,gl_inquiry.`status`,gl_inquiry.`gid`,gl_goods.`reach_endtime`,gl_goods.`cid` AS cargo_id,gl_goods.`weights`
+                FROM gl_inquiry
+                LEFT JOIN gl_goods ON gl_goods.`id` = gl_inquiry.`gid`
+                WHERE
+                {$where}";
+
+        $inquiry = $this->dbh->select_row($sql);
+
+        if(!$inquiry){
+            return false;
+        }
 
 
+        //开始事物
+        $this->dbh->begin();
+        try{
+            //修改货源状态
+            $goods['status']  = 4;
+            $result = $this->dbh->update('gl_goods',$goods,'id ='.$inquiry['gid']);
+            if(!$result){
+                $this->dbh->rollback();
+                return false;
+            }
+
+            //新增托运单信息
+            //货源id
+            $params['goods_id'] = $inquiry['gid'];
+            //托运方
+            $params['cargo_id'] = $inquiry['cargo_id'];
+            //承运方
+            $params['company_id'] = $inquiry['company_id'];
+            //预成交运费
+            $params['estimate_freight'] = $inquiry_info['minprice']*$inquiry['weights'];
+
+            $res = $this->dbh->insert('gl_order',$params);
+            if(empty($res)){
+                $this->dbh->rollback();
+                return false;
+            }
+
+            //修改询价单信息
+            $updata_inquiry = array(
+                'order_id' =>$res,
+                'status' =>3,
+                'price' =>$inquiry_info['minprice'],
+            );
+            $data = $this->dbh->update('gl_inquiry',$updata_inquiry,'id ='.$id);
+            if(empty($data)){
+                $this->dbh->rollback();
+                return false;
+            }
+
+            $this->dbh->commit();
+            return true;
+
+        }catch (Exception $e){
+            $this->dbh->rollback();
+            return false;
+        }
 
     }
 
