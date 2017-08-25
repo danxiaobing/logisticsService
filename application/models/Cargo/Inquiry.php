@@ -93,15 +93,16 @@ class Cargo_InquiryModel
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
         $sql = "SELECT 
-               gl_inquiry.id,
-               gl_goods.start_provice_id,
-               gl_goods.end_provice_id,
-               gl_goods.product_id,
-               gl_goods.weights,
-               gl_goods.price,
-               gl_inquiry.status,
-               gl_inquiry.created_at,
-               gl_products.zh_name as product_name
+                 gl_inquiry.id,
+                 gl_goods.start_provice_id,
+                 gl_goods.end_provice_id,
+                 gl_goods.product_id,
+                 gl_goods.weights,
+                 gl_goods.price,
+                 gl_inquiry.order_id,
+                 gl_inquiry.status,
+                 gl_inquiry.created_at,
+                 gl_products.zh_name as product_name
                 FROM gl_goods 
                 LEFT JOIN gl_inquiry ON gl_inquiry.gid = gl_goods.id
                  LEFT JOIN gl_products ON gl_products.id = gl_goods.product_id

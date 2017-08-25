@@ -121,6 +121,39 @@ class Order_OrderModel
         $result['list']  = $this->dbh->select_page($sql);
         return $result;
     }
+    /**
+     * 根据id获取详情
+     * id: 权限id
+     * @return 数组
+     */
+    public function getInfo($id = 0)
+    {
+        $sql = "SELECT
+                id,
+                number,
+                cargo_id,
+                goods_id,
+                company_id,
+                estimate_freight,
+                fact_freight,
+                pay_time,
+                status,
+                reasons
+                 FROM gl_order WHERE gl_order.id=".$id;
+
+        return $this->dbh->select_row($sql);
+    }
+    //添加
+    public function addInfo($params)
+    {
+        return $this->dbh->insert('gl_order',$params);
+    }
+
+    //修改
+    public function updata($id,$params)
+    {
+        return $this->dbh->update('gl_order',$params,'id=' . intval($id));
+    }
 
 
 }
