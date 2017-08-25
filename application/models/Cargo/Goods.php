@@ -149,7 +149,7 @@ class Cargo_GoodsModel
      */
     public function searchGoods($params){
         $filter = array();
-        $where = 'is_del = 0 AND status = 1 ';
+        $where = ' gl_goods.`is_del` = 0 AND gl_goods.`status` = 1 AND gl_goods.`reach_endtime`>  NOW()';
 
         if (isset($params['start_provice_id']) && $params['start_provice_id'] != '') {
             $filter[] = " gl_goods.`start_provice_id` =".$params['start_provice_id'];
