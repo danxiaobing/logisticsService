@@ -281,6 +281,7 @@ class Cargo_InquiryModel
                 'order_id' =>$res,
                 'status' =>3,
                 'price' =>$inquiry_info['minprice'],
+                'updated_at' =>'=NOW()'
             );
             $data = $this->dbh->update('gl_inquiry',$updata_inquiry,'id ='.$id);
             if(empty($data)){
