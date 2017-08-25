@@ -79,11 +79,11 @@ class Order_OrderModel
         }
 
         if (isset($params['starttime']) && $params['starttime'] != '') {
-            $filter[] = " gl_order.`created_at` >= '{$params['starttime']}'";
+            $filter[] = " unix_timestamp(gl_order.`created_at`) >= unix_timestamp('{$params['starttime']} 00:00:00')";
         }
 
         if (isset($params['endtime']) && $params['endtime'] != '') {
-            $filter[] = " gl_order.`created_at` >= '{$params['endtime']}'";
+            $filter[] = " unix_timestamp(gl_order.`created_at`) <= unix_timestamp('{$params['endtime']} 23:59:59')";
         }
 
         if (isset($params['number']) && $params['number'] != '') {
@@ -96,7 +96,6 @@ class Order_OrderModel
 
 
         $sql = "SELECT count(1) FROM gl_goods  LEFT JOIN gl_order ON gl_order.goods_id = gl_goods.id  WHERE {$where}";
-
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);

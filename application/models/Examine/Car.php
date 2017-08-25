@@ -234,15 +234,14 @@ class Examine_CarModel
             $filter_r[] = " r.`product_id` = " . intval($params['product_id']);
             $filter_z[] = " p.`product_id` = " . intval($params['product_id']);
         }
-         //筛选开始时间
+        //筛选开始时间
         if (isset($params['starttime']) && $params['starttime'] != '') {
-            $filter_r[] = " r.`start_time` >= '{$params['starttime']}'";
+            $filter_r[] = " unix_timestamp(r.`start_time`) >= unix_timestamp('{$params['starttime']} 00:00:00')";
         }
         //筛选结束时间
         if (isset($params['endtime']) && $params['endtime'] != '') {
-            $filter_r[] = " r.`end_time` <= '{$params['endtime']}'";
+            $filter_r[] = " unix_timestamp(r.`end_time`) <= unix_timestamp('{$params['endtime']} 23:59:59')";
         }
-
         if (count($filter_r) > 0) {
             $where_r .= implode(" AND ", $filter_r);
         }

@@ -73,13 +73,12 @@ class Cargo_InquiryModel
         }
 
         if (isset($params['starttime']) && $params['starttime'] != '') {
-            $filter[] = " gl_inquiry.`created_at` >= '{$params['starttime']}'";
+            $filter[] = " unix_timestamp(gl_inquiry.`created_at`) >= unix_timestamp('{$params['starttime']} 00:00:00')";
         }
 
         if (isset($params['endtime']) && $params['endtime'] != '') {
-            $filter[] = " gl_inquiry.`created_at` >= '{$params['endtime']}'";
+            $filter[] = " unix_timestamp(gl_inquiry.`created_at`) <= unix_timestamp('{$params['endtime']} 23:59:59')";
         }
-
 
         if (count($filter) > 0) {
             $where .= ' AND '.implode(" AND ", $filter);
