@@ -99,7 +99,7 @@ class Transmanage_InquiryDelModel
             $city = array_column($this->dbh->select('SELECT cityid,city FROM conf_city'),'city','cityid');
             foreach($result['list'] as $key=>$value){
                 $result['list'][$key]['start_city'] = $city[$value['start_city_id']];
-                $params['list'][$key]['end_city'] = $city[$value['end_city_id']];
+                $result['list'][$key]['end_city'] = $city[$value['end_city_id']];
             }
             unset($city);
         }
