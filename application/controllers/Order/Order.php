@@ -16,13 +16,13 @@ class Order_OrderController extends Rpc {
 
 
     /**
-     * 搜索
+     * 托运单列表
      * @param array $paramsa
      * @author amor
      */
-    public function searchOrderFunc($params){
+    public function getOrderListFunc($params){
         $L = new Order_OrderModel(Yaf_Registry::get("db"));
-        $data = $L->searchOrder($params);
+        $data = $L->getOrderList($params);
         return $data;
     }
 
