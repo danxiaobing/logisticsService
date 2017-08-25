@@ -49,5 +49,11 @@ class Transmanage_InquiryDelController extends Rpc {
         return $L->cancalInquiry($params);
     }
 
+    /*同意交易*/
+    public function agreeInquiryFunc($data=array(),$inquiryid){
+        $L = new Transmanage_InquiryDelModel(Yaf_Registry::get("db"));
+        return $L->agreeInquiry($data,$inquiryid);        
+    }
+
 
 }

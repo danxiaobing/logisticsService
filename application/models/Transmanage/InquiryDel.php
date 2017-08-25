@@ -265,4 +265,82 @@ class Transmanage_InquiryDelModel
         }
     }
 
+
+    /*同意交易*/
+    public function agreeInquiry($data,$inquiryid){
+        //开启事务
+        $this->dbh->begin();
+        try{
+            //同意交易流程
+            if( $inquiryid == 0){
+
+                //承运商未报价直接同意交易
+                $input = array(
+                    'gid'        => $data['goodsid'],//goodsid
+                    'price'      => $data['price'],//成交价格
+                    'cid'        => $data['cid'],//承运商id
+                    'status'     => 3,//托运生成状态
+                    'created_at' => '=NOW()',
+                    'updated_at' => '=NOW()',
+                );
+
+                $id = $this->dbh->insert('gl_inquiry',$input);
+                if(!$id){
+                    $this->dbh->rollback();
+                    return false;   
+                }
+                $price = $data['price'];
+
+            }elseif($inquiryid != 0){
+                //已生成询价单  同意交易
+                $sql = "SELECT minprice FROM gl_inquiry_info WHERE pid=".intval($inquiryid)." AND type=2  ORDER BY id DESC LIMIT 1";
+                $price  = $this->dbh->select_one($sql);//获取成交价格
+                $res = $this->dbh->update('gl_inquiry',array('status' => 3,'price'=>$price),'id='.intval($inquiryid));
+            
+                if(!$res){
+                    $this->dbh->rollback();
+                    return 1111;
+                }
+                $id = $inquiryid;
+
+            }
+
+            /*生成托运单流程start*/
+            list($min,$sec) = explode(" ",microtime());
+            $orderid = date("Ymd"). substr($sec,3).mt_rand(100,999);
+
+            //更新询价单 托运单：order_id
+            $res = $this->dbh->update('gl_inquiry',array('order_id'=>$orderid),'id='.intval($id));
+            if(!$res){
+                $this->dbh->rollback();
+                return false;                
+            }
+            //生成托运单
+            $order_info = array(
+                'number' => $orderid,
+                'cargo_id'=> $data['companyid'],//货主公司id
+                'goods_id' =>$data['goodsid'],
+                'company_id' => $data['cid'],//承运商公司id
+                'estimate_freight' =>  $price*$data['weights'],
+                'updated_at'=>'=NOW()',
+                'created_at'=>'=NOW()'
+            );  
+            $resid = $this->dbh->insert('gl_order',$order_info);  
+
+            if(!$resid){
+                $this->dbh->rollback();
+                return false;
+            }
+            //修改goods表状态
+            $this->dbh->update('gl_goods',array('status'=>4),'id='.intval($data['goodsid']));  
+            $this->dbh->commit();
+            return $id;     
+            /*生成托运单流程end*/
+            
+        }catch (Excaption $e){
+            $this->dbh->rollback();
+            return false;
+        }
+    }
+
 }
