@@ -282,6 +282,101 @@ class Transrange_ReceivingModel
 
     //智能接单
     public function matching($params){
-        echo 2222;
+
+        //筛选产品
+        $psql = "select p.rule_id from gl_rule_product as p where p.`is_del` = 0 AND p.`product_id` = ".$params['product_id'];
+        $products = $this->dbh->select($psql);
+        if( ! count($products) ){
+            return false;
+        }
+        foreach ($products as $k => $v) {
+            $pro_id .= $v['rule_id'] . ',';
+        }
+        $pro_id = substr($pro_id,0,-1);
+
+
+
+        //基础筛选
+        $filter = array();
+        $filter[] = " WHERE r.`is_del` = 0 ";
+        $filter[] = " r.`set_rule` = 1 ";
+        $filter[] = " r.`is_use` = 1 ";
+        $filter[] = " r.`id` in ({$pro_id}) ";
+        
+        if( isset($params['start_province_id']) && $params['start_province_id'] != '' && $params['start_province_id'] != '0'){
+            if( isset($params['start_city_id']) && $params['start_city_id'] != '' && $params['start_city_id'] != '0'){
+                if( isset($params['start_area_id']) && $params['start_area_id'] != '' && $params['start_area_id'] != '0'){
+                    //全县
+                    $filter[] = " ( r.`start_province_id` = 0 OR r.`start_city_id` = 0 OR r.`start_area_id` = 0 OR r.`start_area_id` = '{$params['start_area_id']}' ) ";
+                }else{
+                    //全市
+                    $filter[] = " ( r.`start_province_id` = 0 OR OR r.`start_city_id` = 0 r.`start_city_id` = '{$params['start_city_id']}' ) ";
+                }
+            }else{
+                //全省
+                $filter[] = " ( r.`start_province_id` = 0 OR r.`start_province_id` = '{$params['start_province_id']}' ) ";
+            }
+        }
+
+        if( isset($params['end_province_id']) && $params['end_province_id'] != '' && $params['end_province_id'] != '0'){
+            if( isset($params['end_city_id']) && $params['end_city_id'] != '' && $params['end_city_id'] != '0'){
+                if( isset($params['end_area_id']) && $params['end_area_id'] != '' && $params['end_area_id'] != '0'){
+                    //全县
+                    $filter[] = " ( r.`end_province_id` = 0 OR r.`end_city_id` = 0 OR r.`end_area_id` = 0 OR r.`end_area_id` = '{$params['end_area_id']}' ) ";
+                }else{
+                    //全市
+                    $filter[] = " ( r.`end_province_id` = 0 OR OR r.`end_city_id` = 0 r.`end_city_id` = '{$params['end_city_id']}' ) ";
+                }
+            }else{
+                //全省
+                $filter[] = " ( r.`end_province_id` = 0 OR r.`end_province_id` = '{$params['end_province_id']}' ) ";
+            }
+        }
+        if( $params['loss'] ){
+            $filter[] = " r.`loss` <= {$params['loss']} ";
+        }
+        
+        if( $params['load'] ){
+            $filter[] = " ( r.`min_load` <= {$params['load']} AND r.`max_load` >= {$params['load']}) ";
+        }
+
+        if( $params['car_type'] ){
+            $filter[] = " r.`car_type` <= {$params['car_type']} ";
+        }
+
+        //黑白名单
+        $filter[] = "
+            IF (
+                r.`fire` = 1,
+                ! (f.`user_list` LIKE '%{$params['company_id']}%'),
+                '1=1'
+            )
+            AND
+            IF (
+                r.`fire` = 2,
+                f.`user_list` LIKE '%{$params['company_id']}%',
+                '1=1'
+            )
+        ";
+
+        //生成WHERE
+        $where = "";
+        if (1 <= count($filter)) {
+            $where .= implode(' AND ', $filter);
+        }
+        
+
+        $sql = "
+            SELECT
+                r.`cid`
+            FROM
+                gl_rule AS r
+            LEFT JOIN gl_rule_firewall AS f ON r.`id` = f.`rule_id`
+            {$where}
+            ORDER BY
+                r.`updated_at` desc;
+        ";
+        // return $sql;
+        return $this->dbh->select($sql);
     }
 }
