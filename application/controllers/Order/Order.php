@@ -27,6 +27,15 @@ class Order_OrderController extends Rpc {
     }
 
     /**
+     * 新增
+     */
+    public function addInfoFunc($params)
+    {
+        $S = new Order_OrderModel(Yaf_Registry:: get("db"));
+        $data = $S->addInfo($params);
+        return $data;
+    }
+    /**
      * 细节
      */
     public function getInfoFunc($id)
