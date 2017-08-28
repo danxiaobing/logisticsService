@@ -79,10 +79,26 @@ class Transmanage_ReturnCarModel
         return $result;
     }
    //获取详细
-    public function getInfo($fields=null,$where=null){
-        $sql = "SELECT $fields FROM `gl_return_car` WHERE `is_del`= 0 ";
-        if($where)$sql .= "AND $where";
-        return $this->dbh->select($sql);
+    public function getInfo($id){
+        $sql = "SELECT
+                       `id`,
+                       `start_provice_id`,
+                       `start_city_id`,
+                       `start_area_id`,
+                       `end_provice_id`,
+                       `end_city_id`,
+                       `end_area_id`,
+                       `start_time`,
+                       `end_time`,
+                       `price_type`,
+                       `min_load`,
+                       `max_load`,
+                       `category_id`,
+                       `product_id`,
+                       `price`,
+                       `status`
+                        FROM `gl_return_car`  WHERE `id` = {$id} AND `is_del`= 0 ";
+        return $this->dbh->select_row($sql);
     }
     //添加信息
     public function addInfo($params)
