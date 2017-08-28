@@ -210,17 +210,17 @@ class Examine_CarModel
             $filter_z[] = " z.`start_area_id` = " . intval($params['start_area_id']);
         }
         //筛选目的省份
-        if (isset($params['end_provice_id']) && $params['end_provice_id'] != '') {
+        if (isset($params['end_provice_id']) && !empty($params['end_provice_id'])) {
             $filter_r[] = " r.`end_province_id` = " . intval($params['end_provice_id']);
             $filter_z[] = " z.`end_province_id` = " . intval($params['end_provice_id']);
         }
         //筛选目的城市
-        if (isset($params['end_city_id']) && $params['end_city_id'] != '') {
+        if (isset($params['end_city_id']) && !empty($params['end_city_id'])) {
             $filter_r[] = " r.`end_city_id` = " . intval($params['end_city_id']);
             $filter_z[] = " z.`end_city_id` = " . intval($params['end_city_id']);
         }
         //筛选目的地区
-        if (isset($params['end_area_id']) && $params['end_area_id'] != '') {
+        if (isset($params['end_area_id']) && !empty($params['end_area_id'])) {
             $filter_r[] = " r.`end_area_id` = " . intval($params['end_area_id']);
             $filter_z[] = " z.`end_area_id` = " . intval($params['end_area_id']);
         }
@@ -261,7 +261,7 @@ class Examine_CarModel
                     LEFT JOIN gl_rule_product AS p ON p.rule_id = z.id
                     LEFT JOIN gl_companies AS com ON com.id = z.cid  {$where_z}
                 ) AS tt";
-//print_r($sql);die;
+
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
