@@ -246,9 +246,9 @@ class Cargo_GoodsModel
                 ";
 
 
-        $data = $this->dbh->select_page($sql);
-        if(!empty($data)){
-            $result['list'] = $this->city($data);
+        $result['list'] = $this->dbh->select_page($sql);
+        if(!empty($result['list'])){
+            $result['list'] = $this->city($result['list']);
         }
 
         return $result;
