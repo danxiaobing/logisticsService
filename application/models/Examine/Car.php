@@ -196,8 +196,8 @@ class Examine_CarModel
         }
         //筛选起始省份
         if (isset($params['start_provice_id']) && !empty($params['start_provice_id'])) {
-            $filter_r[] = " r.`start_provice_id` = " . intval($params['start_provice_id']);
-            $filter_z[] = " z.`start_provice_id` = " . intval($params['start_provice_id']);
+            $filter_r[] = " r.`start_province_id` = " . intval($params['start_provice_id']);
+            $filter_z[] = " z.`start_province_id` = " . intval($params['start_provice_id']);
         }
         //筛选起始城市
         if (isset($params['start_city_id']) && !empty($params['start_city_id'])) {
@@ -211,8 +211,8 @@ class Examine_CarModel
         }
         //筛选目的省份
         if (isset($params['end_provice_id']) && $params['end_provice_id'] != '') {
-            $filter_r[] = " r.`end_provice_id` = " . intval($params['end_provice_id']);
-            $filter_z[] = " z.`end_provice_id` = " . intval($params['end_provice_id']);
+            $filter_r[] = " r.`end_province_id` = " . intval($params['end_provice_id']);
+            $filter_z[] = " z.`end_province_id` = " . intval($params['end_provice_id']);
         }
         //筛选目的城市
         if (isset($params['end_city_id']) && $params['end_city_id'] != '') {

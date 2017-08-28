@@ -55,6 +55,11 @@ class Basicdata_ProductController extends Rpc {
    		$P = new Basicdata_ProductModel(Yaf_Registry::get("db"));
     	return $P->getProductByCateId($id);
    	}
+   	//获取数据By Id
+   	public function getProductByIdFunc($id){
+   		$P = new Basicdata_ProductModel(Yaf_Registry::get("db"));
+    	return $P->getProductById($id);
+   	}
 
    	//查看MSDS证件
    	public function getImgSrcFunc($id){
