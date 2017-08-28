@@ -55,8 +55,12 @@ class Transmanage_OrderModel
         }
 
         if(isset($params['id']) && $params['id'] != ''){
-            $order = implode(',',$params['id']);
+            $order = substr($params['id'],0,strlen($params['id'])-1);
             $filter[] = "o.`id` in({$order})";
+
+        }else{
+            $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
+            $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 8);
         }
         $where = ' o.`is_del` = 0 ';
 
@@ -69,8 +73,6 @@ class Transmanage_OrderModel
 
         $result['totalRow'] = $this->dbh->select_one($sql);
 
-        $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
-        $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 8);
 
         $sql = "SELECT 
                g.start_provice_id,
@@ -98,7 +100,12 @@ class Transmanage_OrderModel
                 ORDER BY id DESC 
                 ";
 
-        $result['list'] = $this->dbh->select_page($sql);
+        if(isset($params['id']) && $params['id'] != ''){
+            $result['list'] = $this->dbh->select($sql);
+        }else{
+            $result['list'] = $this->dbh->select_page($sql);
+        }
+
 
         if(!empty($result['list'])){
             $city = array_column($this->dbh->select('SELECT cityid,city FROM conf_city'),'city','cityid');
