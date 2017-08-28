@@ -32,6 +32,18 @@ class Cargo_InquiryController extends Rpc {
     }
 
     /**
+     * 生成询价单
+     * @param $params
+     * @return mixed
+     */
+    public function addInquiryFunc($params)
+    {
+        $L = new Cargo_InquiryModel(Yaf_Registry::get("db"));
+        $data = $L->addInquiry($params);
+        return $data;
+    }
+
+    /**
      * 新增货源询价单记录信息
      */
     public function addInquiryInfoFunc($params){

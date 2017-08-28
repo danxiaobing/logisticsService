@@ -151,6 +151,15 @@ class Cargo_InquiryModel
         $result['inquiry_info'] = $this->dbh->select($sql);
         return $result;
     }
+    /**
+     * 生成询价单
+     * @param $params
+     * @return mixed
+     */
+    public function addInquiry($params)
+    {
+        return $this->dbh->insert('gl_inquiry',$params);
+    }
 
     /**
      * 添加货源询价单记录
