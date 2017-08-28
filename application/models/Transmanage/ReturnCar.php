@@ -56,10 +56,10 @@ class Transmanage_ReturnCarModel
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
         $sql = "SELECT `id`,
-                       `start_provice_id`,
+                       `start_province_id`,
                        `start_city_id`,
                        `start_area_id`,
-                       `end_provice_id`,
+                       `end_province_id`,
                        `end_city_id`,
                        `end_area_id`,
                        `start_time`,
