@@ -149,7 +149,8 @@ class Transrange_ReceivingModel
 
     public function getInfo($id)
     {
-        $sql = "SELECT * FROM `gl_rule`  WHERE `id` = {$id} ";
+        $sql = "SELECT gl_rule.*,p.product_id FROM `gl_rule`
+                 LEFT JOIN gl_rule_product AS p ON p.rule_id = gl_rule.id WHERE gl_rule.`id` = {$id} ";
         return $this->dbh->select_row($sql);
     }
 
