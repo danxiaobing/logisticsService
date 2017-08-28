@@ -54,11 +54,16 @@ class Transmanage_OrderModel
             $filter[] = " o.`company_id` = '{$params['cid']}'";
         }
 
+        if(isset($params['id']) && $params['id'] != ''){
+            $order = implode(',',$params['id']);
+            $filter[] = "o.`id` in({$order})";
+        }
         $where = ' o.`is_del` = 0 ';
 
         if (count($filter) > 0) {
             $where .= ' AND '.implode(" AND ", $filter);
         }
+
 
         $sql = "SELECT count(1) FROM gl_order AS o LEFT JOIN gl_goods AS g ON g.`id` = o.`goods_id`  WHERE {$where}";
 
@@ -80,6 +85,7 @@ class Transmanage_OrderModel
                g.off_endtime,
                g.reach_starttime,
                g.reach_endtime,
+               g.companies_name,
                o.status,
                o.id,
                o.created_at,
