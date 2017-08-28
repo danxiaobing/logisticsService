@@ -13,7 +13,7 @@ class Examine_DriverController extends Rpc {
     }
 
     //获取司机信息
-    public function getDriverInfoFunc($serach,$id){
+    public function getDriverInfoFunc($serach,$id=''){
         $D = new Examine_DriverModel(Yaf_Registry::get("db"));
         return $D->getDriverInfo($serach,$id);
     }
@@ -36,9 +36,9 @@ class Examine_DriverController extends Rpc {
     }
 
     //证件查看
-    public function getPicFunc($id){
+    public function getPicFunc($id,$type){
     	$D = new Examine_DriverModel(Yaf_Registry::get("db"));
-    	return $D->getPic($id);
+    	return $D->getPic($id,$type);
     }
 
     //隶属公司

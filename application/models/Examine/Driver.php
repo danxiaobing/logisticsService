@@ -49,10 +49,16 @@ class Examine_DriverModel
             $filter[] = " gd.company_id = {$serach['companyid']} ";
         }
 
-        //获取合作承运商公司id
-        $sql = "SELECT GROUP_CONCAT(gc.id) FROM gl_companies  gc WHERE id = {$id} or pid= {$id}";
-        $ids = $this->dbh->select_one($sql);
-        $WHERE = " WHERE gd.isdelete = 0 AND gd.status <> 2 AND gd.company_id in ({$ids}) ";
+        if(isset($id) && $id != ''){
+            //获取合作承运商公司id
+            $sql = "SELECT GROUP_CONCAT(gc.id) FROM gl_companies  gc WHERE id = {$id} or pid= {$id}";
+            $ids = $this->dbh->select_one($sql);
+            $WHERE = " WHERE gd.isdelete = 0 AND gd.status <> 2 AND gd.company_id in ({$ids}) ";           
+        }else{
+            $WHERE = " WHERE gd.isdelete = 0 AND gd.status <> 2"; 
+        }
+
+
         if(count($filter) > 0){
             $WHERE .= ' AND '.implode('AND', $filter);
         }
@@ -68,7 +74,7 @@ class Examine_DriverModel
             $this ->dbh ->set_page_num($serach['pageCurrent']);
             $this ->dbh ->set_page_rows($serach['pageSize']); 
             //数据获取
-            $sql = "SELECT id,name,mobile,sex,cid,type,driver_start,driver_end,practitioners,driver_status,driver_license,certificate_pic,other_pic,company_id,is_use,status FROM gl_driver gd {$WHERE} ORDER BY updated_at DESC ";
+            $sql = "SELECT id,name,mobile,sex,cid,type,driver_start,driver_end,practitioners,driver_status,company_id,is_use,status FROM gl_driver gd {$WHERE} ORDER BY updated_at DESC ";
             $result['list'] = $this->dbh->select_page($sql);
         }
 
@@ -96,9 +102,14 @@ class Examine_DriverModel
 
 
     //证件查看
-    public function getPic($id){
-        $sql = " SELECT driver_license,certificate_pic,other_pic FROM gl_driver WHERE id =  ".intval($id);
-        return $this->dbh->select_row($sql);
+    public function getPic($id,$type){
+        // $sql = " SELECT driver_license,certificate_pic,other_pic FROM gl_driver WHERE id =  ".intval($id);
+        $sql = "SELECT type,`path` FROM gl_driver_pic where cid=".intval($id)." AND type = {$type} ORDER BY updated_at DESC";
+        if( $type == 3 ){
+            return $this->dbh->select($sql);
+        }else{
+            return $this->dbh->select_row($sql);
+        }
     }
 
 
