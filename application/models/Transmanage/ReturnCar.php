@@ -81,6 +81,7 @@ class Transmanage_ReturnCarModel
    //获取详细
     public function getInfo($id){
         $sql = "SELECT
+                        `id`,
                         `cid`,
                         `start_province_id`,
                         `start_city_id`,
