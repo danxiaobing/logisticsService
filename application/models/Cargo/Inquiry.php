@@ -241,11 +241,7 @@ class Cargo_InquiryModel
 
 
         $inquiry_info = $this->dbh->select_row($sql);
-
-        if(!$inquiry_info){
-            return false;
-        }
-
+        
         //获取询价单相关信息
         $where = " gl_inquiry.`is_del` = 0 AND gl_inquiry.`id` = {$id}";
         $sql = "SELECT gl_inquiry.`cid` AS company_id,gl_inquiry.`status`,gl_inquiry.`gid`,gl_goods.`reach_endtime`,gl_goods.`cid` AS cargo_id,gl_goods.`weights`
