@@ -165,7 +165,7 @@ class Transmanage_OrderModel
         #开启事物
         $this->dbh->begin();
         try{
-            $orderArr['status'] = 7;
+            $orderArr['status'] = $params['status'];
             $orderArr['reasons'] = !empty($params['reasons']) ? $params['reasons']:'';
             $order = $this->dbh->update('gl_order',$orderArr,'id = '.$orderArr['id']);
 
@@ -174,14 +174,16 @@ class Transmanage_OrderModel
                 return false;
             }
 
-            $goodArr = $this->dbh->select_row('SELECT status,source,reach_endtime FROM gl_order WHERE id = '.$orderArr['goods_id']);
-            if(!empty($goodArr) && $goodArr['source'] == 0){
-                $goodArr['status'] =  time() > strtotime($goodArr['reach_endtime']) ? 3:1;
-                $good = $this->dbh->update('gl_goods',$goodArr,'id = '.$orderArr['goods_id']);
+            if (isset($params['cargo_id'])  && $params['status'] == 7) {
+                $goodArr = $this->dbh->select_row('SELECT status,source,reach_endtime FROM gl_order WHERE id = ' . $orderArr['goods_id']);
+                if (!empty($goodArr) && $goodArr['source'] == 0) {
+                    $goodArr['status'] = time() > strtotime($goodArr['reach_endtime']) ? 3 : 1;
+                    $good = $this->dbh->update('gl_goods', $goodArr, 'id = ' . $orderArr['goods_id']);
 
-                if(empty($good)){
-                    $this->dbh->rollback();
-                    return false;
+                    if (empty($good)) {
+                        $this->dbh->rollback();
+                        return false;
+                    }
                 }
             }
 
