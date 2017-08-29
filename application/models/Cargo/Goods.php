@@ -20,7 +20,7 @@ class Cargo_GoodsModel
     public function getList($params)
     {
         $filter = $filed = array();
-        $where = 'WHERE gl_goods.is_del = 0 ';
+        $where = 'WHERE gl_goods.is_del = 0 AND gl_goods.source = 0 ';
         $order = "gl_goods.updated_at";
 
         if (isset($params['order']) && $params['order'] != '') {
@@ -149,7 +149,7 @@ class Cargo_GoodsModel
      */
     public function searchGoods($params){
         $filter = array();
-        $where = ' gl_goods.`is_del` = 0 AND gl_goods.`status` = 1 AND gl_goods.`reach_endtime`>  NOW()';
+        $where = ' gl_goods.`is_del` = 0 AND gl_goods.`status` = 1 AND gl_goods.source = 0 AND gl_goods.`reach_endtime`>  NOW()';
 
         if (isset($params['start_provice_id']) && $params['start_provice_id'] != '') {
             $filter[] = " gl_goods.`start_provice_id` =".$params['start_provice_id'];
