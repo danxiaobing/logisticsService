@@ -156,7 +156,8 @@ class Transmanage_OrderModel
 
 
     public function untreadOrder($params){
-        $where = ' gl_order.`is_del` = 0  AND gl_order.`status` = 1';
+
+        $where = ' gl_order.`is_del` = 0 ';
         $filter = [];
 
         if (isset($params['id']) && $params['id'] != '') {
@@ -174,7 +175,7 @@ class Transmanage_OrderModel
             $where .= ' AND '.implode(" AND ", $filter);
         }
 
-        $sql = "SELECT status,goods_id FROM gl_order   WHERE {$where}";
+        $sql = "SELECT id,status,goods_id FROM gl_order   WHERE {$where}";
 
         $orderArr = $this->dbh->select_row($sql);
 
@@ -195,7 +196,7 @@ class Transmanage_OrderModel
             }
 
             if (isset($params['cargo_id'])  && $params['status'] == 6) {
-                $goodArr = $this->dbh->select_row('SELECT status,source,reach_endtime FROM gl_order WHERE id = ' . $orderArr['goods_id']);
+                $goodArr = $this->dbh->select_row('SELECT status,source,reach_endtime FROM gl_goods WHERE id = ' . $orderArr['goods_id']);
                 if (!empty($goodArr) && $goodArr['source'] == 0) {
                     $goodArr['status'] = time() > strtotime($goodArr['reach_endtime']) ? 3 : 1;
                     $good = $this->dbh->update('gl_goods', $goodArr, 'id = ' . $orderArr['goods_id']);
