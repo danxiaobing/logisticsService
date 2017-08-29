@@ -131,7 +131,27 @@ class Transmanage_OrderModel
 
       //获取城市信息
       $city = $this->dbh->select('SELECT cityid,city FROM conf_city');
-      return array('info'=>$info,'data'=>$data,'city'=>$city);
+      //获取托运单的调度信息
+      $sql = "SELECT
+                god.`id`,
+                god.`cars_number` ,
+                god.`driver_name` ,
+                gd.`mobile` ,
+                god.`weights` ,
+                god.`start_weights` ,
+                god.`end_weights` ,
+                god.`status`
+              FROM
+                gl_order_dispatch god
+              LEFT JOIN 
+                gl_driver gd 
+              ON 
+                gd.id = god.driver_id
+              WHERE
+                god.`order_id` = ".intval($orderid);
+      $res = $this->dbh->select($sql);
+      $Schedule =  $res ? $res:[];
+      return array('info'=>$info,'data'=>$data,'city'=>$city,'schedule'=>$Schedule);
     }
 
 
@@ -197,4 +217,5 @@ class Transmanage_OrderModel
         }
 
     }
+
 }
