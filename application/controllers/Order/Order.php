@@ -51,7 +51,7 @@ class Order_OrderController extends Rpc {
     public function updateFunc($id,$data = array())
     {
         $L = new Order_OrderModel(Yaf_Registry::get("db"));
-        $data = $L->updata($data,$id);
+        $data = $L->updata($id,$data);
         return $data;
     }
 
