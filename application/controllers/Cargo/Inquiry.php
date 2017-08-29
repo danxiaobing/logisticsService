@@ -79,4 +79,12 @@ class Cargo_InquiryController extends Rpc {
         $data = $L->agreeOffer($id,$params);
         return $data;
     }
+    /**
+     * 货主查找车源报价
+     */
+    public function addPublishAndCreateInquiryFunc($params){
+        $L = new Cargo_InquiryModel(Yaf_Registry::get("db"));
+        $data = $L->addPublishAndCreateInquiry($params);
+        return $data;
+    }
 }

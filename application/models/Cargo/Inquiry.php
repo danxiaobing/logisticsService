@@ -32,6 +32,9 @@ class Cargo_InquiryModel
         if (isset($params['start_provice_id']) && $params['start_provice_id'] != '') {
             $filter[] = " gl_goods.`start_provice_id` =".$params['start_provice_id'];
         }
+        if (isset($params['cid']) && !empty($params['cid'])) {
+            $filter[] = " gl_goods.`cid` =".$params['cid'];
+        }
 
         if (isset($params['start_city_id']) && $params['start_city_id'] != '') {
             $filter[] = " gl_goods.`start_city_id` =".$params['start_city_id'];
@@ -307,5 +310,73 @@ class Cargo_InquiryModel
         }
 
     }
+    /**
+     * 货主找车议价
+     */
+    public function addPublishAndCreateInquiry($params){
+
+        //1 添加货源信息 2 生成询价单  3 添加询价记录
+
+
+        //开始事物
+        $this->dbh->begin();
+        try{
+
+            $goods_info  = $params;
+            unset($goods_info['carriers_id']);
+            unset($goods_info['offer_price']);
+            unset($goods_info['stype']);
+
+            $gid = $this->dbh->insert('gl_goods',$goods_info);
+            if(!$gid){
+                $this->dbh->rollback();
+                return false;
+            }
+
+            $insertInfo = array(
+                'gid'=>$gid,
+                'cid'=>$params['carriers_id'],//承运商id
+                'status'=>1,
+                'created_at'=>'=NOW()',
+                'updated_at'=>'=NOW()',
+            );
+
+            $inquiry = $this->dbh->insert('gl_inquiry',$insertInfo);
+            if(!$inquiry){
+                $this->dbh->rollback();
+                return false;
+            }
+
+
+           if($params['stype'] == 1){
+                $info = array(
+                    'pid'=>$inquiry,
+                    'minprice'=>$params['offer_price'],
+                    'pid'=>$inquiry,
+                    'cid'=>$params['cid'],
+                    'type'=>2,
+                    'created_at'=>'=NOW()',
+                    'updated_at'=>'=NOW()'
+                );
+
+                $re = $this->dbh->insert('gl_inquiry_info',$info);
+                if(!$re){
+                    $this->dbh->rollback();
+                    return false;
+                }
+            }
+
+            $this->dbh->commit();
+            return $inquiry;
+
+        }catch (Exception $e){
+            $this->dbh->rollback();
+            return false;
+        }
+
+
+
+    }
+
 
 }
