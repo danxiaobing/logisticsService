@@ -133,4 +133,66 @@ class Transmanage_OrderModel
       $city = $this->dbh->select('SELECT cityid,city FROM conf_city');
       return array('info'=>$info,'data'=>$data,'city'=>$city);
     }
+
+
+    public function untreadOrder($params){
+        $where = ' gl_order.`is_del` = 0  AND gl_order.`status` = 1';
+        $filter = [];
+
+        if (isset($params['id']) && $params['id'] != '') {
+            $filter[] = " gl_order.`id` =".$params['id'];
+        }
+
+        if (isset($params['companies_id']) && $params['companies_id'] != '') {
+            $filter[] = " gl_order.`company_id` =".$params['companies_id'];
+        }
+        if (isset($params['cargo_id']) && $params['cargo_id'] != ''){
+            $filter[] = " gl_order.`cargo_id` =".$params['cargo_id'];
+        }
+
+        if (count($filter) > 0) {
+            $where .= ' AND '.implode(" AND ", $filter);
+        }
+
+        $sql = "SELECT status,goods_id FROM gl_order   WHERE {$where}";
+
+        $orderArr = $this->dbh->select_row($sql);
+
+        if(empty($orderArr)){
+            return false;
+        }
+
+        #开启事物
+        $this->dbh->begin();
+        try{
+            $orderArr['status'] = 7;
+            $orderArr['reasons'] = !empty($params['reasons']) ? $params['reasons']:'';
+            $order = $this->dbh->update('gl_order',$orderArr,'id = '.$orderArr['id']);
+
+            if(empty($order)){
+                $this->dbh->rollback();
+                return false;
+            }
+
+            $goodArr = $this->dbh->select_row('SELECT status,source,reach_endtime FROM gl_order WHERE id = '.$orderArr['goods_id']);
+            if(!empty($goodArr) && $goodArr['source'] == 0){
+                $goodArr['status'] =  time() > strtotime($goodArr['reach_endtime']) ? 3:1;
+                $good = $this->dbh->update('gl_goods',$goodArr,'id = '.$orderArr['goods_id']);
+
+                if(empty($good)){
+                    $this->dbh->rollback();
+                    return false;
+                }
+            }
+
+            $this->dbh->commit();
+            return true;
+
+
+        } catch (Exception $e) {
+            $this->dbh->rollback();
+            return false;
+        }
+
+    }
 }

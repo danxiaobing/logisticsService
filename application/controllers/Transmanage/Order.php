@@ -38,4 +38,9 @@ class Transmanage_OrderController extends Rpc
         return $result;
     }
 
+    public function  untreadOrderFunc($params){
+        $L = new Transmanage_OrderModel(Yaf_Registry::get("db"));
+        $data = $L->untreadOrder($params);
+        return $data;
+    }
 }
