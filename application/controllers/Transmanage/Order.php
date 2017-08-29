@@ -25,5 +25,17 @@ class Transmanage_OrderController extends Rpc
         return $data;
     }
 
+    /*获取单个托运单详情*/
+    public function getOrderInfoFunc($orderid){
+        $O = new Transmanage_OrderModel(Yaf_Registry::get("db"));
+        $result = $O->getOrderInfo($orderid); 
+        $cityArr = array_column($result['city'],'city','cityid');//城市数据 cityid-city 
+        $s_index = $result['data']['start_city_id'];//起始城市id
+        $e_index = $result['data']['end_city_id'];//起始城市id
+        $result['citystart'] = $cityArr[$s_index];//起始城市
+        $result['cityend'] = $cityArr[$e_index];//目的城市
+        unset($result['city']);
+        return $result;
+    }
 
 }
