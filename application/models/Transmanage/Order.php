@@ -29,12 +29,21 @@ class Transmanage_OrderModel
             $filter[] = " g.`start_city_id` =".$params['start_city_id'];
         }
 
+        if (isset($params['start_area_id']) && $params['start_area_id'] != '') {
+            $filter[] = " g.`start_area_id` =".$params['start_area_id'];
+        }
+
         if (isset($params['end_provice_id']) && $params['end_provice_id'] != '') {
             $filter[] = " g.`end_provice_id` =".$params['end_provice_id'];
         }
 
         if (isset($params['end_city_id']) && $params['end_city_id'] != '') {
             $filter[] = " g.`end_city_id` =".$params['end_city_id'];
+        }
+
+
+        if (isset($params['end_area_id']) && $params['end_area_id'] != '') {
+            $filter[] = " g.`end_area_id` =".$params['end_area_id'];
         }
 
 

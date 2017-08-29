@@ -40,6 +40,12 @@ class Transmanage_InquiryDelModel
         if(isset($search['start_city_id']) && $search['start_city_id'] != ''){
             $filter[] = " g.`start_city_id` ={$search['start_city_id']} ";
         }
+
+        //起始县
+        if(isset($search['start_area_id']) && $search['start_area_id'] != ''){
+            $filter[] = " g.`start_area_id` ={$search['start_area_id']} ";
+        } 
+
         //目的省
         if(isset($search['end_provice_id']) && $search['end_provice_id'] != ''){
             $filter[] = " g.`end_provice_id` ={$search['end_provice_id']} ";
@@ -48,6 +54,14 @@ class Transmanage_InquiryDelModel
         if(isset($search['end_city_id']) && $search['end_city_id'] != ''){
             $filter[] = " g.`end_city_id` ={$search['end_city_id']} ";
         }
+
+        //目的县
+        if(isset($search['end_area_id']) && $search['end_area_id'] != ''){
+            $filter[] = " g.`end_area_id` ={$search['end_area_id']} ";
+        }         
+
+       
+
         //重量
         if(isset($search['min']) && $search['min'] != ''){
             $filter[] = " g.`weights` >= {$search['min']}";
@@ -89,6 +103,8 @@ class Transmanage_InquiryDelModel
             LEFT JOIN gl_products as p ON p.id = g.product_id
             {$where}
           ORDER BY l.`updated_at` DESC";
+
+
 
         $this->dbh->set_page_num($search['page'] ? $search['page'] : 1);
         $this->dbh->set_page_rows($search['rows'] ? $search['rows'] : 8);
