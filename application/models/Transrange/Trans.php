@@ -168,4 +168,45 @@ class Transrange_TransModel
     }
 
 
+    //匹配承运商list
+    public function getTransMatch($parameter){
+        $sql = "SELECT
+                    gcr.`id` ,
+                    gcr.`user` ,
+                    gcr.`mobile` ,
+                    gcr.`is_black` ,
+                    gcrr.`area_id` ,
+                    gcrb.`blist`
+                FROM
+                    gl_companies_range gcr
+                LEFT JOIN gl_companies_range_region gcrr ON gcr.`id` = gcrr.`r_id`
+                LEFT JOIN gl_companies_range_black gcrb ON gcrb.`cid` = gcr.`id`
+                WHERE
+
+                IF(
+                    gcr.`is_black` = 1 ,
+                    ! INSTR(gcrb.`blist` , {$parameter['companyid']}) ,
+                    '1=1'
+                )
+                AND
+                IF(
+                    gcr.`is_black` = 2 ,
+                    INSTR(gcrb.`blist` , {$parameter['companyid']}) ,
+                    '1=1'
+                )
+                AND (INSTR(gcrr.`area_id` , {$parameter['start_area_id']}) && INSTR(gcrr.`area_id`,{$parameter['end_area_id']}) )
+                GROUP BY
+                    gcr.`user` ,
+                    gcr.`mobile`
+                ORDER BY
+                    gcr.`id` DESC
+                ";
+
+        $res = $this->dbh->select($sql);
+
+        return $res;
+
+    }
+
+
 }

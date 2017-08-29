@@ -49,5 +49,11 @@ class Transrange_TransController extends Rpc {
         $T = new Transrange_TransModel(Yaf_Registry::get("db"));
         return $T->getBlacklist($id);        
     }
+
+    //获取匹配的承运商名单
+    public function getTransMatchFunc($parameter){
+        $T = new Transrange_TransModel(Yaf_Registry::get("db"));
+        return $T->getTransMatch($parameter);   
+    }
 }
 
