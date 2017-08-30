@@ -25,5 +25,16 @@ class Transmanage_DispatchController extends Rpc
         return $data;
     }
 
+    /**
+     * 搜索
+     * @param array $params
+     * @author amor
+     */
+    public function dispatchProcedureFunc($params){
+        $L = new Transmanage_DispatchModel(Yaf_Registry::get("db"));
+        $data = $L->dispatchProcedure($params);
+        return $data;
+    }
+
 
 }

@@ -105,4 +105,56 @@ class Transmanage_DispatchModel
 
         return $result;
     }
+
+    public function dispatchProcedure($params){
+        $dispatch_arr  = [
+            'id' =>$params['id'],
+            'status' =>$params['status'],
+            'start_weights'=>$params['start_weights'],
+            'end_weights'=>$params['end_weights'],
+            'start_time'=>$params['start_time'],
+            'end_time'=>$params['end_time'],
+        ];
+
+        $dispatch_arr = array_filter($dispatch_arr);
+
+        #开启事物
+        $this->dbh->begin();
+        try{
+            #修改调度单
+            $dispatch = $this->dbh->insert('gl_order_dispatch', $dispatch_arr,'id = '.intval($params['id']));
+            if(!$dispatch){
+                $this->dbh->rollback();
+                return false;
+            }
+
+            if(5 == $params['status'] && 3 == $params['status']){
+                if(empty($params['other_file'])){
+                    $this->dbh->rollback();
+                    return false;
+                }
+                $pic = [];
+                $status = $params['status'] == 3?1:2;
+                foreach ($params['other_file'] as $key=>$v){
+                    $pic[$key] = ['pic'=>$v,'status'=>$status,'dispatch_id'=>$params['id'],'created_at'=>'=NOW()','updated_at'=>'=NOW()'];
+                }
+
+                $data = '';
+                foreach ($pic as $v){
+                    $data = $this->dbh->insert('gl_order_dispatch_pic',$v);
+                    if(empty($data)){
+                        $this->dbh->rollback();
+                        return false;
+                    }
+                }
+            }
+
+            $this->dbh->commit();
+            return true;
+
+        } catch (Exception $e) {
+            $this->dbh->rollback();
+            return false;
+        }
+    }
 }
