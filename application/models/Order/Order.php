@@ -126,9 +126,9 @@ class Order_OrderModel
      * id: 权限id
      * @return 数组
      */
-    public function getInfo($id = 0)
+    public function getInfo($orderid = 0)
     {
-        $sql = "SELECT
+      /*  $sql = "SELECT
                 id,
                 number,
                 cargo_id,
@@ -141,7 +141,32 @@ class Order_OrderModel
                 reasons
                  FROM gl_order WHERE gl_order.id=".$id;
 
-        return $this->dbh->select_row($sql);
+        return $this->dbh->select_row($sql);*/
+        //获取托运单基本信息
+        $sql = "SELECT go.number,go.goods_id,go.status,go.reasons,go.estimate_freight,go.fact_freight,go.pay_time FROM gl_order go WHERE go.id=".intval($orderid);
+        $info = $this->dbh->select_row($sql);
+
+        //获取托运单的调度信息
+        $sql = "SELECT
+                god.`id`,
+                god.`cars_number` ,
+                god.`driver_name` ,
+                gd.`mobile` ,
+                god.`weights` ,
+                god.`start_weights` ,
+                god.`end_weights` ,
+                god.`status`
+              FROM
+                gl_order_dispatch god
+              LEFT JOIN
+                gl_driver gd
+              ON
+                gd.id = god.driver_id
+              WHERE
+                god.`order_id` = ".intval($orderid);
+        $res = $this->dbh->select($sql);
+        $Schedule =  $res ? $res:[];
+        return array('order_info'=>$info,'schedule'=>$Schedule);
     }
     //添加
     public function addInfo($params)
