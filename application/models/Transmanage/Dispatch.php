@@ -114,6 +114,7 @@ class Transmanage_DispatchModel
             'end_weights'=>$params['end_weights'],
             'start_time'=>$params['start_time'],
             'end_time'=>$params['end_time'],
+            'weights'=>$params['weights'],
         ];
 
         $dispatch_arr = array_filter($dispatch_arr);
@@ -122,8 +123,14 @@ class Transmanage_DispatchModel
         $this->dbh->begin();
         try{
             #修改调度单
-            $dispatch = $this->dbh->insert('gl_order_dispatch', $dispatch_arr,'id = '.intval($params['id']));
+            $dispatch = $this->dbh->update('gl_order_dispatch', $dispatch_arr,'id = '.intval($params['id']));
             if(!$dispatch){
+                $this->dbh->rollback();
+                return false;
+            }
+
+            $dispatch_log = $this->dbh->insert('gl_order_dispatch_log',['status'=>intval($params['status']),'dispatch_id'=>$params['id'],'created_at'=>'=NOW()','updated_at'=>'=NOW()']);
+            if(empty($dispatch_log)){
                 $this->dbh->rollback();
                 return false;
             }
