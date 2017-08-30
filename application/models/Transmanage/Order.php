@@ -215,6 +215,16 @@ class Transmanage_OrderModel
                         return false;
                     }
                 }
+                //修改调度单状态
+                $order_dispatchArr = $this->dbh->select_row('SELECT status FROM gl_order_dispatch WHERE is_del= 0 AND order_id = '. $orderArr['id']);
+                if(!empty($order_dispatchArr)){
+                    $update['is_del'] = 1;
+                    $res = $this->dbh->update('gl_order_dispatch',$update,'order_id = '.$orderArr['id']);
+                    if (empty($res)) {
+                        $this->dbh->rollback();
+                        return false;
+                    }
+                }
             }
 
             $this->dbh->commit();
