@@ -26,7 +26,7 @@ class Transmanage_DispatchController extends Rpc
     }
 
     /**
-     * 搜索
+     * 修改状态
      * @param array $params
      * @author amor
      */
@@ -36,5 +36,10 @@ class Transmanage_DispatchController extends Rpc
         return $data;
     }
 
+    public function dispatchListFunc($id){
+        $L = new Transmanage_DispatchModel(Yaf_Registry::get("db"));
+        $data = $L->dispatchList($id);
+        return $data;
+    }
 
 }
