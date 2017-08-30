@@ -142,7 +142,7 @@ class Transmanage_InquiryDelModel
     public function getInquiryInfo($id){
         $sql = "SELECT gi.`id`,gi.`status`,gi.`type`,gii.`minprice`,gii.`maxprice`,gii.`type`,gii.`created_at` FROM gl_inquiry gi LEFT JOIN gl_inquiry_info gii ON gi.id = gii.pid WHERE gii.pid=".intval($id)." AND gi.`is_del`=0  ORDER BY gii.`id` ASC";
         $data =  $this->dbh->select($sql);
-        unset($data[0]);
+        // unset($data[0]);
         return $data;
     }
 
@@ -161,19 +161,26 @@ class Transmanage_InquiryDelModel
                     $this->dbh->rollback();
                     return false;
                 } 
+
+
                 //生成询价日志信息 记录托运方报价
-                $info = array(
-                    'pid'        => $id,//询价单主键id
-                    'minprice'   => $price['offer_price'],
-                    'type'       => 2,
-                    'created_at' => '=NOW()',
-                    'updated_at' => '=NOW()',
-                );
-                $res = $this->dbh->insert('gl_inquiry_info',$info);
+                // $info = array(
+                //     'pid'        => $id,//询价单主键id
+                //     'minprice'   => $price['offer_price'],
+                //     'type'       => 2,
+                //     'created_at' => '=NOW()',
+                //     'updated_at' => '=NOW()',
+                // );
+                // $res = $this->dbh->insert('gl_inquiry_info',$info);
+
+
                 //插入承运商报价
+                $info['pid']      = $id;
                 $info['minprice'] = $price['minprice'];
                 $info['maxprice'] = $price['maxprice'];
                 $info['type']     = 1;
+                $info['created_at'] = '=NOW()';
+                $info['updated_at'] = '=NOW()';
 
                 $result = $this->dbh->insert('gl_inquiry_info',$info);
                 if(!$result){
