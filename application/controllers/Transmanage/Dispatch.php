@@ -19,9 +19,9 @@ class Transmanage_DispatchController extends Rpc
      * @param array $params
      * @author amor
      */
-    public function searchOrderFunc($params){
-        $L = new Transmanage_OrderModel(Yaf_Registry::get("db"));
-        $data = $L->searchOrder($params);
+    public function getListFunc($params){
+        $L = new Transmanage_DispatchModel(Yaf_Registry::get("db"));
+        $data = $L->getList($params);
         return $data;
     }
 

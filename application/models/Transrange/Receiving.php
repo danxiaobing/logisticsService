@@ -27,6 +27,10 @@ class Transrange_ReceivingModel
         $where = "  ";
 
 
+        if (isset($params['company_ids']) && count($params['company_ids']) ) {
+            $filter[] = " r.`cid` in (".implode(',',$params['company_ids']).")";
+        }
+
         if (isset($params['product']) && $params['product'] != '' ) {
             $filter[] = " p.`zh_name` LIKE '%{$params['product']}%' ";
         }
