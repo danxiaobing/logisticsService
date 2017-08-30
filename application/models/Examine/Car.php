@@ -26,7 +26,7 @@ class Examine_CarModel
 
 
         if (isset($params['company_ids']) && count($params['company_ids']) ) {
-            $filter[] = " com.`id` in (".implode(',',$params['company_ids']).")";
+            $filter[] = " c.`company_id` in (".implode(',',$params['company_ids']).")";
         }
 
         if (isset($params['keyworks']) && $params['keyworks'] != '') {
