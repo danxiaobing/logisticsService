@@ -344,8 +344,9 @@ class Cargo_InquiryModel
             }
 
 
-           if($params['stype'] == 1){
-                $info = array(
+
+            //添加询价记录
+            $info = array(
                     'pid'=>$inquiry,
                     'minprice'=>$params['offer_price'],
                     'pid'=>$inquiry,
@@ -353,14 +354,14 @@ class Cargo_InquiryModel
                     'type'=>2,
                     'created_at'=>'=NOW()',
                     'updated_at'=>'=NOW()'
-                );
+            );
 
-                $re = $this->dbh->insert('gl_inquiry_info',$info);
-                if(!$re){
-                    $this->dbh->rollback();
-                    return false;
-                }
+            $re = $this->dbh->insert('gl_inquiry_info',$info);
+            if(!$re){
+                $this->dbh->rollback();
+                return false;
             }
+
 
             $this->dbh->commit();
             return $inquiry;
