@@ -133,13 +133,14 @@ class Transmanage_OrderModel
       //获取托运单基本信息
       $sql = "SELECT go.number,go.goods_id,go.estimate_freight FROM gl_order go WHERE go.id=".intval($orderid);
       $info = $this->dbh->select_row($sql);
-
       //获取goods基本信息
       $sql = "SELECT gd.id, gd.cid ,gd.start_provice_id ,gd.start_city_id ,gd.end_provice_id ,gd.end_city_id ,gd.weights,gd.weights_done,gd.price ,gd.companies_name ,gd.off_starttime ,gd.off_endtime ,gd.reach_starttime ,gd.reach_endtime ,gd.offer_status,gd.offer_price,gd.loss,gd.desc_str ,gd.off_address ,gd.off_user ,gd.off_phone ,gd.reach_address ,gd.reach_user ,gd.reach_phone ,gd.consign_user ,gd.consign_phone,gp.zh_name,gct.`name`,gd.created_at,gd.`status` FROM gl_goods gd LEFT JOIN  gl_products gp ON gp.id = gd.product_id LEFT JOIN gl_cars_type gct ON  gct.id=gd.cars_type WHERE gd.id =".$info['goods_id'];
       $data = $this->dbh->select_row($sql);
 
       //获取城市信息
       $city = $this->dbh->select('SELECT cityid,city FROM conf_city');
+      //获取省的信息
+      $province = $this->dbh->select('SELECT province,provinceid FROM conf_province');
       //获取托运单的调度信息
       $sql = "SELECT
                 god.`id`,
@@ -160,7 +161,7 @@ class Transmanage_OrderModel
                 god.`order_id` = ".intval($orderid);
       $res = $this->dbh->select($sql);
       $Schedule =  $res ? $res:[];
-      return array('info'=>$info,'data'=>$data,'city'=>$city,'schedule'=>$Schedule);
+      return array('info'=>$info,'data'=>$data,'city'=>$city,'province'=>$province,'schedule'=>$Schedule);
     }
 
 

@@ -138,7 +138,7 @@ class Transmanage_DispatchModel
 
     /*待发车调度单*/
     public function getInfo($dispatch_id){
-        $sql = "SELECT id,dispatch_number,order_number,order_id,ctype_name,driver_name,supercargo_name,cars_number,end_time,start_time,weights FROM gl_order_dispatch WHERE id=".intval($dispatch_id);
+        $sql = "SELECT god.id,god.dispatch_number,god.order_number,god.order_id,god.ctype_name,god.driver_name,god.supercargo_name,god.cars_number,god.end_time,god.start_time,god.weights FROM gl_order_dispatch god  WHERE god.id=".intval($dispatch_id);
         $data =  $this->dbh->select_row($sql);
         return $data ? $data : [];
 
