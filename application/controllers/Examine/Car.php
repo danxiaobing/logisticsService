@@ -17,6 +17,12 @@ class Examine_CarController extends Rpc {
         $data = $L->getPage($params);
         return $data;
     }
+    public function getCarByTypeFunc($params)
+    {
+        $L = new Examine_CarModel(Yaf_Registry::get("db"));
+        $data = $L->getCarByType($params);
+        return $data;
+    }
 
     public function showfileFunc($id)
     {

@@ -107,7 +107,39 @@ class Examine_CarModel
         //print_r($result);die;
         return $result;
     }
+    public function getCarByType($params)
+    {
 
+
+        $where = "WHERE c.is_del = 0 AND c.company_id in (" . implode(',',$params['company_ids']) . ") AND c.type =  ".$params['type'];
+        $sql = "SELECT 
+                c.`id`,
+                c.`number`,
+                c.`type`,
+                c.`vins`,
+                c.`register`,
+                c.`engine_number`,
+                c.`material`,
+                c.`car_position`,
+                c.`is_use`,
+                f.`name` as fleets_name,
+                d.`id` as driver_id,
+                d.`name` as driver_name,
+                d.`mobile` as driver_mobile,
+                d2.`name` as escort_name,
+                d2.`mobile` as escort_mobile,
+                d2.`id` as escort_id
+                FROM `gl_cars` AS c
+                LEFT JOIN `gl_fleets` AS f ON f.`id` = c.`fleets_id`
+                LEFT JOIN `gl_driver` AS d ON d.`id` = c.`driver_id`
+                LEFT JOIN `gl_driver` AS d2 ON d2.`id` = c.`escort_id`
+                {$where} 
+                ORDER BY c.`updated_at` DESC";
+        //print_r($sql);die;
+        $result = $this->dbh->select($sql);
+        //print_r($result);die;
+        return $result;
+    }
     public function add($params)
     {
         
