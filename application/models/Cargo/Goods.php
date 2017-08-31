@@ -35,7 +35,7 @@ class Cargo_GoodsModel
             $filter[] = " gl_goods.cid = " . $params['cid'];
         }
         if (isset($params['status']) && !empty($params['status'])) {
-            $filter[] = " `gl_goods.status`=" . $params['status'];
+            $filter[] = " gl_goods.status=" . $params['status'];
         }
         if (1 <= count($filter)) {
             $where .= ' AND ' . implode(' AND ', $filter);
