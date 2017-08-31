@@ -111,7 +111,6 @@ class Cargo_InquiryModel
                  LEFT JOIN gl_products ON gl_products.id = gl_goods.product_id
                 WHERE  {$where}
                 ORDER BY id DESC";
-      //  print_r($sql);die;
         $result['list']  = $this->dbh->select_page($sql);
         return $result;
     }
