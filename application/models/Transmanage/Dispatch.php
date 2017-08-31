@@ -21,7 +21,6 @@ class Transmanage_DispatchModel
     public function getList($params){
         $filter = array();
 
-
         if (isset($params['company_ids']) && count($params['company_ids']) ) {
             $filter[] = " `c_id` in (".implode(',',$params['company_ids']).")";
         }
@@ -153,13 +152,32 @@ class Transmanage_DispatchModel
         if(!empty($params['id'])){
             $res = $this->dbh->update('gl_order_dispathc', $params,' id = '.intval($params['id']));
         }else{
-            $res = $this->dbh->insert('gl_order_dispathc', $params);
-        }
-        if( !$res ){
-            return false;
+            $time = $params['time'];
+            if(empty($time)){
+                return false;
+            }
+
+            $this->dbh->begin();
+            try{
+                foreach ($time as $v){
+                    $params['start_time'] = $v['start_time'];
+                    $params['end_time'] = $v['end_time'];
+                    $res = $this->dbh->insert('gl_order_dispathc', $params);
+                    if($res){
+                        $this->dbh->rollback();
+                        return false;
+                    }
+                }
+                $this->dbh->commit();
+                return true;
+
+            } catch (Exception $e) {
+                $this->dbh->rollback();
+                return false;
+            }
+
         }
 
-        return true;
     }
 
 }
