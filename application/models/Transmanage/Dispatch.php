@@ -124,6 +124,7 @@ class Transmanage_DispatchModel
         }
     }
 
+
     /**
      * 查询调运单列表
      * @param $id
@@ -133,4 +134,14 @@ class Transmanage_DispatchModel
         $sql = "SELECT id,dispatch_number,weights,cars_number,driver_name,supercargo_name,start_time,end_time FROM gl_order_dispatch_ WHERE status = 5 AND order_id = ".intval($id);
         return $this->dbh->select($sql);
     }
+
+
+    /*待发车调度单*/
+    public function getInfo($dispatch_id){
+        $sql = "SELECT id,dispatch_number,order_number,order_id,ctype_name,driver_name,supercargo_name,cars_number,end_time,start_time,weights FROM gl_order_dispatch WHERE id=".intval($dispatch_id);
+        $data =  $this->dbh->select_row($sql);
+        return $data ? $data : [];
+
+    } 
+
 }
