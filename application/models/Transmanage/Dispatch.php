@@ -142,6 +142,24 @@ class Transmanage_DispatchModel
         $data =  $this->dbh->select_row($sql);
         return $data ? $data : [];
 
-    } 
+    }
+
+    /**
+     * 编辑和新增
+     * @param  array $params
+     * @return bool
+     */
+    public function editDispatch($params){
+        if(!empty($params['id'])){
+            $res = $this->dbh->update('gl_order_dispathc', $params,' id = '.intval($params['id']));
+        }else{
+            $res = $this->dbh->insert('gl_order_dispathc', $params);
+        }
+        if( !$res ){
+            return false;
+        }
+
+        return true;
+    }
 
 }
