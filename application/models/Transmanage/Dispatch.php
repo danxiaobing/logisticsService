@@ -151,8 +151,14 @@ class Transmanage_DispatchModel
     public function editDispatch($params){
         if(!empty($params['id'])){
             $res = $this->dbh->update('gl_order_dispathc', $params,' id = '.intval($params['id']));
+            if($res){
+                return true;
+            }else{
+                return false;
+            }
         }else{
             $time = $params['time'];
+            unset($params['time']);
             if(empty($time)){
                 return false;
             }
