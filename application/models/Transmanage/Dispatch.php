@@ -149,7 +149,6 @@ class Transmanage_DispatchModel
      * @return bool
      */
     public function editDispatch($params){
-        // echo "<pre>";print_r($params);echo "</pre>";die; 
         if(!empty($params['id'])){
             $res = $this->dbh->update('gl_order_dispathc', $params,' id = '.intval($params['id']));
             if($res){
@@ -169,11 +168,21 @@ class Transmanage_DispatchModel
                 foreach ($time as $v){
                     $params['start_time'] = $v['start_time'];
                     $params['end_time'] = $v['end_time'];
-                    $res = $this->dbh->insert('gl_order_dispatch', $params);
-                    if($res){
+                    $res = $this->dbh->insert('gl_order_dispathc', $params);
+                    if(!$res){
                         $this->dbh->rollback();
                         return false;
                     }
+                }
+                $order = $this->dbh->update('gl_order',['status'=>2],' id ='.intval($params['order_id']));
+                if(!$order){
+                    $this->dbh->rollback();
+                    return false;
+                }
+                $goods = $this->dbh->update('gl_goods',['weights_done'=>$params['weights_done']+$params['weights']],' id ='.$params['goods_id']);
+                if(!$goods){
+                    $this->dbh->rollback();
+                    return false;
                 }
                 $this->dbh->commit();
                 return true;
