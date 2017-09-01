@@ -144,6 +144,7 @@ class Transmanage_OrderModel
       //获取托运单的调度信息
       $sql = "SELECT
                 god.`id`,
+                god.`order_id`,
                 god.`cars_number` ,
                 god.`driver_name` ,
                 gd.`mobile` ,
@@ -237,6 +238,37 @@ class Transmanage_OrderModel
             return false;
         }
 
+    }
+
+    /*获取物流详情*/
+    public function getlist($dispatchid){
+      //调度单日志
+     $sql = "SELECT
+              godl.`id` ,
+              godl.`dispatch_id` ,
+              godl.`status` ,
+              godl.`created_at` 
+            FROM
+              gl_order_dispatch_log godl
+            WHERE godl.dispatch_id = ".intval($dispatchid)."
+            ORDER BY
+              godl.`status` ASC";
+     $res = $this->dbh->select($sql);
+     if(empty($res)){
+        return false;
+     }
+     //单据凭证
+     $sql = 'SELECT pic,status FROM gl_order_dispatch_pic   godp WHERE is_del = 0 AND dispatch_id='.intval($dispatchid);
+     $pic = $this->dbh->select($sql);
+
+     return array('data'=> $res,'pic'=>$pic);
+    }
+
+
+    /*获取托运单生成时间*/
+    public function getTime($orderid){
+      $sql = "SELECT created_at FROM gl_order WHERE id=".intval($orderid);
+      return $this->dbh->select_one($sql);
     }
 
 }

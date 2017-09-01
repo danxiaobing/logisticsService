@@ -52,4 +52,18 @@ class Transmanage_OrderController extends Rpc
         $data = $L->untreadOrder($params);
         return $data;
     }
+
+
+    /*获取对应的物流详情*/
+    public function getlistFunc($dispatchid){
+        $L = new Transmanage_OrderModel(Yaf_Registry::get("db"));
+        return $L->getlist($dispatchid);    
+    }
+
+
+    /*获取托运单的生成时间*/
+    public function getTimeFunc($orderid){
+        $L = new Transmanage_OrderModel(Yaf_Registry::get("db"));
+        return $L->getTime($orderid);           
+    }
 }
