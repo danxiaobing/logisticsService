@@ -75,6 +75,8 @@ class Transmanage_DispatchModel
             'weights'=>$params['weights'],
         ];
 
+        $order_id = $params['order_id'] ? $params['order_id']:'';
+
         $dispatch_arr = array_filter($dispatch_arr);
 
         #开启事物
@@ -89,6 +91,18 @@ class Transmanage_DispatchModel
 
             $dispatch_log = $this->dbh->insert('gl_order_dispatch_log',['status'=>intval($params['status']),'dispatch_id'=>$params['id'],'created_at'=>'=NOW()','updated_at'=>'=NOW()']);
             if(empty($dispatch_log)){
+                $this->dbh->rollback();
+                return false;
+            }
+
+            if(6 == $params['status'] && $params['weights'] != '' && $params['goods_id'] != ''){
+                $goods_arr = $this->dbh->select_row('SELECT weights_done FROM gl_goods WHERE id = '.$params['goods_id']);
+                $goods = $this->dbh->update('gl_goods',['weights_done'=>$goods_arr['weights_done'] - $params['weights']],' id = '.$params['goods_id']);
+                if(!$goods){
+                    $this->dbh->rollback();
+                    return false;
+                }
+            }else{
                 $this->dbh->rollback();
                 return false;
             }
@@ -113,6 +127,11 @@ class Transmanage_DispatchModel
                     }
                 }
             }
+
+//            if(6 == $params['status']){
+//                $count = $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE order_id = '.$order_id);
+//                $success = $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE status = 6 AND order_id = '.$order_id);
+//            }
 
             $this->dbh->commit();
             return true;
