@@ -186,7 +186,7 @@ class Transmanage_OrderModel
             $where .= ' AND '.implode(" AND ", $filter);
         }
 
-        $sql = "SELECT id,status,goods_id FROM gl_order   WHERE {$where}";
+        $sql = "SELECT id,status,goods_id,car_id FROM gl_order   WHERE {$where}";
 
         $orderArr = $this->dbh->select_row($sql);
 
@@ -213,6 +213,26 @@ class Transmanage_OrderModel
                     $good = $this->dbh->update('gl_goods', $goodArr, 'id = ' . $orderArr['goods_id']);
 
                     if (empty($good)) {
+                        $this->dbh->rollback();
+                        return false;
+                    }
+                }
+                //car_id 不为代表是从货主查找车源添加的信息
+                //不为空代表是回程车信息
+                if(!empty($orderArr['car_id'])){
+                    //修改回程车信息状态
+
+                    $sql = "SELECT `id`,`end_time` FROM gl_return_car WHERE `id` =".$orderArr['car_id'];
+                    $return_car = $this->dbh->select_row($sql);
+                    if(!$return_car){
+                        $this->dbh->rollback();
+                        return false;
+                    }
+                    $info['status']  = time() > strtotime($return_car['end_time']) ? 3:1;
+                    $info['inquiry_id'] = 0;
+                    $info['order_id']  = 0;
+                    $result = $this->dbh->update('gl_return_car',$info,'id ='.$return_car['id']);
+                    if(!$result){
                         $this->dbh->rollback();
                         return false;
                     }
