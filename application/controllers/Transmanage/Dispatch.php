@@ -59,7 +59,7 @@ class Transmanage_DispatchController extends Rpc
      */
     public function editDispatchFunc($params){
         $L = new Transmanage_DispatchModel(Yaf_Registry::get("db"));
-        return $L->editDispatc($params);
+        return $L->editDispatch($params);
     }
 
 
