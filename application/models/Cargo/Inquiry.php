@@ -243,7 +243,7 @@ class Cargo_InquiryModel
         
         //获取询价单相关信息
         $where = " gl_inquiry.`is_del` = 0 AND gl_inquiry.`id` = {$id}";
-        $sql = "SELECT gl_inquiry.`cid` AS company_id,gl_inquiry.`status`,gl_inquiry.`gid`,gl_goods.`reach_endtime`,gl_goods.`cid` AS cargo_id,gl_goods.`weights`
+        $sql = "SELECT gl_inquiry.`cid` AS company_id,gl_inquiry.`status`,gl_inquiry.`gid`,gl_inquiry.`car_id`,gl_goods.`reach_endtime`,gl_goods.`cid` AS cargo_id,gl_goods.`weights`
                 FROM gl_inquiry
                 LEFT JOIN gl_goods ON gl_goods.`id` = gl_inquiry.`gid`
                 WHERE
@@ -267,6 +267,7 @@ class Cargo_InquiryModel
                 return false;
             }
 
+
             //新增托运单信息
             //货源id
             $params['goods_id'] = $inquiry['gid'];
@@ -276,16 +277,29 @@ class Cargo_InquiryModel
             $params['company_id'] = $inquiry['company_id'];
             //预成交运费
             $params['estimate_freight'] = $inquiry_info['minprice']*$inquiry['weights'];
-
-            $res = $this->dbh->insert('gl_order',$params);
-            if(empty($res)){
+            if(!empty($inquiry['car_id'])){
+                $params['car_id'] = $inquiry['car_id'];
+            }
+            $order = $this->dbh->insert('gl_order',$params);
+            if(empty($order)){
                 $this->dbh->rollback();
                 return false;
+            }
+            //不为空代表是回程车信息
+            if(!empty($inquiry['car_id'])){
+                //修改回程车信息状态
+                $info['status']  = 6;//已生成托运单
+                $info['order_id']  = $order;//已生成托运单
+                $result = $this->dbh->update('gl_return_car',$info,'id ='.$inquiry['car_id']);
+                if(!$result){
+                    $this->dbh->rollback();
+                    return false;
+                }
             }
 
             //修改询价单信息
             $updata_inquiry = array(
-                'order_id' =>$res,
+                'order_id' =>$order,
                 'status' =>3,
                 'price' =>$inquiry_info['minprice'],
                 'updated_at' =>'=NOW()'
@@ -318,6 +332,7 @@ class Cargo_InquiryModel
         try{
 
             $goods_info  = $params;
+            unset($goods_info['car_id']);
             unset($goods_info['carriers_id']);
             unset($goods_info['offer_price']);
             unset($goods_info['stype']);
@@ -336,12 +351,27 @@ class Cargo_InquiryModel
                 'updated_at'=>'=NOW()',
             );
 
+            if (isset($params['car_id']) && !empty($params['car_id'])) {
+                $insertInfo['car_id'] = $params['car_id'];
+
+            }
+
             $inquiry = $this->dbh->insert('gl_inquiry',$insertInfo);
             if(!$inquiry){
                 $this->dbh->rollback();
                 return false;
             }
 
+            //修改回程车信息状态
+            if (isset($params['car_id']) && !empty($params['car_id'])) {
+                $info['status']  = 2;
+                $info['inquiry_id']  = $inquiry;
+                $result = $this->dbh->update('gl_return_car',$info,'id ='.$params['car_id']);
+                if(!$result){
+                    $this->dbh->rollback();
+                    return false;
+                }
+            }
 
 
             //添加询价记录

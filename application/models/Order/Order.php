@@ -180,5 +180,74 @@ class Order_OrderModel
         return $this->dbh->update('gl_order',$params,'id=' . intval($id));
     }
 
+    /**
+     * 货主找车直接生成托运单
+     */
+    public function addPublishAndCreateOrder($params){
+
+        //1 添加货源信息 2 生成托运单 3.如果是回程车修改回程车状态
+
+
+        //开始事物
+        $this->dbh->begin();
+        try{
+
+            $goods_info  = $params;
+            unset($goods_info['number']);
+            unset($goods_info['car_id']);
+            unset($goods_info['carriers_id']);
+            unset($goods_info['carriers_price']);
+            unset($goods_info['offer_price']);
+            unset($goods_info['stype']);
+
+            $gid = $this->dbh->insert('gl_goods',$goods_info);
+            if(!$gid){
+                $this->dbh->rollback();
+                return false;
+            }
+            $insertInfo = array(
+                'number'=> $params['number'],//托运单号
+                'cargo_id'=> $params['cid'],//货主id
+                'goods_id'=>$gid,
+                'company_id'=>$params['carriers_id'],//承运商id
+                'estimate_freight'=>$params['carriers_price']*$params['weights'],
+                'created_at'=>'=NOW()',
+                'updated_at'=>'=NOW()',
+            );
+
+            if (isset($params['car_id']) && !empty($params['car_id'])) {
+                $insertInfo['car_id'] = $params['car_id'];
+            }
+            $order = $this->dbh->insert('gl_order',$insertInfo);
+            if(!$order){
+                $this->dbh->rollback();
+                return false;
+            }
+            if (isset($params['car_id']) && !empty($params['car_id'])) {
+                //修改回程车信息状态
+                $info['status']  = 6;//已生成托运单
+                $info['order_id']  = $order;//已生成托运单
+                $result = $this->dbh->update('gl_return_car',$info,'id ='.$params['car_id']);
+                if(!$result){
+                    $this->dbh->rollback();
+                    return false;
+                }
+            }
+
+            $this->dbh->commit();
+            return $order;
+
+        }catch (Exception $e){
+            $this->dbh->rollback();
+            return false;
+        }
+
+
+
+    }
+
+
+
+
 
 }

@@ -246,7 +246,7 @@ class Transmanage_InquiryDelModel
             $where .= ' AND '.implode(' AND ', $filter);
         }
 
-        $sql = "SELECT gl_inquiry.`status`,gl_inquiry.`gid`,gl_goods.`reach_endtime`
+        $sql = "SELECT gl_inquiry.`status`,gl_inquiry.`gid`,gl_inquiry.`car_id`,gl_goods.`reach_endtime`
                 FROM gl_inquiry  
                 LEFT JOIN gl_goods ON gl_goods.`id` = gl_inquiry.`gid`
                 WHERE  
@@ -277,6 +277,25 @@ class Transmanage_InquiryDelModel
             if(empty($data)){
                 $this->dbh->rollback();
                 return false;
+            }
+            //不为空代表是回程车信息
+            if(!empty($inquiry['car_id'])){
+                //修改回程车信息状态
+
+                $sql = "SELECT `id`,`end_time` FROM gl_return_car WHERE `id` =".$inquiry['car_id'];
+                $return_car = $this->dbh->select_row($sql);
+                if(!$return_car){
+                    $this->dbh->rollback();
+                    return false;
+                }
+                $info['status']  = time() > strtotime($return_car['end_time']) ? 3:1;
+                $info['inquiry_id'] = 0;
+                $info['order_id']  = 0;
+                $result = $this->dbh->update('gl_return_car',$info,'id ='.$return_car['id']);
+                if(!$result){
+                    $this->dbh->rollback();
+                    return false;
+                }
             }
 
             $this->dbh->commit();
@@ -315,16 +334,26 @@ class Transmanage_InquiryDelModel
                 $price = $data['price'];
 
             }elseif($inquiryid != 0){
+
+                //获取询价单相关信息
+                $where = " gl_inquiry.`is_del` = 0 AND gl_inquiry.`id` = {$inquiryid}";
+                $sql = "SELECT gl_inquiry.`status`,gl_inquiry.`gid`,gl_inquiry.`car_id` FROM gl_inquiry WHERE {$where}";
+                $inquiry = $this->dbh->select_row($sql);
+                if(!$inquiry){
+                    $this->dbh->rollback();
+                    return false;
+                }
                 //已生成询价单  同意交易
                 $sql = "SELECT minprice FROM gl_inquiry_info WHERE pid=".intval($inquiryid)." AND type=2  ORDER BY id DESC LIMIT 1";
                 $price  = $this->dbh->select_one($sql);//获取成交价格
                 $res = $this->dbh->update('gl_inquiry',array('status' => 3,'price'=>$price),'id='.intval($inquiryid));
-            
+
                 if(!$res){
                     $this->dbh->rollback();
                     return 1111;
                 }
                 $id = $inquiryid;
+
 
             }
 
@@ -338,20 +367,40 @@ class Transmanage_InquiryDelModel
                 'number' => $orderid,
                 'cargo_id'=> $data['companyid'],//货主公司id
                 'goods_id' =>$data['goodsid'],
+                'car_id' =>$inquiry['car_id'],
                 'company_id' => $data['cid'],//承运商公司id
                 'estimate_freight' =>  $price*$data['weights'],
                 'updated_at'=>'=NOW()',
                 'created_at'=>'=NOW()'
-            );  
+            );
+            //car_id不为零时说明是货主找车 回程车议价添加的
+            if(!empty($inquiry['car_id'])){
+                $order_info['car_id'] = $inquiry['car_id'];
+
+            }
             $resid = $this->dbh->insert('gl_order',$order_info);  
 
             if(!$resid){
                 $this->dbh->rollback();
                 return false;
             }
+            //car_id不为零时说明是货主找车 回程车议价添加的  修改回程车信息
+            if(!empty($inquiry['car_id'])){
+
+                //修改回程车信息状态
+                $info['status']  = 6;//已生成托运单
+                $info['order_id']  = $resid;//已生成托运单
+                $result = $this->dbh->update('gl_return_car',$info,'id ='.$inquiry['car_id']);
+                if(!$result){
+                    $this->dbh->rollback();
+                    return false;
+                }
+            }
 
             //更新询价单 托运单：order_id=$resid
-            $res = $this->dbh->update('gl_inquiry',array('order_id'=>$resid),'id='.intval($id));
+            $info['status']=3;
+            $info['order_id']=$resid;
+            $res = $this->dbh->update('gl_inquiry',$info,'id='.intval($id));
             if(!$res){
                 $this->dbh->rollback();
                 return false;                

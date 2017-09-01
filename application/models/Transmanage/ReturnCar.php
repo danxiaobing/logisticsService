@@ -31,11 +31,11 @@ class Transmanage_ReturnCarModel
             $order = $params['order'];
         }
         if (isset($params['status']) && $params['status'] != '') {
-            $filter[] = " `status`=" . $params['status'];
+            $filter[] = " gl_return_car.`status`=" . $params['status'];
         }
         if (isset($params['cid']) && $params['cid'] != '') {
 
-            $filter[] = " `cid`=" . $params['cid'];
+            $filter[] = " gl_return_car.`cid`=" . $params['cid'];
         }
         if (count($filter) > 0) {
             $where .= implode(" AND ", $filter);
@@ -55,25 +55,28 @@ class Transmanage_ReturnCarModel
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
-        $sql = "SELECT `id`,
-                       `start_province_id`,
-                       `start_city_id`,
-                       `start_area_id`,
-                       `end_province_id`,
-                       `end_city_id`,
-                       `end_area_id`,
-                       `start_time`,
-                       `end_time`,
-                       `price_type`,
-                       `min_load`,
-                       `max_load`,
-                       `category_id`,
-                       `product_id`,
-                       `price`,
-                       `status`
+        $sql = "SELECT gl_return_car.`id`,
+                       gl_return_car.`start_province_id`,
+                       gl_return_car.`start_city_id`,
+                       gl_return_car.`start_area_id`,
+                       gl_return_car.`end_province_id`,
+                       gl_return_car.`end_city_id`,
+                       gl_return_car.`end_area_id`,
+                       gl_return_car.`start_time`,
+                       gl_return_car.`end_time`,
+                       gl_return_car.`price_type`,
+                       gl_return_car.`min_load`,
+                       gl_return_car.`max_load`,
+                       gl_return_car.`category_id`,
+                       gl_return_car.`product_id`,
+                       gl_return_car.`inquiry_id`,
+                       gl_return_car.`order_id`,
+                       gl_return_car.`price`,
+                       gl_return_car.`status`,
+                       gl_inquiry.`gid` as goods_id
                      FROM `gl_return_car`
-                     {$where}
-                     ORDER BY status=3 ASC, `{$order}` DESC";
+                     LEFT JOIN gl_inquiry  ON gl_return_car.`id` = gl_inquiry.`car_id`  {$where}
+                     ORDER BY gl_return_car.status=3 ASC, gl_return_car.`{$order}` DESC";
         $result['list'] = $this->dbh->select_page($sql);
 
         return $result;

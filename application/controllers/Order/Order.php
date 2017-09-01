@@ -54,6 +54,15 @@ class Order_OrderController extends Rpc {
         $data = $L->updata($id,$data);
         return $data;
     }
+    /**
+     * 货主查找车源-生成托运单
+     */
+    public function addPublishAndCreateOrderFunc($params)
+    {
+        $L = new Order_OrderModel(Yaf_Registry::get("db"));
+        $data = $L->addPublishAndCreateOrder($params);
+        return $data;
+    }
 
 
 
