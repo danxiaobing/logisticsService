@@ -21,8 +21,8 @@ class Transmanage_DispatchModel
     public function getList($params){
         $filter = array();
 
-        if (isset($params['company_ids']) && count($params['company_ids']) ) {
-            $filter[] = " `c_id` in (".implode(',',$params['company_ids']).")";
+        if (isset($params['company_id']) && count($params['company_id']) ) {
+            $filter[] = " `c_id` = ".$params['company_id'];
         }
 
         if (isset($params['start_time']) && $params['start_time'] != '') {
@@ -40,6 +40,11 @@ class Transmanage_DispatchModel
         if (isset($params['status']) && $params['status'] != '') {
             $filter[] = " `status` =".$params['status'];
         }
+
+        if(isset($params['order_id']) && $params['order_id'] != 0){
+            $filter[] = " `order_id` =".$params['order_id'];
+        }
+
 
         $where = ' 1= 1 ';
 
