@@ -43,6 +43,12 @@ class Transmanage_DispatchController extends Rpc
         return $data;
     }
 
+    public function getListByOrderidFunc($id){
+        $L = new Transmanage_DispatchModel(Yaf_Registry::get("db"));
+        $data = $L->getListByOrderid($id);
+        return $data;
+    }
+
     /**
      * 待发车调度单
      * @param array $params
