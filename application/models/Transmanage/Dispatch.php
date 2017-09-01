@@ -165,6 +165,7 @@ class Transmanage_DispatchModel
             $weights_remainder = $weights_every+sprintf("%.3f", $weights_remainder);
             unset($params['weights_this']);
             unset($params['weights_done']);
+            unset($params['weights_all']);
             unset($params['time']);
             if(empty($time)){
                 return false;
@@ -180,6 +181,7 @@ class Transmanage_DispatchModel
                     }
                     $params['start_time'] = $v['start_time'];
                     $params['end_time'] = $v['end_time'];
+                    $params['dispatch_number'] = 'DD'.time().rand(100,999).$key;
 
                     $res = $this->dbh->insert('gl_order_dispatch', $params);
                     if(!$res){
