@@ -160,6 +160,7 @@ class Transmanage_DispatchModel
             $time = $params['time'];
             $weights_this = $params['weights_this'];
             $weights_done = $params['weights_done'];
+            $weights_all = $params['weights_all'];
             $weights_every = sprintf("%.3f", $weights_this/count($time));
             $weights_remainder = $weights_this == ($weights_every*count(time))?0:$weights_this - ($weights_every*count($time));
             $weights_remainder = $weights_every+sprintf("%.3f", $weights_remainder);
@@ -189,16 +190,22 @@ class Transmanage_DispatchModel
                         return false;
                     }
                 }
+
                 $order = $this->dbh->update('gl_order',['status'=>2],' id ='.intval($params['order_id']));
                 if(!$order){
                     $this->dbh->rollback();
                     return false;
                 }
-                $goods = $this->dbh->update('gl_goods',['weights_done'=>$weights_done+$weights_this],' id ='.$params['goods_id']);
-                if(!$goods){
-                    $this->dbh->rollback();
-                    return false;
+
+                $weights_done =  $weights_done+$weights_this;
+                if($weights_all == $weights_done){
+                    $goods = $this->dbh->update('gl_goods',['weights_done'=>$weights_done],' id ='.$params['goods_id']);
+                    if(!$goods){
+                        $this->dbh->rollback();
+                        return false;
+                    }
                 }
+
                 $this->dbh->commit();
                 return true;
 
