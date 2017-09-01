@@ -181,7 +181,7 @@ class Transmanage_DispatchModel
                     $params['start_time'] = $v['start_time'];
                     $params['end_time'] = $v['end_time'];
 
-                    $res = $this->dbh->insert('gl_order_dispathc', $params);
+                    $res = $this->dbh->insert('gl_order_dispatch', $params);
                     if(!$res){
                         $this->dbh->rollback();
                         return false;
