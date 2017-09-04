@@ -108,11 +108,11 @@ class Examine_UsersModel
         $where = 'gl_user_info.is_del != 1 AND';
 
         if(is_numeric($param) && strlen($param) >10){
-            $where = ' gl_user_info.`mobile` = '.$param;
+            $where .= ' gl_user_info.`mobile` = '.$param;
         }elseif(preg_match('/^[0-9a-zA-Z]+@(([0-9a-zA-Z]+)[.])+[a-z]{2,4}$/i',$param)){
-            $where = " gl_user_info.`email` = '{$param}'";
+            $where .= " gl_user_info.`email` = '{$param}'";
         }elseif(is_numeric($param)){
-            $where = " gl_user_info.`id` = '{$param}'";
+            $where .= " gl_user_info.`id` = '{$param}'";
         }
 
 
@@ -120,6 +120,7 @@ class Examine_UsersModel
         $sql = "SELECT gl_user_info.user_name, gl_user_info.id,gl_user_info.password,gl_user_info.mobile,gl_user_info.email,gl_companies.company_code,gl_companies.id as cid,gl_companies.company_name,gl_companies.company_telephone,gl_companies.company_user FROM gl_user_info
                 LEFT JOIN gl_companies ON gl_companies.id = gl_user_info.cid WHERE 
                 ".$where;
+
         $data =  $this->dbh->select_row($sql);
 
         if(!empty($password)) {
