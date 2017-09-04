@@ -86,7 +86,7 @@ class Basicdata_ProductModel
 
     //获取类别信息
     public function getCate(){
-        $sql = " SELECT id,name FROM gl_category ";
+        $sql = " SELECT id,name FROM gl_category WHERE is_del = '0' ";
         return $this->dbh->select($sql);
     }
 
