@@ -79,18 +79,22 @@ class Transmanage_DispatchModel
 
     public function dispatchProcedure($params){
         $dispatch_arr  = [
-            'id' =>$params['id'],
             'status' =>$params['status'],
             'start_weights'=>$params['start_weights'],
             'end_weights'=>$params['end_weights'],
-            'start_time'=>$params['start_time'],
-            'end_time'=>$params['end_time'],
-            'weights'=>$params['weights'],
         ];
 
         $order_id = $params['order_id'] ? $params['order_id']:'';
 
+        #过滤空值
         $dispatch_arr = array_filter($dispatch_arr);
+
+        #查询调度单
+        $dispatchData = $this->dbh->select_row('SELECT weights,goods_id FROM gl_order_dispatch WHERE id = '.$params['id']);
+
+        if(!$dispatchData){
+            return false;
+        }
 
         #开启事物
         $this->dbh->begin();
@@ -102,15 +106,17 @@ class Transmanage_DispatchModel
                 return false;
             }
 
+            #插入日志表
             $dispatch_log = $this->dbh->insert('gl_order_dispatch_log',['status'=>intval($params['status']),'dispatch_id'=>$params['id'],'created_at'=>'=NOW()','updated_at'=>'=NOW()']);
             if(empty($dispatch_log)){
                 $this->dbh->rollback();
                 return false;
             }
 
-            if(6 == $params['status'] && $params['weights'] != '' && $params['goods_id'] != ''){
-                $goods_arr = $this->dbh->select_row('SELECT weights_done FROM gl_goods WHERE id = '.$params['goods_id']);
-                $goods = $this->dbh->update('gl_goods',['weights_done'=>$goods_arr['weights_done'] - $params['weights']],' id = '.$params['goods_id']);
+            #取消调度单时候改重量
+            if(6 == $params['status']){
+                $goods_arr = $this->dbh->select_row('SELECT weights_done FROM gl_goods WHERE id = '.$dispatchData['goods_id']);
+                $goods = $this->dbh->update('gl_goods',['weights_done'=>$goods_arr['weights_done'] - $dispatchData['weights']],' id = '.$dispatchData['goods_id']);
                 if(!$goods){
                     $this->dbh->rollback();
                     return false;
@@ -120,6 +126,7 @@ class Transmanage_DispatchModel
                 return false;
             }
 
+            #卸货和装货要上传图片
             if(5 == $params['status'] && 3 == $params['status']){
                 if(empty($params['other_file'])){
                     $this->dbh->rollback();
@@ -196,7 +203,7 @@ class Transmanage_DispatchModel
      */
     public function editDispatch($params){
         if(!empty($params['id'])){
-            $res = $this->dbh->update('gl_order_dispathc', $params,' id = '.intval($params['id']));
+            $res = $this->dbh->update('gl_order_dispatch', $params,' id = '.intval($params['id']).' AND c_id = '.intval($params['c_id']));
             if($res){
                 return true;
             }else{
@@ -208,7 +215,7 @@ class Transmanage_DispatchModel
             $weights_done = $params['weights_done'];
             $weights_all = $params['weights_all'];
             $weights_every = sprintf("%.3f", $weights_this/count($time));
-            $weights_remainder = $weights_this == ($weights_every*count(time))?0:$weights_this - ($weights_every*count($time));
+            $weights_remainder = $weights_this == ($weights_every*count($time))?0:$weights_this - ($weights_every*count($time));
             $weights_remainder = $weights_every+sprintf("%.3f", $weights_remainder);
             unset($params['weights_this']);
             unset($params['weights_done']);
