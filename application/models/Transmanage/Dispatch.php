@@ -260,4 +260,25 @@ class Transmanage_DispatchModel
 
     }
 
+    /*确认是否符合发车条件*/
+    public function queryInfo($dispatch_id){
+        //根据调度单id获取goosid
+        $sql = "SELECT go.goods_id FROM gl_order_dispatch god LEFT JOIN gl_order go ON go.id = god.order_id WHERE god.id=".intval($dispatch_id);
+        $res = $this->dbh->select_one($sql);
+        if(!$res){
+            return false;
+        }
+
+        //判断状态
+        $sql = "SELECT weights,weights_done FROM gl_goods WHERE  id=".$res;
+        $data = $this->dbh->select_row($sql);
+        if($data['weights'] == $data['weights_done'] && $data['weights'] != 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+
+
 }

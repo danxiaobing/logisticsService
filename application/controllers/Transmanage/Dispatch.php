@@ -68,6 +68,12 @@ class Transmanage_DispatchController extends Rpc
         return $L->editDispatch($params);
     }
 
+    /*确认发车条件*/
+    public function queryInfoFunc($dispatch_id){
+         $L = new Transmanage_DispatchModel(Yaf_Registry::get("db"));
+         return $L->queryInfo($dispatch_id);       
+    }
+
 
 
 }
