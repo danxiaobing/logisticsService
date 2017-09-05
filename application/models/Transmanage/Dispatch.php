@@ -90,7 +90,7 @@ class Transmanage_DispatchModel
         $dispatch_arr = array_filter($dispatch_arr);
 
         #查询调度单
-        $dispatchData = $this->dbh->select_row('SELECT weights,goods_id FROM gl_order_dispatch WHERE id = '.$params['id']);
+        $dispatchData = $this->dbh->select_row('SELECT order_id,c_id,weights,goods_id FROM gl_order_dispatch WHERE id = '.$params['id']);
 
 
         if(!$dispatchData){
@@ -127,7 +127,7 @@ class Transmanage_DispatchModel
 
 
             #卸货和装货要上传图片
-            if(5 == $params['status'] && 3 == $params['status']){
+            if(5 == $params['status'] or 3 == $params['status']){
                 if(empty($params['other_file'])){
                     $this->dbh->rollback();
                     return false;
@@ -148,12 +148,19 @@ class Transmanage_DispatchModel
                 }
             }
 
-
-//            if(6 == $params['status']){
-//                $count = $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE order_id = '.$order_id);
-//                $success = $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE status = 6 AND order_id = '.$order_id);
-//            }
-
+            if(5 == $params['status']){
+                $count = $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE c_id = '.$dispatchData['c_id']);
+                $completeTotal =  $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE status = 5 AND c_id = '.$dispatchData['c_id']);
+                if($count == $completeTotal){
+                    $goods = $this->dbh->update('gl_goods',['status'=>6],' id = '.$dispatchData['goods_id']);
+                    $order = $this->dbh->update('gl_order',['status'=>4],' id ='.$dispatchData['order_id']);
+                    if(empty($goods) or empty($order)){
+                        $this->dbh->rollback();
+                        return false;
+                    }
+                }
+            }
+            
             $this->dbh->commit();
             return true;
 
@@ -162,6 +169,7 @@ class Transmanage_DispatchModel
             return false;
         }
     }
+
 
 
     /**
@@ -191,7 +199,7 @@ class Transmanage_DispatchModel
 
     /*待发车调度单*/
     public function getInfo($dispatch_id){
-        $sql = "SELECT god.id,god.dispatch_number,god.order_number,god.order_id,god.ctype_name,god.driver_name,god.supercargo_name,god.cars_number,god.end_time,god.start_time,god.weights,go.cargo_id,god.cars_id,god.driver_id,god.supercargo_id,god.ctype_id,god.status FROM gl_order_dispatch god LEFT JOIN gl_order go ON go.id=god.order_id WHERE god.id=".intval($dispatch_id);
+        $sql = "SELECT god.id,god.dispatch_number,god.order_number,god.order_id,god.ctype_name,god.driver_name,god.supercargo_name,god.cars_number,god.end_time,god.start_time,god.weights,go.cargo_id,god.cars_id,god.driver_id,god.supercargo_id,god.ctype_id,god.status,god.start_weights FROM gl_order_dispatch god LEFT JOIN gl_order go ON go.id=god.order_id WHERE god.id=".intval($dispatch_id);
         $data =  $this->dbh->select_row($sql);
         return $data ? $data : [];
 
@@ -289,6 +297,11 @@ class Transmanage_DispatchModel
         }else{
             return false;
         }
+    }
+
+    public function dispatchPic($id){
+        $pic = $this->dbh->select('SELECT pic FROM  gl_order_dispatch_pic WHERE dispatch_id = '.intval($id));
+        return $pic;
     }
 
 
