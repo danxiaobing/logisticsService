@@ -80,6 +80,7 @@ class Transmanage_OrderModel
 
         $sql = "SELECT count(1) FROM gl_order AS o LEFT JOIN gl_goods AS g ON g.`id` = o.`goods_id`  WHERE {$where}";
 
+
         $result['totalRow'] = $this->dbh->select_one($sql);
 
 

@@ -30,7 +30,7 @@ class Transmanage_InquiryDelModel
         }
         //询价状态
         if(isset($search['status']) && $search['status'] != ''){
-            $filter[] = " l.`status` = '{$search['status']} ";
+            $filter[] = " l.`status` = {$search['status']} ";
         }
         //起始省
         if(isset($search['start_provice_id']) && $search['start_provice_id'] != ''){
@@ -79,6 +79,7 @@ class Transmanage_InquiryDelModel
         if(count($filter)>0){
             $where .= ' AND '.implode(' AND ', $filter);
         }
+
         //总数
         $sql = " SELECT count(1) FROM gl_inquiry WHERE cid = {$search['cid']}";
         $result['totalRow'] = $this->dbh->select_one($sql);
@@ -103,7 +104,6 @@ class Transmanage_InquiryDelModel
             LEFT JOIN gl_products as p ON p.id = g.product_id
             {$where}
           ORDER BY l.`updated_at` DESC";
-
 
 
         $this->dbh->set_page_num($search['page'] ? $search['page'] : 1);
