@@ -26,7 +26,7 @@ class Transmanage_InquiryDelModel
         }
         //创建截止时间
         if(isset($search['endtime']) && $search['endtime'] != ''){
-            $filter[] = " l.`updated_at` <= '{$search['starttime']} 23:59:59'";
+            $filter[] = " l.`updated_at` <= '{$search['endtime']} 23:59:59'";
         }
         //询价状态
         if(isset($search['status']) && $search['status'] != ''){

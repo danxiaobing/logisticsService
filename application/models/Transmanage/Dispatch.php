@@ -92,6 +92,7 @@ class Transmanage_DispatchModel
         #查询调度单
         $dispatchData = $this->dbh->select_row('SELECT weights,goods_id FROM gl_order_dispatch WHERE id = '.$params['id']);
 
+
         if(!$dispatchData){
             return false;
         }
@@ -101,6 +102,7 @@ class Transmanage_DispatchModel
         try{
             #修改调度单
             $dispatch = $this->dbh->update('gl_order_dispatch', $dispatch_arr,'id = '.intval($params['id']));
+
             if(!$dispatch){
                 $this->dbh->rollback();
                 return false;
@@ -108,7 +110,7 @@ class Transmanage_DispatchModel
 
             #插入日志表
             $dispatch_log = $this->dbh->insert('gl_order_dispatch_log',['status'=>intval($params['status']),'dispatch_id'=>$params['id'],'created_at'=>'=NOW()','updated_at'=>'=NOW()']);
-            if(empty($dispatch_log)){
+            if(!$dispatch_log){
                 $this->dbh->rollback();
                 return false;
             }
@@ -121,10 +123,8 @@ class Transmanage_DispatchModel
                     $this->dbh->rollback();
                     return false;
                 }
-            }else{
-                $this->dbh->rollback();
-                return false;
             }
+
 
             #卸货和装货要上传图片
             if(5 == $params['status'] && 3 == $params['status']){
@@ -147,6 +147,7 @@ class Transmanage_DispatchModel
                     }
                 }
             }
+
 
 //            if(6 == $params['status']){
 //                $count = $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE order_id = '.$order_id);
@@ -190,7 +191,7 @@ class Transmanage_DispatchModel
 
     /*待发车调度单*/
     public function getInfo($dispatch_id){
-        $sql = "SELECT god.id,god.dispatch_number,god.order_number,god.order_id,god.ctype_name,god.driver_name,god.supercargo_name,god.cars_number,god.end_time,god.start_time,god.weights,go.cargo_id,god.cars_id,god.driver_id,god.supercargo_id,god.ctype_id FROM gl_order_dispatch god LEFT JOIN gl_order go ON go.id=god.order_id WHERE god.id=".intval($dispatch_id);
+        $sql = "SELECT god.id,god.dispatch_number,god.order_number,god.order_id,god.ctype_name,god.driver_name,god.supercargo_name,god.cars_number,god.end_time,god.start_time,god.weights,go.cargo_id,god.cars_id,god.driver_id,god.supercargo_id,god.ctype_id,god.status FROM gl_order_dispatch god LEFT JOIN gl_order go ON go.id=god.order_id WHERE god.id=".intval($dispatch_id);
         $data =  $this->dbh->select_row($sql);
         return $data ? $data : [];
 

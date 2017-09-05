@@ -56,7 +56,7 @@ class Transmanage_OrderModel
         }
 
         if (isset($params['status']) && $params['status'] != '') {
-            $filter[] = " o.`reach_starttime` = '{$params['status']}'";
+            $filter[] = " o.`status` = '{$params['status']}'";
         }
 
         if (isset($params['cid']) && $params['cid'] != '') {
