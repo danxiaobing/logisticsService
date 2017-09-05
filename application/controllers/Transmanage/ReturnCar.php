@@ -23,7 +23,22 @@ class Transmanage_ReturnCarController extends Rpc {
         $data = $L->getPage($params);
         return $data;
     }
-
+    /**
+     * 智能发布
+     */
+    public function fastBackCarFunc($params){
+        $L = new Transmanage_ReturnCarModel(Yaf_Registry::get("db"));
+        $data = $L->fastBackCar($params);
+        return $data;
+    }
+    /**
+     * 保存数据
+     */
+    public function fastFunc($params){
+        $L = new Transmanage_ReturnCarModel(Yaf_Registry::get("db"));
+        $data = $L->fast($params);
+        return $data;
+    }
     /**
      * 更新数据
      * @param $params
