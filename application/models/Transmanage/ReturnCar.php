@@ -225,7 +225,7 @@ class Transmanage_ReturnCarModel
                         'category_id'=>$v['cate_id'],
                         'product_id'=>$v['product_id'],
                         'start_time'=>$v['reach_endtime'],
-                        'end_time'=>$v['reach_endtime'],
+                        'end_time'=>date('Y-m-d', strtotime ("+7 day", strtotime($v['reach_endtime']))),
                         'price_type'=>$price_type_arr[$k],
                         'price'=>$price_arr[$k],
                         'created_at'=>'=NOW()',
