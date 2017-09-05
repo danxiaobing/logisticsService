@@ -160,7 +160,7 @@ class Transmanage_DispatchModel
                     }
                 }
             }
-            
+
             $this->dbh->commit();
             return true;
 
@@ -199,7 +199,7 @@ class Transmanage_DispatchModel
 
     /*待发车调度单*/
     public function getInfo($dispatch_id){
-        $sql = "SELECT god.id,god.dispatch_number,god.order_number,god.order_id,god.ctype_name,god.driver_name,god.supercargo_name,god.cars_number,god.end_time,god.start_time,god.weights,go.cargo_id,god.cars_id,god.driver_id,god.supercargo_id,god.ctype_id,god.status,god.start_weights FROM gl_order_dispatch god LEFT JOIN gl_order go ON go.id=god.order_id WHERE god.id=".intval($dispatch_id);
+        $sql = "SELECT god.id,god.dispatch_number,god.order_number,god.order_id,god.ctype_name,god.driver_name,god.supercargo_name,god.cars_number,god.end_time,god.start_time,god.weights,go.cargo_id,god.cars_id,god.driver_id,god.supercargo_id,god.ctype_id,god.status,god.start_weights,god.end_weights FROM gl_order_dispatch god LEFT JOIN gl_order go ON go.id=god.order_id WHERE god.id=".intval($dispatch_id);
         $data =  $this->dbh->select_row($sql);
         return $data ? $data : [];
 
@@ -299,8 +299,8 @@ class Transmanage_DispatchModel
         }
     }
 
-    public function dispatchPic($id){
-        $pic = $this->dbh->select('SELECT pic FROM  gl_order_dispatch_pic WHERE dispatch_id = '.intval($id));
+    public function dispatchPic($id,$status){
+        $pic = $this->dbh->select('SELECT pic FROM  gl_order_dispatch_pic WHERE dispatch_id = '.intval($id).' AND status = '.intval($status));
         return $pic;
     }
 

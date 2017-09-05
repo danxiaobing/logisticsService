@@ -36,9 +36,9 @@ class Transmanage_DispatchController extends Rpc
         return $data;
     }
 
-    public function dispatchPicFunc($id){
+    public function dispatchPicFunc($id,$status){
         $L = new Transmanage_DispatchModel(Yaf_Registry::get("db"));
-        $data = $L->dispatchPic($id);
+        $data = $L->dispatchPic($id,$status);
         return $data;
     }
 
