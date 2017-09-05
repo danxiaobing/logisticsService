@@ -47,7 +47,7 @@ class Examine_CarrierModel
         if($pid != ''){
             $filter[] = " gl_companies.`pid` != 0";
         }else{
-            $filter[] = " gl_companies.`pid` = 0";
+            $filter[] = " gl_companies.`pid` = {$pid}";
         }
 
         $where .= ' gl_companies.`status` != 0 ';
