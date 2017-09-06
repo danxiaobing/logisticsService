@@ -26,7 +26,7 @@ class Transmanage_DispatchModel
         }
 
         if (isset($params['start_time']) && $params['start_time'] != '') {
-            $filter[] = " `start_time =".$params['start_time'];
+            $filter[] = " `start_time` =".$params['start_time'];
         }
 
         if (isset($params['end_time']) && $params['end_time'] != '') {
