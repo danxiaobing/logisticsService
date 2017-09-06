@@ -24,17 +24,20 @@ class Transmanage_DispatchModel
         if (isset($params['company_id']) && count($params['company_id']) ) {
             $filter[] = " `c_id` = ".$params['company_id'];
         }
+        if (isset($params['ids']) && count($params['ids']) ) {
+            $filter[] = " `id` in ({$params['ids']}) ";
+        }
 
         if (isset($params['start_time']) && $params['start_time'] != '') {
-            $filter[] = " `start_time` =".$params['start_time'];
+            $filter[] = " `start_time` <= '".$params['start_time']."'";
         }
 
         if (isset($params['end_time']) && $params['end_time'] != '') {
-            $filter[] = " `end_time` =".$params['end_time'];
+            $filter[] = " `end_time` >= '".$params['end_time']."'";
         }
 
         if (isset($params['keyworks']) && $params['keyworks'] != '') {
-            $filter[] = " `keyworks` =".$params['keyworks'];
+            $filter[] = " ( `dispatch_number` like '%{$params['keyworks']}%' OR `cars_number` like '%{$params['keyworks']}%' OR `driver_name` like '%{$params['keyworks'] }%'  OR `supercargo_name` like '%{$params['keyworks']}%')";
         }
 
         if (isset($params['status']) && $params['status'] != '') {
@@ -53,7 +56,7 @@ class Transmanage_DispatchModel
         }
 
         $sql = "SELECT count(1) FROM gl_order_dispatch  WHERE {$where}";
-
+        // echo "<pre>";print_r($sql);echo "</pre>";die; 
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
