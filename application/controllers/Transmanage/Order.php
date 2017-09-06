@@ -20,14 +20,14 @@ class Transmanage_OrderController extends Rpc
      * @author amor
      */
     public function searchOrderFunc($params){
-        $L = new Transmanage_OrderModel(Yaf_Registry::get("db"));
+        $L = new Transmanage_OrderModel(Yaf_Registry::get("db"),null,Yaf_Registry::get("gy_db"));
         $data = $L->searchOrder($params);
         return $data;
     }
 
     /*获取单个托运单详情*/
     public function getOrderInfoFunc($orderid){
-        $O = new Transmanage_OrderModel(Yaf_Registry::get("db"));
+        $O = new Transmanage_OrderModel(Yaf_Registry::get("db"),null,Yaf_Registry::get("gy_db"));
         $result = $O->getOrderInfo($orderid); 
         $cityArr = array_column($result['city'],'city','cityid');//城市数据 cityid-city 
         $provinceArr = array_column($result['province'],'province','provinceid');//省数据 provinceid-province
@@ -48,7 +48,7 @@ class Transmanage_OrderController extends Rpc
     }
 
     public function  untreadOrderFunc($params){
-        $L = new Transmanage_OrderModel(Yaf_Registry::get("db"));
+        $L = new Transmanage_OrderModel(Yaf_Registry::get("db"),null,Yaf_Registry::get("gy_db"));
         $data = $L->untreadOrder($params);
         return $data;
     }
@@ -56,14 +56,14 @@ class Transmanage_OrderController extends Rpc
 
     /*获取对应的物流详情*/
     public function getlistFunc($dispatchid){
-        $L = new Transmanage_OrderModel(Yaf_Registry::get("db"));
+        $L = new Transmanage_OrderModel(Yaf_Registry::get("db"),null,Yaf_Registry::get("gy_db"));
         return $L->getlist($dispatchid);    
     }
 
 
     /*获取托运单的生成时间*/
     public function getTimeFunc($orderid){
-        $L = new Transmanage_OrderModel(Yaf_Registry::get("db"));
+        $L = new Transmanage_OrderModel(Yaf_Registry::get("db"),null,Yaf_Registry::get("gy_db"));
         return $L->getTime($orderid);           
     }
 
