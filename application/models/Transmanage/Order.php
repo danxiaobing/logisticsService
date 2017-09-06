@@ -7,15 +7,17 @@
 class Transmanage_OrderModel
 {
     public $dbh = null;
+    public $dbh2 = null;
 
     /**
      * Constructor
      * @param   object $dbh
      * @return  void
      */
-    public function __construct($dbh, $mch = null)
+    public function __construct($dbh, $mch = null,$dbh2)
     {
         $this->dbh = $dbh;
+        $this->dbh2 = $dbh2;
     }
 
     public function searchOrder($params){
@@ -291,5 +293,69 @@ class Transmanage_OrderModel
       $sql = "SELECT created_at FROM gl_order WHERE id=".intval($orderid);
       return $this->dbh->select_one($sql);
     }
+
+    /*智运后台获取托运单数据*/
+    public function getOrderList($serach){
+      $filter = array();
+      if(isset($serach['number']) && $serach['number'] != ''){
+        $filter[] = " god.`order_number` = '{$serach['number']}' ";
+      }
+      if(isset($serach['dispatch_number']) && $serach['dispatch_number'] != ''){
+        $filter[] = " god.`dispatch_number` = '{$serach['dispatch_number']}' ";
+      } 
+      if(isset($serach['carryname']) && $serach['carryname'] != ''){
+        $filter[] = " god.`c_name` like '%{$serach['dispatch_number']}%' ";
+      } 
+
+      $WHERE = " WHERE god.`is_del` = 0 ";
+      if(count($filter)>0){
+        $WHERE .= " AND ".implode(' AND ', $filter);
+      }
+
+      //获取总数
+      $sql = "SELECT count(1) FROM gl_order_dispatch god {$WHERE}";
+
+      $result['totalRow']= $this->dbh->select_one($sql);
+      $result['list'] = array();
+
+
+        if($result['totalRow']){
+            //总的页数
+            $result['totalPage']  = ceil($result['totalRow'] / $serach['pageSize']);  
+            //设置当前页 和 pagesize
+            $this ->dbh ->set_page_num($serach['pageCurrent']);
+            $this ->dbh ->set_page_rows($serach['pageSize']); 
+            //数据获取
+            $sql = "SELECT god.`id`,god.`order_number`,go.`cargo_id`,CONCAT(god.`c_name`,'',gc.`company_telephone`) cname,god.`start_provice_id`,god.`end_provice_id`,god.`weights`,god.`start_weights`,god.`end_weights` FROM gl_order_dispatch god LEFT JOIN gl_order go  ON go.id = god.order_id LEFT JOIN gl_companies gc ON gc.id = go.company_id {$WHERE} ORDER BY god.id  DESC";
+            $result['list'] = $this->dbh->select_page($sql);
+
+            //获取省名
+            $sql = "SELECT provinceid,province FROM conf_province";
+            $province = $this->dbh->select($sql);
+            $province = array_column($province,'province','provinceid');
+
+            //获取货主公司名称
+            $sql = "SELECT IFNULL(company_name,'') name  FROM td_companies WHERE id=";
+            foreach ($result['list'] as $k => $val) {
+                if(is_null($val['cargo_id'])){
+                    $result['list'][$k]['cargoname'] = '';
+                }else{
+                    $sql .= $val['cargo_id'];
+                    $name = $this->dbh2->select_one($sql);
+                    $result['list'][$k]['cargoname'] = $name ? $name : '';
+                }
+
+                $result['list'][$k]['startp'] = $province[$val['start_provice_id']];
+                $result['list'][$k]['endp'] = $province[$val['end_provice_id']];
+            }
+
+        }
+
+        return $result;
+
+
+
+    }
+
 
 }

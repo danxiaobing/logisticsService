@@ -66,4 +66,12 @@ class Transmanage_OrderController extends Rpc
         $L = new Transmanage_OrderModel(Yaf_Registry::get("db"));
         return $L->getTime($orderid);           
     }
+
+    /*智运后台获取托运单数据*/
+    public function getOrderListFunc($serach){
+        $L = new Transmanage_OrderModel(Yaf_Registry::get("db"),null,Yaf_Registry::get("gy_db"));
+        return $L->getOrderList($serach);           
+    }
+
+
 }
