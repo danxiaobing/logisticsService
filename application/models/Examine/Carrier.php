@@ -226,7 +226,6 @@ class Examine_CarrierModel
     public function cooperateCarrier($params){
 
         $filter = array();
-        $where = '';
 
         #检测参数
         if (isset($params['company_name']) && $params['company_name'] != '') {
@@ -243,7 +242,7 @@ class Examine_CarrierModel
         $filter[] = " gl_companies.`pid` = ".intval($params['pid']);
 
 
-        $where .= ' gl_companies.`status` != 0 ';
+        $where = ' gl_companies.`status` != 0 AND gl_companies.`is_del` = 0';
         #条件
         if (0 != count($filter)) {
             $where .= ' AND ' . implode(' AND ', $filter);
@@ -255,7 +254,7 @@ class Examine_CarrierModel
 
 
         #sql语句
-        $sql = "SELECT gl_companies.id,gl_companies.company_code,gl_companies.province_id,gl_companies.company_name,gl_companies.city_id,gl_companies.area_id,gl_companies.company_address,gl_companies.company_user,gl_companies.company_telephone,gl_companies.`status`,conf_area.area,conf_province.province,conf_city.city,(SELECT count(1) FROM gl_fleets  WHERE  gl_fleets.`company_id` = gl_companies.`id`
+        $sql = "SELECT gl_companies.id,gl_companies.is_status,gl_companies.company_code,gl_companies.province_id,gl_companies.company_name,gl_companies.city_id,gl_companies.area_id,gl_companies.company_address,gl_companies.company_user,gl_companies.company_telephone,gl_companies.`status`,conf_area.area,conf_province.province,conf_city.city,(SELECT count(1) FROM gl_fleets  WHERE  gl_fleets.`company_id` = gl_companies.`id`
 	 )  AS fleets FROM gl_companies 
                 LEFT JOIN conf_area ON conf_area.areaid = gl_companies.area_id
                 LEFT JOIN conf_province ON conf_province.provinceid = gl_companies.province_id
@@ -342,5 +341,15 @@ class Examine_CarrierModel
             $this->dbh->rollback();
             return false;
         }
+    }
+
+    /**
+     * 更新合作承运商
+     * @param $where
+     * @param $id
+     * @return mixed
+     */
+    public function updateCooperate($status,$id){
+        return $this->dbh->update('gl_companies',$status,' id = '.intval($id));
     }
 }
