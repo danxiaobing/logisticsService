@@ -270,9 +270,14 @@ class Transmanage_OrderModel
               godl.`id` ,
               godl.`dispatch_id` ,
               godl.`status` ,
-              godl.`created_at` 
+              godl.`created_at`, 
+              godp.`pic`
             FROM
               gl_order_dispatch_log godl
+            LEFT JOIN 
+              gl_order_dispatch_pic godp
+            ON 
+              godl.dispatch_id = godp.dispatch_id
             WHERE godl.dispatch_id = ".intval($dispatchid)."
             ORDER BY
               godl.`status` ASC";
@@ -281,10 +286,10 @@ class Transmanage_OrderModel
         return false;
      }
      //单据凭证
-     $sql = 'SELECT pic,status FROM gl_order_dispatch_pic   godp WHERE is_del = 0 AND dispatch_id='.intval($dispatchid);
-     $pic = $this->dbh->select($sql);
+     // $sql = 'SELECT pic,status FROM gl_order_dispatch_pic   godp WHERE is_del = 0 AND dispatch_id='.intval($dispatchid);
+     // $pic = $this->dbh->select($sql);
 
-     return array('data'=> $res,'pic'=>$pic);
+     return array('data'=> $res);
     }
 
 
