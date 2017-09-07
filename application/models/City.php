@@ -49,7 +49,33 @@ class CityModel
         return $data;
     }
 
-
+    /**
+     *  获取地区
+     */
+    public function getpalce($palce)
+    {
+        //获取省
+        $sql = " SELECT provinceid,province FROM conf_province WHERE `province` like '%{$palce}%'";
+        $province = $this->dbh->select($sql);
+        //获取市
+        $sql = " SELECT cityid,city,father cpid FROM conf_city WHERE `city` like '%{$palce}%'";
+        $city = $this->dbh->select($sql);
+        //县
+        $sql = " SELECT areaid,area,father xpid FROM conf_area WHERE `area` like '%{$palce}%'";
+        $area = $this->dbh->select($sql);
+        //数据处理
+        $arr = array();
+        foreach ($province as $k=> $v) {
+            $arr[] = $v['provinceid'];
+        }
+        foreach ($city as $k=> $v) {
+            $arr[] = $v['cityid'];
+        }
+        foreach ($area as $k=> $v) {
+            $arr[] = $v['areaid'];
+        }
+        return $arr;
+    }
 
     //省市县数据获取
     public function getPlaceList($id){
