@@ -81,7 +81,7 @@ class Transmanage_InquiryDelModel
         }
 
         //总数
-        $sql = " SELECT count(1) FROM gl_inquiry WHERE cid = {$search['cid']}";
+        $sql = " SELECT count(1) FROM gl_inquiry as l LEFT JOIN gl_goods as g ON g.id = l.gid  LEFT JOIN gl_products as p ON p.id = g.product_id {$where}";
         $result['totalRow'] = $this->dbh->select_one($sql);
         $result['list'] = array();
 
