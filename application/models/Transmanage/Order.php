@@ -54,7 +54,7 @@ class Transmanage_OrderModel
         }
 
         if (isset($params['endtime']) && $params['endtime'] != '') {
-            $filter[] = " o.`off_starttime` >= '{$params['endtime']}'";
+            $filter[] = " o.`endtime` >= '{$params['endtime']}'";
         }
 
         if (isset($params['status']) && $params['status'] != '') {
