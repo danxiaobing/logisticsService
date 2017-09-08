@@ -50,11 +50,11 @@ class Transmanage_OrderModel
 
 
         if (isset($params['starttime']) && $params['starttime'] != '') {
-            $filter[] = " o.`starttime` <= '{$params['starttime']}'";
+            $filter[] = " o.`created_at` <= '{$params['starttime']}'";
         }
 
         if (isset($params['endtime']) && $params['endtime'] != '') {
-            $filter[] = " o.`endtime` >= '{$params['endtime']}'";
+            $filter[] = " o.`created_at` >= '{$params['endtime']}'";
         }
 
         if (isset($params['status']) && $params['status'] != '') {
@@ -81,7 +81,7 @@ class Transmanage_OrderModel
 
 
         $sql = "SELECT count(1) FROM gl_order AS o LEFT JOIN gl_goods AS g ON g.`id` = o.`goods_id`  WHERE {$where}";
-
+//        var_dump($sql);die;
 
         $result['totalRow'] = $this->dbh->select_one($sql);
 
