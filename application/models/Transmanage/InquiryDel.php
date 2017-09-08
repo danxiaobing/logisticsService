@@ -77,7 +77,7 @@ class Transmanage_InquiryDelModel
         } 
         //产品
         if(isset($search['product_name']) && $search['product_name'] != ''){
-            $filter[] = " l.`product_name` like '%{$search['product_name']}%'  ";
+            $filter[] = " p.`zh_name` like '%{$search['product_name']}%'  ";
         }  
 
         //重量
@@ -111,6 +111,10 @@ class Transmanage_InquiryDelModel
             l.`cid`,
             l.`g_name`,
             l.`created_at`,
+            l.`c_name`,
+            g.`off_phone`,
+            g.`consign_user`,
+            g.`consign_phone`,
             g.`start_provice_id`,
             g.`start_city_id`,
             g.`end_provice_id`,
