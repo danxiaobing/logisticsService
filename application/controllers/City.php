@@ -42,6 +42,15 @@ class CityController extends Rpc {
         return $data;
     }
 
+    /**
+     * 获取地区
+     */
+    public function getpalceFunc($palce)
+    {
+      $C = new CityModel(Yaf_Registry::get("db"));
+        $data = $C->getpalce($palce);
+        return $data;
+    }
     //获取省市县json输出
     public function getPlaceListFunc($id){
       $C = new CityModel(Yaf_Registry::get("db"));

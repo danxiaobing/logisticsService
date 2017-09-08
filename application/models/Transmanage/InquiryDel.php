@@ -58,9 +58,27 @@ class Transmanage_InquiryDelModel
         //目的县
         if(isset($search['end_area_id']) && $search['end_area_id'] != ''){
             $filter[] = " g.`end_area_id` ={$search['end_area_id']} ";
-        }         
+        }      
 
-       
+        //地区
+        if(isset($search['place']) && $search['place'] != ''){
+            $filter[] = " (
+            g.`start_provice_id` in ({$search['place']})
+            OR g.`start_city_id` in ({$search['place']})
+            OR g.`start_area_id` in ({$search['place']})
+            OR g.`end_provice_id` in ({$search['place']})
+            OR g.`end_city_id` in ({$search['place']})
+            OR g.`end_area_id` in ({$search['place']})
+            )";
+        }
+        //货主／承运商
+        if(isset($search['company']) && $search['company'] != ''){
+            $filter[] = " ( g.`companies_name` like '%{$search['company']}%' OR l.`c_name` like '%{$search['company']}%') ";
+        } 
+        //产品
+        if(isset($search['product_name']) && $search['product_name'] != ''){
+            $filter[] = " l.`product_name` like '%{$search['product_name']}%'  ";
+        }  
 
         //重量
         if(isset($search['min']) && $search['min'] != ''){
@@ -79,7 +97,7 @@ class Transmanage_InquiryDelModel
         if(count($filter)>0){
             $where .= ' AND '.implode(' AND ', $filter);
         }
-
+        // echo "<pre>";print_r($where);echo "</pre>";die; 
         //总数
         $sql = " SELECT count(1) FROM gl_inquiry as l LEFT JOIN gl_goods as g ON g.id = l.gid  LEFT JOIN gl_products as p ON p.id = g.product_id {$where}";
         $result['totalRow'] = $this->dbh->select_one($sql);
@@ -90,6 +108,7 @@ class Transmanage_InquiryDelModel
             l.`gid`,
             l.`status`,
             l.`cid`,
+            l.`g_name`,
             l.`created_at`,
             g.`start_provice_id`,
             g.`start_city_id`,
