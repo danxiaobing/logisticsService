@@ -68,13 +68,13 @@ class TodoModel
 
             //<---调度单start-->
             //待确认发车
-            $sql = "SELECT count(1) FROM gl_order_dispatch WHERE is_del = 0 AND  status= 0 AND c_id = {$params['cid']}";
+            $sql = "SELECT count(1) FROM gl_order_dispatch WHERE is_del = 0 AND  status = 0 AND c_id = {$params['cid']}";
             $result['dispatch_a'] = $this->dbh->select_one($sql);
              //待确认提货
             $sql = "SELECT count(1) FROM gl_order_dispatch WHERE is_del = 0 AND  status = 2 AND c_id = {$params['cid']}";
             $result['dispatch_b'] = $this->dbh->select_one($sql);
              //待确认卸货
-            $sql = "SELECT count(1) FROM gl_order_dispatch WHERE is_del = 0 AND  status= 4 AND c_id = {$params['cid']}";
+            $sql = "SELECT count(1) FROM gl_order_dispatch WHERE is_del = 0 AND  status = 4 AND c_id = {$params['cid']}";
             $result['dispatch_c'] = $this->dbh->select_one($sql);
 
               //<---调度单end-->
@@ -86,16 +86,12 @@ class TodoModel
 
                 $sql = "SELECT count(1) FROM gl_driver WHERE isdelete = 0 AND type=1 AND status= 0 {$where}";
                 $result['driver_a'] = $this->dbh->select_one($sql);
-            }
+
             //押运员信息备案中
-            $sql = "SELECT count(1) FROM gl_driver WHERE isdelete = 0 AND type= 2 AND status= 0 AND company_id = {$params['cid']}";
-            $result['driver_b'] = $this->dbh->select_one($sql);
+                $sql = "SELECT count(1) FROM gl_driver WHERE isdelete = 0 AND type= 2 AND status= 0 {$where}";
+                 $result['driver_b'] = $this->dbh->select_one($sql);
 
             //车辆信息备案中
-
-            if (isset($params['company_ids']) && count($params['company_ids']) ) {
-                $where = "AND  `company_id` in (".implode(',',$params['company_ids']).")";
-
                 $sql = "SELECT count(1) FROM gl_cars WHERE is_del = 0  AND status= 0 {$where}";
                 $result['cars'] = $this->dbh->select_one($sql);
             }
