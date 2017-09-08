@@ -65,6 +65,14 @@ class Transmanage_OrderModel
             $filter[] = " o.`company_id` = '{$params['cid']}'";
         }
 
+        if (isset($params['min']) && $params['min'] != '') {
+            $filter[] = " g.`weights` >= '{$params['min']}'";
+        }
+
+        if (isset($params['max']) && $params['max'] != '') {
+            $filter[] = " g.`weights` <= '{$params['min']}'";
+        }
+
         if(isset($params['id']) && $params['id'] != ''){
             $order = substr($params['id'],0,strlen($params['id'])-1);
             $filter[] = "o.`id` in({$order})";
