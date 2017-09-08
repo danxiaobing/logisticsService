@@ -80,9 +80,13 @@ class TodoModel
               //<---调度单end-->
 
             //司机信息备案中
-            $sql = "SELECT count(1) FROM gl_driver WHERE isdelete = 0 AND type=1 AND status= 0 AND company_id = {$params['cid']}";
-            $result['driver_a'] = $this->dbh->select_one($sql);
 
+            if (isset($params['company_ids']) && count($params['company_ids']) ) {
+                $where = "AND  `company_id` in (" . implode(',', $params['company_ids']) . ")";
+
+                $sql = "SELECT count(1) FROM gl_driver WHERE isdelete = 0 AND type=1 AND status= 0 {$where}";
+                $result['driver_a'] = $this->dbh->select_one($sql);
+            }
             //押运员信息备案中
             $sql = "SELECT count(1) FROM gl_driver WHERE isdelete = 0 AND type= 2 AND status= 0 AND company_id = {$params['cid']}";
             $result['driver_b'] = $this->dbh->select_one($sql);
