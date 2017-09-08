@@ -277,6 +277,7 @@ class Examine_CarrierModel
 
 
     public function addCooperate($params){
+        $id = $params['id'];
         $cooperate_arr = array(
             'company_name'      =>$params['company_name'],
             'province_id'       =>$params['province_id'],
@@ -286,23 +287,36 @@ class Examine_CarrierModel
             'company_user'      =>$params['company_user'],
             'company_telephone' =>$params['company_telephone'],
             'status'            =>$params['status'],
-            'pid'               =>$params['pid'],
             'code'              =>$params['code'],
             'created_at' => '=NOW()',
             'updated_at' => '=NOW()',
         );
 
+        if(!$id){
+            $cooperate_arr['pid'] = $params['pid'];
+        }
 
         #开启事物
         $this->dbh->begin();
         try{
-            #修改公司
-            $cooperate = $this->dbh->insert('gl_companies', $cooperate_arr);
-            if(empty($cooperate)){
-                $this->dbh->rollback();
-                return false;
-            }
 
+            if(!$id){
+
+                #添加
+                $cooperate = $this->dbh->insert('gl_companies', $cooperate_arr);
+                if(empty($cooperate)){
+                    $this->dbh->rollback();
+                    return false;
+                }
+            }else {
+
+                #修改公司
+                $cooperate = $this->dbh->update('gl_companies', $cooperate_arr,' id = '.intval($id));
+                if(empty($cooperate)) {
+                    $this->dbh->rollback();
+                    return false;
+                }
+            }
 
             $res = $this->dbh->update('gl_companies_pic',['is_del'=>1],'cid='.$cooperate);
             if(empty($res)){
