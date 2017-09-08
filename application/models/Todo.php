@@ -89,8 +89,13 @@ class TodoModel
 
             //车辆信息备案中
 
-            $sql = "SELECT count(1) FROM gl_cars WHERE is_del = 0  AND status= 0 AND company_id = {$params['cid']}";
-            $result['cars'] = $this->dbh->select_one($sql);
+            if (isset($params['company_ids']) && count($params['company_ids']) ) {
+                $where = "AND  `company_id` in (".implode(',',$params['company_ids']).")";
+
+                $sql = "SELECT count(1) FROM gl_cars WHERE is_del = 0  AND status= 0 {$where}";
+                $result['cars'] = $this->dbh->select_one($sql);
+            }
+
 
               //承运商信息备案中
             $sql = "SELECT count(1) FROM gl_companies WHERE is_del = 0  AND status= 1 AND pid = {$params['cid']}";
