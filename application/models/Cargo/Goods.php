@@ -151,28 +151,28 @@ class Cargo_GoodsModel
         $filter = array();
         $where = ' gl_goods.`is_del` = 0 AND gl_goods.`status` = 1 AND gl_goods.source = 0 AND gl_goods.`reach_endtime`>  NOW()';
 
-        if (isset($params['start_provice_id']) && $params['start_provice_id'] != '') {
+        if (isset($params['start_provice_id']) && !empty($params['start_provice_id'])) {
             $filter[] = " gl_goods.`start_provice_id` =".$params['start_provice_id'];
         }
 
-        if (isset($params['start_city_id']) && $params['start_city_id'] != '') {
+        if (isset($params['start_city_id']) && !empty($params['start_city_id'])) {
             $filter[] = " gl_goods.`start_city_id` =".$params['start_city_id'];
         }
 
-        if (isset($params['start_area_id']) && $params['start_area_id'] != '') {
+        if (isset($params['start_area_id']) && !empty($params['start_area_id'])) {
             $filter[] = " gl_goods.`start_area_id` =".$params['start_area_id'];
         }
 
 
-        if (isset($params['end_provice_id']) && $params['end_provice_id'] != '') {
+        if (isset($params['end_provice_id']) && !empty($params['end_provice_id'])) {
             $filter[] = " gl_goods.`end_provice_id` =".$params['end_provice_id'];
         }
 
-        if (isset($params['end_city_id']) && $params['end_city_id'] != '') {
+        if (isset($params['end_city_id']) && !empty($params['end_city_id'])) {
             $filter[] = " gl_goods.`end_city_id` =".$params['end_city_id'];
         }
 
-        if (isset($params['end_area_id']) && $params['end_area_id'] != '') {
+        if (isset($params['end_area_id']) && !empty($params['end_area_id'])) {
             $filter[] = " gl_goods.`end_area_id` =".$params['end_area_id'];
         }
 
@@ -192,7 +192,7 @@ class Cargo_GoodsModel
             $filter[] = " gl_goods.`reach_endtime` = '{$params['reach_endtime']}'";
         }
 
-        if (isset($params['product_id']) && $params['product_id'] != '') {
+        if (isset($params['product_id']) && !empty($params['product_id'])) {
             $product = implode(',',$params['product_id']);
             $filter[] = "gl_goods.`product_id` in({$product})";
         }
