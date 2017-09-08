@@ -105,6 +105,7 @@ class Transmanage_InquiryDelModel
 
         $sql = " SELECT 
             l.`id`,
+            l.`order_id`,
             l.`gid`,
             l.`status`,
             l.`cid`,
