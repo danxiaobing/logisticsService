@@ -1,6 +1,7 @@
 <?php
 /**
  * 询价单管理
+ * 
  * @author  Andy
  * @date    2017-8-121
  * @version $Id$
