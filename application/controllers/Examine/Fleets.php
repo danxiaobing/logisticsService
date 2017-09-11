@@ -32,6 +32,8 @@ class Examine_FleetsController extends Rpc {
         $list = $S->addInfo($data);
         return $list;
     }
+
+
     public function getInfoFunc($id){
         $S = new Examine_FleetsModel(Yaf_Registry::get("db"));
         $data = $S->getInfo($id);
@@ -67,6 +69,19 @@ class Examine_FleetsController extends Rpc {
     {
         $L = new Examine_FleetsModel(Yaf_Registry::get("db"));
         $data = $L->getCompany($params,$where);
+        return $data;
+    }
+
+
+    /**
+     * 获取合作承运商
+     * @param $id
+     * @param $page
+     * @return mixed
+     */
+    public function  getCooperateFunc($id,$page){
+        $L = new Examine_FleetsModel(Yaf_Registry::get("db"));
+        $data = $L->getCooperate($id,$page);
         return $data;
     }
 }

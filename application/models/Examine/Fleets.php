@@ -125,4 +125,44 @@ class Examine_FleetsModel
     {
         return $this->dbh->delete('gl_fleets','id=' . intval($id));
     }
+
+    public function getCooperate($id,$page){
+        $result = array(
+            'totalRow' => 0,
+            'list' => array()
+        );
+
+        $sql = "SELECT count(1)
+                FROM `gl_fleets` AS fs
+                LEFT JOIN `gl_companies` AS com ON com.`id` = fs.`company_id` 
+                WHERE com.id = ".intval($id);
+
+
+        $result['totalRow'] = $this->dbh->select_one($sql);
+
+        $this->dbh->set_page_num($page ? $page : 1);
+        $this->dbh->set_page_rows(8);
+
+        $sql = "SELECT
+                fs.`id`,
+                fs.`name` as fleet_name,
+                fs.`fleet_user`,
+                fs.`fleet_phone`,
+                fs.`fleets_type`,
+                fs.`is_use`,
+                fs.`company_id`,
+                com.`company_name`,
+                COUNT(cars.`id`) as num
+                FROM `gl_fleets` AS fs
+                LEFT JOIN `gl_companies` AS com ON com.`id` = fs.`company_id`
+                LEFT JOIN `gl_cars`  AS cars ON cars.`fleets_id` = fs.`id`
+                WHERE com.id = {$id}
+                GROUP BY fs.`id`
+                ORDER BY fs.`updated_at` DESC";
+
+
+        $result['list'] = $this->dbh->select_page($sql);
+
+        return $result;
+    }
 }
