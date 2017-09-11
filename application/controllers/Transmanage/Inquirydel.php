@@ -7,7 +7,7 @@
  * @version $Id$
  */
 
-class Transmanage_InquiryDelController extends Rpc {
+class Transmanage_InquirydelController extends Rpc {
 
     public function init() {
         parent::init();
