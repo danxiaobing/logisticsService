@@ -204,7 +204,8 @@ class Transrange_TransModel
 
         $res = $this->dbh->select($sql);
 
-        return $res;
+
+        return $res ? $res : [];
 
     }
 
