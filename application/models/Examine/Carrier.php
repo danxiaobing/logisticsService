@@ -46,7 +46,7 @@ class Examine_CarrierModel
         }
 
         if($pid == ''){
-            $filter[] = " gl_companies.`pid` != 0";
+            $filter[] = " gl_companies.`pid` = 0";
         }else{
             $filter[] = " gl_companies.`pid` = {$pid}";
         }
@@ -57,12 +57,6 @@ class Examine_CarrierModel
             $where .= ' AND ' . implode(' AND ', $filter);
         }
 
-//        var_dump($where);die;
-        #设置分页参数
-        $page = isset($params['pageCurrent'])? intval($params['pageCurrent']) : 1;
-        $pageSize = isset($params['pageSize'])? intval($params['pageSize']) : 9;
-
-
         #sql语句
         $sql = "SELECT gl_companies.id,gl_companies.company_code,gl_companies.province_id,gl_companies.company_name,gl_companies.city_id,gl_companies.area_id,gl_companies.company_address,gl_companies.company_user,gl_companies.company_telephone,gl_companies.status,conf_area.area,conf_province.province,conf_city.city,gl_companies.business,gl_companies.products FROM gl_companies 
                 LEFT JOIN conf_area ON conf_area.areaid = gl_companies.area_id
@@ -71,13 +65,13 @@ class Examine_CarrierModel
                 {$where} 
                 ORDER BY gl_companies.`updated_at` DESC";
 
-        $countSql = "SELECT COUNT(1) FROM gl_companies WHERE is_del = 0 AND status != 0";
+        $countSql = "SELECT COUNT(1) FROM gl_companies WHERE  {$where}";
 
         $data['total'] = $this->dbh->select_one($countSql);
-        $this->dbh->set_page_num($page);
-        $this->dbh->set_page_rows($pageSize);
+        $this->dbh->set_page_num($params['pageCurrent']);
+        $this->dbh->set_page_rows($params['pageSize']);
 
-        $data['list'] =  $this->dbh->select($sql);
+        $data['list'] =  $this->dbh->select_page($sql);
 
         return $data;
     }
