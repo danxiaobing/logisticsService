@@ -37,7 +37,12 @@ class Examine_CarController extends Rpc {
         $data = $L->update($params,$id);
         return $data;
     }
-
+    public function updateMutyStatusFunc($params,$where)
+    {
+        $L = new Examine_CarModel(Yaf_Registry::get("db"));
+        $data = $L->updateMutyStatus($params,$where);
+        return $data;
+    }
     /**
      * 新增
      */

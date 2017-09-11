@@ -91,7 +91,7 @@ class Examine_CarModel
                 c.`material`,
                 c.`car_position`,
                 c.`is_use`,
-
+                c.`status`,
                 com.`company_name`,
                 f.`name` as fleets_name,
                 d.`name` as driver_name,
@@ -171,6 +171,12 @@ class Examine_CarModel
             return $res;
         }
         return false;
+    }
+
+    public function updateMutyStatus($params, $where)
+    {
+        $res = $this->dbh->update('gl_cars', $params, $where);
+        return $res;
     }
 
     /**
