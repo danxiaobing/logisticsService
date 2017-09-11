@@ -279,9 +279,6 @@ class Transrange_ReceivingModel
     
     //获取黑白名单
     public function getFileWall($rule_id){
-
-        echo 444;
-
         $sql = "SELECT user_list FROM gl_rule_firewall WHERE `rule_id` = ".intval($rule_id);
         echo "<pre>";print_r($sql);echo "</pre>";die; 
         return $this->dbh->select_one($sql);

@@ -69,9 +69,7 @@ class Transrange_ReceivingController extends Rpc {
 
     //获取黑白名单
     public function getFileWallFunc($rule_id){
-        return 222;
         $T = new TransRange_ReceivingModel(Yaf_Registry::get("db"));
-        return 333;
         return $T->getFileWall($rule_id);        
     }
 

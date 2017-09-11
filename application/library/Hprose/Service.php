@@ -233,7 +233,10 @@ abstract class Service extends HandlerManager {
         $stream = new BytesIO();
         $writer = new Writer($stream, true);
         $stream->write(Tags::TagError);
-        $writer->writeString($this->debug ? $error->getTraceAsString() : $error->getMessage());
+        $writer->writeString(  $error->getMessage());
+        if($this->debug)
+        $writer->writeString($error->getTraceAsString() );
+        //   $writer->writeString($this->debug ? $error->getTraceAsString() : $error->getMessage());
         return $stream;
     }
     public function endError($error, stdClass $context) {
