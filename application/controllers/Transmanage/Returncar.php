@@ -6,7 +6,7 @@
  * @version $Id$
  */
 
-class Transmanage_ReturnCarController extends Rpc {
+class Transmanage_ReturncarController extends Rpc {
 
     public function init() {
         parent::init();
