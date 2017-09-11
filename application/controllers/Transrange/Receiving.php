@@ -62,21 +62,21 @@ class Transrange_ReceivingController extends Rpc {
 
     public function getRualProducusFunc( $id)
     {
-        $Dw = new TransRange_ReceivingModel(Yaf_Registry::get("db"));
+        $Dw = new Transrange_ReceivingModel(Yaf_Registry::get("db"));
         $data = $Dw->getRualProducus($id);
         return $data;
     }
 
     //获取黑白名单
     public function getFileWallFunc($rule_id){
-        $T = new TransRange_ReceivingModel(Yaf_Registry::get("db"));
+        $T = new Transrange_ReceivingModel(Yaf_Registry::get("db"));
         return $T->getFileWall($rule_id);        
     }
 
 
     //智能接单
     public function matchingFunc($params){
-        $T = new TransRange_ReceivingModel(Yaf_Registry::get("db"));
+        $T = new Transrange_ReceivingModel(Yaf_Registry::get("db"));
         return $T->matching($params);  
     }
 }
