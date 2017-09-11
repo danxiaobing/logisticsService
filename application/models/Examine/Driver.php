@@ -84,14 +84,14 @@ class Examine_DriverModel
     public function getAllDriver($company_ids)
     {
         $ids = implode(',', $company_ids);
-        $sql = "SELECT id,name,mobile FROM `gl_driver`  WHERE `type` in (1,3) AND `company_id` in ( {$ids} )";
+        $sql = "SELECT id,name,mobile FROM `gl_driver`  WHERE `status` = 1 AND `is_use` = 1 AND `isdelete` = 0 AND `type` in (1,3) AND `company_id` in ( {$ids} )";
         return $this->dbh->select($sql);
     }
 
     public function getAllEscort($company_ids)
     {
         $ids = implode(',', $company_ids);
-        $sql = "SELECT id,name,mobile FROM `gl_driver`  WHERE `type` in (2,3) AND `company_id` in ( {$ids} )";
+        $sql = "SELECT id,name,mobile FROM `gl_driver`  WHERE `status` = 1 AND `is_use` = 1 AND `isdelete` = 0 AND `type` in (2,3) AND `company_id` in ( {$ids} )";
         return $this->dbh->select($sql);
     }
 
