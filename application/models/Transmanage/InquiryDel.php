@@ -4,7 +4,7 @@
  * 询价单管理
  * User: Andy
  */
-class Transmanage_InquiryDelModel
+class Transmanage_InquirydelModel
 {
     public $dbh = null;
 
