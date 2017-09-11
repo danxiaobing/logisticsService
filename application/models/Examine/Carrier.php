@@ -44,7 +44,8 @@ class Examine_CarrierModel
         if (isset($params['company_code']) && $params['company_code'] != '') {
             $filter[] = " gl_companies.`company_code`   LIKE '%{$params['company_code']}%' ";
         }
-        if($pid != ''){
+
+        if($pid == ''){
             $filter[] = " gl_companies.`pid` != 0";
         }else{
             $filter[] = " gl_companies.`pid` = {$pid}";
