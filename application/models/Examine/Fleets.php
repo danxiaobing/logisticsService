@@ -123,7 +123,29 @@ class Examine_FleetsModel
     //删除
     public function del($id)
     {
-        return $this->dbh->delete('gl_fleets','id=' . intval($id));
+        #开启事物
+        $this->dbh->begin();
+        try{
+            $res =  $this->dbh->delete('gl_fleets','id=' . intval($id));
+            if(empty($res)){
+                $this->dbh->rollback();
+                return false;
+            }else{
+
+                $params['fleets_id'] = 0;
+                $r = $this->dbh->update('gl_cars',$params,'fleets_id=' . intval($id));
+                if(empty($r)){
+                    $this->dbh->rollback();
+                    return false;
+                }
+            }
+            $this->dbh->commit();
+            return true;
+
+        } catch (Exception $e) {
+            $this->dbh->rollback();
+            return false;
+        }
     }
 
     public function getCooperate($id,$page){
