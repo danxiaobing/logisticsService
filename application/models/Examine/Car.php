@@ -57,8 +57,8 @@ class Examine_CarModel
         if ( isset($params['fleets_type']) && $params['fleets_type'] != '' ) {
              $filter[] = " c.`fleets_type`=" .  $params['fleets_type'];
         }
-        if ( isset($params['not_status']) && $params['not_status'] != '' ) {
-             $filter[] = " c.`status` !=" .  $params['not_status'];
+        if ( isset($params['status'])) {
+             $filter[] = " c.`status` =" .$params['status'];
         }
         if (count($filter) > 0) {
             $where .= implode(" AND ", $filter);
