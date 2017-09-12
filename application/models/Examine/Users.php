@@ -117,7 +117,7 @@ class Examine_UsersModel
 
 
 
-        $sql = "SELECT gl_user_info.user_name, gl_user_info.id,gl_user_info.mobile,gl_user_info.email,gl_companies.company_code,gl_companies.id as cid,gl_companies.company_name,gl_companies.company_telephone,gl_companies.company_user,gl_companies.status  FROM gl_user_info
+        $sql = "SELECT gl_user_info.user_name, gl_user_info.id,gl_user_info.password,gl_user_info.mobile,gl_user_info.email,gl_companies.company_code,gl_companies.id as cid,gl_companies.company_name,gl_companies.company_telephone,gl_companies.company_user,gl_companies.status  FROM gl_user_info
                 LEFT JOIN gl_companies ON gl_companies.id = gl_user_info.cid WHERE 
                 ".$where;
 
