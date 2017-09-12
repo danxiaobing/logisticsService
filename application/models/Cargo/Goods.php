@@ -238,9 +238,11 @@ class Cargo_GoodsModel
                gl_goods.consign_phone,
                gl_goods.desc_str,
                gl_goods.status,
-               gl_products.zh_name
+               gl_products.zh_name,
+               IFNULL(gl_cars_type.name,'')  AS carname
                 FROM gl_goods 
                 LEFT JOIN gl_products ON gl_products.id = gl_goods.product_id
+                LEFT JOIN gl_cars_type ON gl_cars_type.id =gl_goods.cars_type 
                 WHERE  {$where}
                 ORDER BY id DESC 
                 ";
