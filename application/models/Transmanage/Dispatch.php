@@ -223,6 +223,7 @@ class Transmanage_DispatchModel
                 return false;
             }
         }else{
+            #分配每次调度的重量
             $time = $params['time'];
             $weights_this = $params['weights_this'];
             $weights_done = $params['weights_done'];
@@ -240,6 +241,8 @@ class Transmanage_DispatchModel
 
             $this->dbh->begin();
             try{
+
+                #循环插入调度单 根据次数
                 foreach ($time as $key=>$v){
                     if($key == 0){
                         $params['weights'] = $weights_remainder;
@@ -257,19 +260,23 @@ class Transmanage_DispatchModel
                     }
                 }
 
-                $order = $this->dbh->update('gl_order',['status'=>2],' id ='.intval($params['order_id']));
-                if(!$order){
+                #修改这次已调度重量
+                $weights_done =  $weights_done+$weights_this;
+                $goods = $this->dbh->update('gl_goods',['weights_done'=>$weights_done],' id ='.$params['goods_id']);
+                if(!$goods){
                     $this->dbh->rollback();
                     return false;
                 }
 
-                $weights_done =  $weights_done+$weights_this;
+                #判断总吨数和已调度吨数 （修改状态）
                 if($weights_all == $weights_done){
                     $goods = $this->dbh->update('gl_goods',['weights_done'=>$weights_done],' id ='.$params['goods_id']);
-                    if(!$goods){
+                    $order = $this->dbh->update('gl_order',['status'=>2],' id ='.intval($params['order_id']));
+                    if(!$goods && !$order){
                         $this->dbh->rollback();
                         return false;
                     }
+
                 }
 
                 $this->dbh->commit();
