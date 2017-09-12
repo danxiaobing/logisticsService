@@ -78,8 +78,8 @@ class Examine_CarModel
         //echo "<pre>";print_r($filter);echo "</pre>";die; 
         $result['totalRow'] = $this->dbh->select_one($sql);
 
-        $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
-        $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
+        $this ->dbh ->set_page_num($params['pageCurrent']);
+        $this ->dbh ->set_page_rows($params['pageSize']); 
 
         $sql = "SELECT 
                 c.`id`,
