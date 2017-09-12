@@ -45,8 +45,8 @@ class Examine_UsersModel
         if (isset($params['email']) && $params['email'] != '') {
             $filter[] = " gl_user_info.`email`  LIKE '%{$params['email']}%'";
         }
-        if (isset($params['company_code']) && $params['company_code'] != '') {
-            $filter[] = " gl_user_info.`user_name` LIKE  '%{$params['email']}%'";
+        if (isset($params['user_name']) && $params['user_name'] != '') {
+            $filter[] = " gl_user_info.`user_name` LIKE  '%{$params['user_name']}%'";
         }
 
         $where .= ' gl_companies.`is_del` = 0 ';
