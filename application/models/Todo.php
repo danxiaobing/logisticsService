@@ -103,7 +103,7 @@ class TodoModel
 
             //<--回程车-->
             //回程车待接单
-            $sql = "SELECT count(1) FROM gl_return_car  WHERE  gl_return_car.`is_del` = 0 AND gl_return_car.`status` = 1";
+            $sql = "SELECT count(1) FROM gl_return_car  WHERE  gl_return_car.`is_del` = 0 AND gl_return_car.`status` = 1 AND cid = {$params['cid']}";
             $result['return_car'] = $this->dbh->select_one($sql);
             //<--回程车-->
 
