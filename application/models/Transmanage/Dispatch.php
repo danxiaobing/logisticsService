@@ -122,7 +122,8 @@ class Transmanage_DispatchModel
             if(6 == $params['status']){
                 $goods_arr = $this->dbh->select_row('SELECT weights_done FROM gl_goods WHERE id = '.$dispatchData['goods_id']);
                 $goods = $this->dbh->update('gl_goods',['weights_done'=>$goods_arr['weights_done'] - $dispatchData['weights']],' id = '.$dispatchData['goods_id']);
-                if(!$goods){
+                $order = $this->dbh->update('gl_order',['status'=>1],' id ='.$dispatchData['order_id']);
+                if(!$goods && !$order){
                     $this->dbh->rollback();
                     return false;
                 }
