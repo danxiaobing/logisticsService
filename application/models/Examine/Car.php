@@ -284,17 +284,19 @@ class Examine_CarModel
             'list' => array()
         );
 
+
         $sql = "SELECT COUNT(*) FROM(
-                    SELECT r.id FROM gl_return_car AS r
-                    LEFT JOIN gl_companies AS com ON com.id = r.cid  {$where_r}
+                 SELECT z.id,z.cid,z.car_type,z.price_type,z.price,z.min_load,z.max_load,z.loss,p.product_id,1 AS ctype,com.company_name
+                 FROM gl_rule AS z
+                 LEFT JOIN gl_rule_product AS p ON p.rule_id = z.id
+                 LEFT JOIN gl_companies AS com ON com.id = z.cid {$where_z}
                 UNION
-                    SELECT p.id FROM gl_rule AS z
-                    LEFT JOIN gl_rule_product AS p ON p.rule_id = z.id
-                    LEFT JOIN gl_companies AS com ON com.id = z.cid  {$where_z}
-                ) AS tt";
+                 SELECT r.id,r.cid,0 AS car_type,r.price_type,r.price,r.min_load,r.max_load,3 AS loss,r.product_id,2 AS ctype,com.company_name
+                 FROM gl_return_car AS r
+                LEFT JOIN gl_companies AS com ON com.id = r.cid {$where_r}
+                ) AS ss ";
 
         $result['totalRow'] = $this->dbh->select_one($sql);
-
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
