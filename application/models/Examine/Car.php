@@ -105,13 +105,11 @@ class Examine_CarModel
                 LEFT JOIN `gl_driver` AS d2 ON d2.`id` = c.`escort_id`
                 {$where} 
                 ORDER BY c.`updated_at` DESC";
-        //print_r($sql);die;
         $result['list'] = $this->dbh->select_page($sql);
-        //print_r($result);die;
         return $result;
     }
     public function getCarByType($params){
-        $where = "WHERE c.is_del = 0 AND c.company_id in (" . implode(',',$params['company_ids']) . ") AND c.type =  ".$params['type'];
+        $where = "WHERE c.is_del = 0 AND c.status = 1 AND c.is_use = 1 AND c.company_id in (" . implode(',',$params['company_ids']) . ") AND c.type =  ".$params['type'];
         $sql = "SELECT 
                 c.`id`,
                 c.`number`,
@@ -128,9 +126,7 @@ class Examine_CarModel
                 LEFT JOIN `gl_driver` AS d2 ON d2.`id` = c.`escort_id`
                 {$where} 
                 ORDER BY c.`updated_at` DESC";
-        //print_r($sql);die;
         $result = $this->dbh->select($sql);
-        //print_r($result);die;
         return $result;
     }
     public function add($params)
