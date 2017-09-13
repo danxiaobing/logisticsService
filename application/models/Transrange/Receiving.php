@@ -34,18 +34,12 @@ class Transrange_ReceivingModel
         if (isset($params['product']) && $params['product'] != '' ) {
             $filter[] = " p.`zh_name` LIKE '%{$params['product']}%' ";
         }
-
-
         if (isset($params['min_load']) && $params['min_load'] != '' && $params['min_load'] != '0') {
             $filter[] = " r.`max_load` >=  '{$params['min_load']}' ";
         }
-
         if (isset($params['max_load']) && $params['max_load'] != '' && $params['max_load'] != '0') {
             $filter[] = " r.`min_load` <=  '{$params['max_load']}' ";
         }
-
-
-
         if (isset($params['set_line']) && $params['set_line'] != '' ) {
             $filter[] = " r.`set_line` = '{$params['set_line']}' ";
         }
@@ -55,27 +49,18 @@ class Transrange_ReceivingModel
         if (isset($params['price_type']) && $params['price_type'] != '' ) {
             $filter[] = " r.`price_type` =  '{$params['price_type']}' ";
         }
-
-        if( isset($params['start_provice_id']) && $params['start_provice_id'] != '' && $params['start_provice_id'] != '0'){
-            if( isset($params['start_city_id']) && $params['start_city_id'] != '' && $params['start_city_id'] != '0'){
-                $filter[] = " ( r.`start_provice_id` = 0 OR r.`start_city_id` = 0 OR r.`start_city_id` = '{$params['start_city_id']}' ) ";
-            }else{
-                //全省
-                $filter[] = " ( r.`start_provice_id` = 0 OR r.`start_provice_id` = '{$params['start_provice_id']}' ) ";
-            }
+        if( isset($params['start_province_id']) && !empty($params['start_province_id'])){
+            $filter[] = " r.`start_province_id` = {$params['start_province_id']}";
         }
-
-        if( isset($params['end_provice_id']) && $params['end_provice_id'] != '' && $params['end_provice_id'] != '0'){
-            if( isset($params['end_city_id']) && $params['end_city_id'] != '' && $params['end_city_id'] != '0'){
-                $filter[] = " ( r.`end_provice_id` = 0 OR r.`end_city_id` = 0 OR r.`end_city_id` = '{$params['end_city_id']}' ) ";
-            }else{
-                //全省
-                $filter[] = " ( r.`end_provice_id` = 0 OR r.`end_provice_id` = '{$params['end_provice_id']}' ) ";
-            }
+        if( isset($params['start_city_id']) && !empty($params['start_city_id'])){
+            $filter[] = " r.`start_city_id` = {$params['start_city_id']}";
         }
-
-
-
+        if( isset($params['end_province_id']) && !empty($params['end_province_id'])){
+            $filter[] = " r.`end_province_id` = '{$params['end_province_id']}' ";
+        }
+        if( isset($params['end_city_id']) && !empty($params['end_city_id'])){
+            $filter[] = " r.`end_city_id` = '{$params['end_city_id']}' ";
+        }
         if (1 <= count($filter)) {
             $where .= implode(' AND ', $filter);
         }else{
