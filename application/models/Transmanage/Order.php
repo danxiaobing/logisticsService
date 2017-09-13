@@ -50,11 +50,11 @@ class Transmanage_OrderModel
 
 
         if (isset($params['starttime']) && $params['starttime'] != '') {
-            $filter[] = " o.`created_at` <= '{$params['starttime']}'";
+            $filter[] = " o.`created_at` >= '{$params['starttime']}'";
         }
 
         if (isset($params['endtime']) && $params['endtime'] != '') {
-            $filter[] = " o.`created_at` >= '{$params['endtime']}'";
+            $filter[] = " o.`created_at` <= '{$params['endtime']}'";
         }
 
         if (isset($params['status']) && $params['status'] != '') {
