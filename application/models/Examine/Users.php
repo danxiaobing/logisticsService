@@ -85,13 +85,19 @@ class Examine_UsersModel
                 {$where} 
                 ORDER BY gl_user_info.`updated_at` DESC";
 
-        $countSql = "SELECT COUNT(1) FROM gl_companies WHERE is_del = 0";
+        $countSql = "SELECT COUNT(1) FROM  gl_user_info LEFT JOIN gl_companies ON gl_companies.id = gl_user_info.cid WHERE {$where}";
 
-        $data['total'] = $this->dbh->select_one($countSql);
-        $this->dbh->set_page_num($page);
-        $this->dbh->set_page_rows($pageSize);
+        $data['totalRow'] = $this->dbh->select_one($countSql);
+        $data['list'] = array();
 
-        $data['list'] =  $this->dbh->select($sql);
+        if($data['totalRow']){
+            //总的页数
+            $data['totalPage']  = ceil($data['totalRow'] /$pageSize);
+            $this->dbh->set_page_num($page);
+            $this->dbh->set_page_rows($pageSize);
+
+            $data['list'] =  $this->dbh->select_page($sql);
+        }
 
         return $data;
     }

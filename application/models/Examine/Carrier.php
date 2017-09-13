@@ -87,11 +87,17 @@ class Examine_CarrierModel
 
         $countSql = "SELECT COUNT(1) FROM gl_companies WHERE  {$where}";
 
-        $data['total'] = $this->dbh->select_one($countSql);
-        $this->dbh->set_page_num($params['pageCurrent']);
-        $this->dbh->set_page_rows($params['pageSize']);
+        $data['totalRow'] = $this->dbh->select_one($countSql);
+        $data['list'] = array();
 
-        $data['list'] =  $this->dbh->select_page($sql);
+        if($data['totalRow']){
+            //总的页数
+            $data['totalPage']  = ceil($data['totalRow'] / $params['pageSize']);
+            $this->dbh->set_page_num($params['pageCurrent']);
+            $this->dbh->set_page_rows($params['pageSize']);
+
+            $data['list'] =  $this->dbh->select_page($sql);
+        }
 
         return $data;
     }
