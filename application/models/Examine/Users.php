@@ -60,7 +60,24 @@ class Examine_UsersModel
         $pageSize = isset($params['pageSize'])? intval($params['pageSize']) : 9;
 
         #sql语句
-        $sql = "SELECT gl_user_info.id,gl_user_info.is_del,gl_user_info.user_name,gl_user_info.mobile,gl_user_info.email,gl_companies.company_code,gl_companies.province_id,gl_companies.company_name,gl_companies.city_id,gl_companies.area_id,gl_companies.company_address,gl_companies.company_user,gl_companies.company_telephone,conf_area.area,conf_province.province,conf_city.city FROM gl_user_info
+        $sql = "SELECT 
+                    gl_user_info.id,
+                    gl_user_info.is_del,
+                    gl_user_info.user_name,
+                    gl_user_info.mobile,
+                    gl_user_info.email,
+                    gl_companies.company_code,
+                    gl_companies.province_id,
+                    gl_companies.company_name,
+                    gl_companies.city_id,
+                    gl_companies.area_id,
+                    gl_companies.company_address,
+                    gl_companies.company_user,
+                    gl_companies.company_telephone,
+                    conf_area.area,
+                    conf_province.province,
+                    conf_city.city 
+                FROM gl_user_info
                 LEFT JOIN gl_companies ON gl_companies.id = gl_user_info.cid
                 LEFT JOIN conf_area ON conf_area.areaid = gl_companies.area_id
                 LEFT JOIN conf_province ON conf_province.provinceid = gl_companies.province_id
@@ -117,7 +134,19 @@ class Examine_UsersModel
 
 
 
-        $sql = "SELECT gl_user_info.user_name, gl_user_info.id,gl_user_info.password,gl_user_info.mobile,gl_user_info.email,gl_companies.company_code,gl_companies.id as cid,gl_companies.company_name,gl_companies.company_telephone,gl_companies.company_user,gl_companies.status  FROM gl_user_info
+        $sql = "SELECT 
+                gl_user_info.user_name,
+                gl_user_info.id,
+                gl_user_info.password,
+                gl_user_info.mobile,
+                gl_user_info.email,
+                gl_companies.company_code,
+                gl_companies.id as cid,
+                gl_companies.company_name,
+                gl_companies.company_telephone,
+                gl_companies.company_user,
+                gl_companies.status  
+                FROM gl_user_info
                 LEFT JOIN gl_companies ON gl_companies.id = gl_user_info.cid WHERE 
                 ".$where;
 
@@ -126,6 +155,7 @@ class Examine_UsersModel
         if(!empty($password)) {
             $hash = $data['password'];
             if (password_verify($password, $hash)) {
+                unset($data['password']);
                 return $data;
             } else {
                 return false;

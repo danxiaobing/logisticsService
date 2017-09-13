@@ -61,7 +61,24 @@ class Examine_CarrierModel
         }
 
         #sql语句
-        $sql = "SELECT gl_companies.id,gl_companies.company_code,gl_companies.province_id,gl_companies.company_name,gl_companies.city_id,gl_companies.area_id,gl_companies.company_address,gl_companies.company_user,gl_companies.company_telephone,gl_companies.code,gl_companies.status,conf_area.area,conf_province.province,conf_city.city,gl_companies.business,gl_companies.products FROM gl_companies 
+        $sql = "SELECT 
+                  gl_companies.id,
+                  gl_companies.company_code,
+                  gl_companies.province_id,
+                  gl_companies.company_name,
+                  gl_companies.city_id,
+                  gl_companies.area_id,
+                  gl_companies.company_address,
+                  gl_companies.company_user,
+                  gl_companies.company_telephone,
+                  gl_companies.code,
+                  gl_companies.status,
+                  conf_area.area,
+                  conf_province.province,
+                  conf_city.city,
+                  gl_companies.business,
+                  gl_companies.products 
+                  FROM gl_companies 
                 LEFT JOIN conf_area ON conf_area.areaid = gl_companies.area_id
                 LEFT JOIN conf_province ON conf_province.provinceid = gl_companies.province_id
                 LEFT JOIN conf_city ON conf_city.cityid = gl_companies.city_id WHERE 
@@ -89,7 +106,24 @@ class Examine_CarrierModel
         $where .= ' AND gl_companies.`is_del` = 0 ';
 
         #sql语句
-        $sql = "SELECT gl_companies.id,gl_companies.company_code,gl_companies.code,gl_companies.province_id,gl_companies.company_name,gl_companies.city_id,gl_companies.area_id,gl_companies.company_address,gl_companies.company_user,gl_companies.company_telephone,gl_companies.status,conf_area.area,conf_province.province,conf_city.city,gl_companies.business,gl_companies.products  FROM gl_companies 
+        $sql = "SELECT 
+                  gl_companies.id,
+                  gl_companies.company_code,
+                  gl_companies.code,
+                  gl_companies.province_id,
+                  gl_companies.company_name,
+                  gl_companies.city_id,
+                  gl_companies.area_id,
+                  gl_companies.company_address,
+                  gl_companies.company_user,
+                  gl_companies.company_telephone,
+                  gl_companies.status,
+                  conf_area.area,
+                  conf_province.province,
+                  conf_city.city,
+                  gl_companies.business,
+                  gl_companies.products  
+                  FROM gl_companies 
                 LEFT JOIN conf_area ON conf_area.areaid = gl_companies.area_id
                 LEFT JOIN conf_province ON conf_province.provinceid = gl_companies.province_id
                 LEFT JOIN conf_city ON conf_city.cityid = gl_companies.city_id WHERE  
@@ -252,8 +286,24 @@ class Examine_CarrierModel
 
 
         #sql语句
-        $sql = "SELECT gl_companies.id,gl_companies.is_status,gl_companies.company_code,gl_companies.province_id,gl_companies.company_name,gl_companies.city_id,gl_companies.area_id,gl_companies.company_address,gl_companies.company_user,gl_companies.company_telephone,gl_companies.`status`,conf_area.area,conf_province.province,conf_city.city,(SELECT count(1) FROM gl_fleets  WHERE  gl_fleets.`company_id` = gl_companies.`id`
-	 )  AS fleets FROM gl_companies 
+        $sql = "SELECT 
+                    gl_companies.id,
+                    gl_companies.is_status,
+                    gl_companies.company_code,
+                    gl_companies.province_id,
+                    gl_companies.company_name,
+                    gl_companies.city_id,
+                    gl_companies.area_id,
+                    gl_companies.company_address,
+                    gl_companies.company_user,
+                    gl_companies.company_telephone,
+                    gl_companies.`status`,
+                    conf_area.area,
+                    conf_province.province,
+                    conf_city.city,
+                    (SELECT count(1) FROM gl_fleets  WHERE  gl_fleets.`company_id` = gl_companies.`id`
+	 )  AS fleets 
+	            FROM gl_companies 
                 LEFT JOIN conf_area ON conf_area.areaid = gl_companies.area_id
                 LEFT JOIN conf_province ON conf_province.provinceid = gl_companies.province_id
                 LEFT JOIN conf_city ON conf_city.cityid = gl_companies.city_id WHERE 
