@@ -22,8 +22,7 @@ class Transrange_ReceivingModel
 
     public function getPage($params)
     {
-        $filed = array();
-        $filter[] = " WHERE r.`is_del` = 0";
+        $filter[] = " WHERE r.`is_del` = 0 AND rg.`is_del` = 0 ";
         $where = "  ";
 
 
@@ -78,7 +77,6 @@ class Transrange_ReceivingModel
         GROUP BY r.`id`
         ) as count";
 
-        // print_r($sql);die;   
         $result = $params;
         $result['totalRow'] = $this->dbh->select_one($sql);
 
@@ -97,14 +95,11 @@ class Transrange_ReceivingModel
         {$where} 
         GROUP BY r.`id`
         ORDER BY r.`updated_at` DESC";
-        // echo "<pre>";print_r($sql);echo "</pre>";die; 
-        $result['list'] = $this->dbh->select_page($sql); 
+
+        $result['list'] = $this->dbh->select_page($sql);
         if( count($result['list']) ){
             foreach ($result['list'] as $k => $v) {
 
-                // if( $v['start_province_id'] == '0' ){
-                //     break;
-                // }
                 $type = 'area';
                 if( $v['start_area_id'] == 0 ){
                     if( $v['start_city_id'] == 0 ){
