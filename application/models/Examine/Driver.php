@@ -121,7 +121,7 @@ class Examine_DriverModel
             $where = '(gc.id='.intval($companyid).' or gc.pid='.intval($companyid).')';
         }
 
-        $sql = 'SELECT gc.id,gc.company_name from gl_companies gc where '.$where.'  and gc.status=2';
+        $sql = 'SELECT gc.id,gc.company_name from gl_companies gc where '.$where.'  and gc.status=2 and gc.is_del= 0';
         return $this->dbh->select($sql);
     }
 
