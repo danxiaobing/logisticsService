@@ -152,8 +152,9 @@ class Transmanage_DispatchModel
             }
 
             if(5 == $params['status']){
-                $count = $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE c_id = '.$dispatchData['c_id']);
-                $completeTotal =  $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE status = 5 AND c_id = '.$dispatchData['c_id']);
+                $count = $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE order_id = '.$dispatchData['order_id']);
+                var_dump($count);
+                $completeTotal =  $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE status = 5 AND order_id = '.$dispatchData['order_id']);
                 if($count == $completeTotal){
                     $goods = $this->dbh->update('gl_goods',['status'=>6],' id = '.$dispatchData['goods_id']);
                     $order = $this->dbh->update('gl_order',['status'=>4],' id ='.$dispatchData['order_id']);
@@ -163,7 +164,7 @@ class Transmanage_DispatchModel
                     }
                 }
             }
-
+      
             $this->dbh->commit();
             return true;
 
@@ -270,7 +271,7 @@ class Transmanage_DispatchModel
                 #判断总吨数和已调度吨数 （修改状态）
                 if($weights_all == $weights_done){
                     $goods = $this->dbh->update('gl_goods',['weights_done'=>$weights_done],' id ='.$params['goods_id']);
-                    $order = $this->dbh->update('gl_order',['status'=>3],' id ='.intval($params['order_id']));
+                    $order = $this->dbh->update('gl_order',['status'=>2],' id ='.intval($params['order_id']));
                     if(!$goods && !$order){
                         $this->dbh->rollback();
                         return false;
