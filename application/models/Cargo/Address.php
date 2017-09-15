@@ -22,7 +22,7 @@ class Cargo_AddressModel
         if ($uid != 0) {
             $where = " WHERE is_del = 0 AND uid = " . $uid;
         } else {
-            $where = ' WHERE is_del = 0 ';
+            return array();
         }
         $filter = $filed = array();
         if (isset($params['type']) && $params['type'] != '') {
