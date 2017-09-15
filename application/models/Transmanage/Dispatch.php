@@ -29,11 +29,11 @@ class Transmanage_DispatchModel
         }
 
         if (isset($params['start_time']) && $params['start_time'] != '') {
-            $filter[] = " `start_time` <= '".$params['start_time']."'";
+            $filter[] = " `created_at` >= '".$params['start_time']."'";
         }
 
         if (isset($params['end_time']) && $params['end_time'] != '') {
-            $filter[] = " `end_time` >= '".$params['end_time']."'";
+            $filter[] = " `created_at` <= '".$params['end_time']."'";
         }
 
         if (isset($params['keyworks']) && $params['keyworks'] != '') {
@@ -56,7 +56,6 @@ class Transmanage_DispatchModel
         }
 
         $sql = "SELECT count(1) FROM gl_order_dispatch  WHERE {$where}";
-        // echo "<pre>";print_r($sql);echo "</pre>";die; 
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
