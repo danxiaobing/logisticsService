@@ -164,7 +164,26 @@ class Transmanage_InquirydelModel
 
     /*获取当前询价单的价格状态信息*/
     public function getInquiryInfo($id){
-        $sql = "SELECT gi.`id`,gi.`status`,gi.`type`,gii.`minprice`,gii.`maxprice`,gii.`type`,gii.`created_at` FROM gl_inquiry gi LEFT JOIN gl_inquiry_info gii ON gi.id = gii.pid WHERE gii.pid=".intval($id)." AND gi.`is_del`=0  ORDER BY gii.`id` ASC";
+        // $sql = "SELECT gi.`id`,gi.`status`,gi.`type`,gii.`minprice`,gii.`maxprice`,gii.`type`,gii.`created_at` FROM gl_inquiry gi LEFT JOIN gl_inquiry_info gii ON gi.id = gii.pid WHERE gii.pid=".intval($id)." AND gi.`is_del`=0  ORDER BY gii.`id` ASC";
+
+        $sql = "SELECT
+                    gi.`id` ,
+                    gi.`status` ,
+                    gi.`type`  as cancel ,
+                    gii.`minprice` ,
+                    gii.`maxprice` ,
+                    gii.`type` as operate,
+                    gii.`created_at`
+                FROM
+                    gl_inquiry gi
+                LEFT JOIN gl_inquiry_info gii ON gi.id = gii.pid
+                WHERE
+                    gii.pid = ".intval($id)."
+                AND gi.`is_del` = 0
+                ORDER BY
+                    gii.`id` ASC";
+
+
         $data =  $this->dbh->select($sql);
         // unset($data[0]);
         return $data;
