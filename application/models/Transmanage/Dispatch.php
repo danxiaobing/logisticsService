@@ -151,6 +151,19 @@ class Transmanage_DispatchModel
                 }
             }
 
+            if(2 == $params['status']){
+                $count = $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE order_id = '.$dispatchData['order_id']);
+                $completeTotal =  $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE status >= 2 AND order_id = '.$dispatchData['order_id']);
+
+                if($count == $completeTotal){
+                    $order = $this->dbh->update('gl_order',['status'=>3],' id ='.$dispatchData['order_id']);
+                    if(empty($order)){
+                        $this->dbh->rollback();
+                        return false;
+                    }
+                }
+            }
+
             if(5 == $params['status']){
                 $count = $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE order_id = '.$dispatchData['order_id']);
                 $completeTotal =  $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE status = 5 AND order_id = '.$dispatchData['order_id']);
