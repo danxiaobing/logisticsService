@@ -142,4 +142,15 @@ class CityModel
          $data = json_encode($arr,JSON_UNESCAPED_UNICODE);
         return array('res'=>$data,'province'=>$province);
     }
+
+
+
+    /**
+     * 获取城市
+     */
+    public function getConfCity()
+    {
+        $sql = "SELECT * FROM conf_city ORDER BY zm";
+        return $this->dbh->select($sql);
+    }
 }

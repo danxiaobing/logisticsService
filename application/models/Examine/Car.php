@@ -78,8 +78,8 @@ class Examine_CarModel
         //echo "<pre>";print_r($filter);echo "</pre>";die; 
         $result['totalRow'] = $this->dbh->select_one($sql);
 
-        $this ->dbh ->set_page_num($params['pageCurrent']);
-        $this ->dbh ->set_page_rows($params['pageSize']); 
+        $this ->dbh ->set_page_num($params['pageCurrent']?$params['pageCurrent']:1);
+        $this ->dbh ->set_page_rows($params['pageSize']?$params['pageSize']:10); 
 
         $sql = "SELECT 
                 c.`id`,
@@ -282,12 +282,12 @@ class Examine_CarModel
 
 
         $sql = "SELECT COUNT(*) FROM(
-                 SELECT z.id,z.cid,z.car_type,z.price_type,z.price,z.min_load,z.max_load,z.loss,p.product_id,1 AS ctype,com.company_name
+                 SELECT z.start_province_id,z.start_city_id,z.id,z.cid,z.car_type,z.price_type,z.price,z.min_load,z.max_load,z.loss,p.product_id,1 AS ctype,com.company_name
                  FROM gl_rule AS z
                  LEFT JOIN gl_rule_product AS p ON p.rule_id = z.id
                  LEFT JOIN gl_companies AS com ON com.id = z.cid {$where_z}
                 UNION
-                 SELECT r.id,r.cid,0 AS car_type,r.price_type,r.price,r.min_load,r.max_load,3 AS loss,r.product_id,2 AS ctype,com.company_name
+                 SELECT r.start_province_id,r.start_city_id,r.id,r.cid,0 AS car_type,r.price_type,r.price,r.min_load,r.max_load,3 AS loss,r.product_id,2 AS ctype,com.company_name
                  FROM gl_return_car AS r
                 LEFT JOIN gl_companies AS com ON com.id = r.cid {$where_r}
                 ) AS ss ";
@@ -296,16 +296,46 @@ class Examine_CarModel
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
-        $sql = "SELECT z.id,z.cid,z.car_type,z.price_type,z.price,z.min_load,z.max_load,z.loss,p.product_id,1 AS ctype,com.company_name
+        $sql = "SELECT '' as starttime,z.start_province_id,z.start_city_id,z.end_province_id,z.end_city_id,z.id,z.cid,z.car_type,z.price_type,z.price,z.min_load,z.max_load,z.loss,p.product_id,1 AS ctype,com.company_name
                  FROM gl_rule AS z
                  LEFT JOIN gl_rule_product AS p ON p.rule_id = z.id
                  LEFT JOIN gl_companies AS com ON com.id = z.cid {$where_z}
                 UNION
-                 SELECT r.id,r.cid,0 AS car_type,r.price_type,r.price,r.min_load,r.max_load,3 AS loss,r.product_id,2 AS ctype,com.company_name
+                 SELECT r.start_time as starttime,r.start_province_id,r.start_city_id,r.end_province_id,r.end_city_id,r.id,r.cid,0 AS car_type,r.price_type,r.price,r.min_load,r.max_load,3 AS loss,r.product_id,2 AS ctype,com.company_name
                  FROM gl_return_car AS r
                 LEFT JOIN gl_companies AS com ON com.id = r.cid {$where_r}
                 ORDER BY id DESC ";
         $result['list'] = $this->dbh->select_page($sql);
+        if( count($result['list']) ){
+            foreach ($result['list'] as $k => $v) {
+
+                $type = 'area';
+                if( $v['start_area_id'] == 0 ){
+                    if( $v['start_city_id'] == 0 ){
+                        $type = 'province';
+                    }else{
+                        $type = 'city';
+                    }
+                }
+                $name = "start_{$type}_id";
+                $sql = "SELECT GROUP_CONCAT(cp.`{$type}`) FROM conf_{$type} cp where cp.`{$type}id` = {$v[$name]}";
+                $data = $this->dbh->select_one($sql);
+                $result['list'][$k]['start_name'] = $data ? $data:'';
+
+                $type = 'area';
+                if( $v['end_area_id'] == 0 ){
+                    if( $v['end_city_id'] == 0 ){
+                        $type = 'province';
+                    }else{
+                        $type = 'city';
+                    }
+                }
+                $name = "end_{$type}_id";
+                $sql = "SELECT GROUP_CONCAT(cp.`{$type}`) FROM conf_{$type} cp where cp.`{$type}id` = {$v[$name]}";
+                $data = $this->dbh->select_one($sql);
+                $result['list'][$k]['end_name'] = $data ? $data:'';
+            }
+        }
         return $result;
     }
 

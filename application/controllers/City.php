@@ -57,5 +57,15 @@ class CityController extends Rpc {
       return $C->getPlaceList($id);
     }
 
-    //
+    /**
+     * 获取城市选项
+     * @author Alan
+     */
+
+    public function getConfCityFunc()
+    {
+        $L = new CityModel(Yaf_Registry::get("db"));
+        $city = $L->getConfCity();
+        return $city;
+    }
 }
