@@ -180,7 +180,7 @@ class Examine_UsersModel
             'password'   => $params['password'],
             'mobile'     => $params['mobile'],
             'user_name'  => $params['user_name'],
-            'is_del'     => 0,
+            'is_del'     => $params['is_del']?$params['is_del']:0,
             'created_at' => '=NOW()',
             'updated_at' => '=NOW()'
         );
