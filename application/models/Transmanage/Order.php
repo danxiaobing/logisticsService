@@ -413,7 +413,8 @@ class Transmanage_OrderModel
      * @return mixed
      */
     public function updateOrder($id,$params){
-        return $this->dbh->update('gl_companies', $params, 'id = '.intval($id));
+
+        return $this->dbh->update('gl_order', $params, 'id = '.intval($id));
     }
 
 
