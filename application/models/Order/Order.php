@@ -144,7 +144,7 @@ class Order_OrderModel
 
         return $this->dbh->select_row($sql);*/
         //获取托运单基本信息
-        $sql = "SELECT go.id,go.number,go.goods_id,go.status,go.reasons,go.estimate_freight,go.fact_freight,go.pay_time FROM gl_order go WHERE go.id=".intval($orderid);
+        $sql = "SELECT go.id,go.number,go.goods_id,go.cargo_id,go.company_id,go.status,go.reasons,go.estimate_freight,go.fact_freight,go.pay_time FROM gl_order go WHERE go.id=".intval($orderid);
         $info = $this->dbh->select_row($sql);
 
         //获取托运单的调度信息
