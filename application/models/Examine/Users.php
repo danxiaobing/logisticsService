@@ -212,13 +212,24 @@ class Examine_UsersModel
                return false;
            }
 
+
+
            #插入个人信息
             $user['cid']  = $carrier_id;
             $user_id = $this->dbh->insert('gl_user_info', $user);
 
             if(!empty($user_id)){
-                $this->dbh->commit();
-                return $user_id;
+                #发送短信
+                $smsrpc=Yaf_Registry::get("smsrpc");
+                $this->Wiserun = Client::create( $smsrpc->host.'Wiserun',false);
+                $sms = $this->Wiserun->sendFunc(array('mobile'=>'18627607669'),'2');
+                if($sms['code'] == "200"){
+                    $this->dbh->commit();
+                    return $user_id;
+                }else{
+                    $this->dbh->rollback();
+                    return false;
+                }
             }else{
                 $this->dbh->rollback();
                 return false;
