@@ -31,10 +31,13 @@ class Cargo_GoodsModel
                 $order = 'gl_goods.reach_starttime';
             }
         }
-        if (isset($params['cid']) && $params['cid'] != '') {
+        if (isset($params['cid']) && !empty($params['cid'])) {
             $filter[] = " gl_goods.cid = " . $params['cid'];
         }
-        if (isset($params['status']) && !empty($params['status'])) {
+        if (isset($params['uid']) && !empty($params['uid'])) {
+            $filter[] = " gl_goods.uid = " . $params['uid'];
+        }
+        if (isset($params['status']) && $params['status'] != '') {
             $filter[] = " gl_goods.status=" . $params['status'];
         }
         if (1 <= count($filter)) {

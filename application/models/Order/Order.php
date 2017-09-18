@@ -28,8 +28,14 @@ class Order_OrderModel
 
         $where = 'gl_order.is_del = 0 and gl_goods.is_del = 0 ';
 
-        if (isset($params['cid']) && $params['cid'] != '') {
-          //  $filter[] = " gl_goods.`cid` =".$params['cid'];
+        if (isset($params['cid']) && !empty($params['cid'])) {
+            $filter[] = " gl_goods.`cid` =".$params['cid'];
+        }
+         /*     if (isset($params['cid']) && $params['cid'] != '') {
+            $filter[] = " gl_order.`cargo_id` = {$params['cid']}";
+        }*/
+        if (isset($params['uid']) && !empty($params['uid'])) {
+            $filter[] = " gl_goods.`uid` =".$params['uid'];
         }
         if (isset($params['start_provice_id']) && $params['start_provice_id'] != '') {
             $filter[] = " gl_goods.`start_provice_id` =".$params['start_provice_id'];
@@ -67,11 +73,6 @@ class Order_OrderModel
                 $filter[] = " gl_goods.`weights` >= ".intval($params['end_weights']);
                 $filter[] = " gl_goods.`weights` <= ".intval($params['start_weights']);
             }
-        }
-
-
-        if (isset($params['cid']) && $params['cid'] != '') {
-            $filter[] = " gl_order.`cargo_id` = {$params['cid']}";
         }
 
         if (isset($params['status']) && $params['status'] != '') {

@@ -26,10 +26,10 @@ class Cargo_AddressModel
         if (isset($params['type']) && $params['type'] != '') {
             $filter[] = " type = " . $params['type'];
         }
-        if (isset($params['uid']) && $params['uid'] != '') {
+        if (isset($params['uid']) && !empty($params['uid'])) {
             $filter[] = " uid = " . $params['uid'];
         }
-        if (isset($params['cid']) && $params['cid'] != '') {
+        if (isset($params['cid']) && !empty($params['cid'])) {
             $filter[] = " cid = " . $params['cid'];
         }
 
@@ -56,7 +56,7 @@ class Cargo_AddressModel
      */
     public function getCargoAddressInfo($id = 0)
     {
-        $sql = "SELECT  id,uid,name,mobile,address,remark,type  FROM gl_cargo_address WHERE id=".$id;
+        $sql = "SELECT  id,cid,uid,name,mobile,address,remark,type  FROM gl_cargo_address WHERE id=".$id;
         return $this->dbh->select_row($sql);
     }
     //添加货主地址
