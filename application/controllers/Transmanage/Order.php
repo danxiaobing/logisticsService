@@ -73,5 +73,14 @@ class Transmanage_OrderController extends Rpc
         return $L->getOrderList($serach);           
     }
 
+    public function payOrderFunc($id,$param){
+        $L = new Transmanage_OrderModel(Yaf_Registry::get("db"),null,Yaf_Registry::get("gy_db"));
+        return $L->payOrder($id,$param);
+    }
+
+    public function updateOrderFunc($id,$param){
+        $L = new Transmanage_OrderModel(Yaf_Registry::get("db"),null,Yaf_Registry::get("gy_db"));
+        return $L->updateOrder($id,$param);
+    }
 
 }

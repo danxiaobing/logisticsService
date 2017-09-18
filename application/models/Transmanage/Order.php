@@ -371,4 +371,50 @@ class Transmanage_OrderModel
     }
 
 
+    /**
+     * 确定金额
+     * @param int $id
+     * @param array $params
+     * @return bool
+     */
+    public function payOrder($id,$params){
+        $order = $this->dbh->select_row('SELECT goods_id,status FROM gl_order WHERE  status = 4 AND is_del= 0 AND id = '.intval($id));
+
+        if(!$order){
+            return false;
+        }
+
+        #开启事物
+        $this->dbh->begin();
+        try{
+            $data = $this->dbh->update('gl_order',$params,'id = '.intval($id));
+            $goods = $this->dbh->update('gl_goods',['status'=>6],' id ='.$order['goods_id']);
+
+            if(!$data && !$goods){
+                $this->dbh->rollback();
+                return false;
+            }
+
+            $this->dbh->commit();
+            return true;
+
+
+        } catch (Exception $e) {
+            $this->dbh->rollback();
+            return false;
+        }
+    }
+
+
+    /**
+     * 修改托运单
+     * @param int $id
+     * @param array $params
+     * @return mixed
+     */
+    public function updateOrder($id,$params){
+        return $this->dbh->update('gl_companies', $params, 'id = '.intval($id));
+    }
+
+
 }
