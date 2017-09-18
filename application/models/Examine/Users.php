@@ -222,7 +222,7 @@ class Examine_UsersModel
                 #发送短信
                 $smsrpc=Yaf_Registry::get("smsrpc");
                 $this->Wiserun = Client::create( $smsrpc->host.'Wiserun',false);
-                $sms = $this->Wiserun->sendFunc(array('mobile'=>'18627607669'),'2');
+                $sms = $this->Wiserun->sendFunc(array('mobile'=>$params['mobile']),'2');
                 if($sms['code'] == "200"){
                     $this->dbh->commit();
                     return $user_id;
