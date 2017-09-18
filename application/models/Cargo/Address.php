@@ -17,16 +17,20 @@ class Cargo_AddressModel
     }
 
     //获取地址列表
-    public function getCargoAddreslist($params,$uid)
+    public function getCargoAddreslist($params)
     {
-        if ($uid != 0) {
-            $where = " WHERE is_del = 0 AND uid = " . $uid;
-        } else {
-            return array();
-        }
+
+        $where = " WHERE is_del = 0 ";
+
         $filter = $filed = array();
         if (isset($params['type']) && $params['type'] != '') {
             $filter[] = " type = " . $params['type'];
+        }
+        if (isset($params['uid']) && $params['uid'] != '') {
+            $filter[] = " uid = " . $params['uid'];
+        }
+        if (isset($params['cid']) && $params['cid'] != '') {
+            $filter[] = " cid = " . $params['cid'];
         }
 
         if (isset($params['key']) && $params['key'] != '') {

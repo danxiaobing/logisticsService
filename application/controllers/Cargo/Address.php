@@ -18,11 +18,11 @@ class Cargo_AddressController extends Rpc {
      * @return 数组
      * @author Tina
      */
-    public function getListFunc($params,$uid)
+    public function getListFunc($params)
     {
 
         $L = new Cargo_AddressModel(Yaf_Registry::get("db"));
-        $data = $L->getCargoAddreslist($params,$uid);
+        $data = $L->getCargoAddreslist($params);
         return $data;
     }
     /**
