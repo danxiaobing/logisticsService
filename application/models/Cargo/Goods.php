@@ -32,13 +32,13 @@ class Cargo_GoodsModel
             }
         }
         if (isset($params['cid']) && !empty($params['cid'])) {
-            $filter[] = " gl_goods.cid = " . $params['cid'];
+            $filter[] = " gl_goods.cid = " . intval($params['cid']);
         }
         if (isset($params['uid']) && !empty($params['uid'])) {
-            $filter[] = " gl_goods.uid = " . $params['uid'];
+            $filter[] = " gl_goods.uid = " . intval($params['uid']);
         }
         if (isset($params['status']) && $params['status'] != '') {
-            $filter[] = " gl_goods.status=" . $params['status'];
+            $filter[] = " gl_goods.status=" . intval($params['status']);
         }
         if (1 <= count($filter)) {
             $where .= ' AND ' . implode(' AND ', $filter);
@@ -155,43 +155,41 @@ class Cargo_GoodsModel
         $where = ' gl_goods.`is_del` = 0 AND gl_goods.`status` = 1 AND gl_goods.source = 0 AND gl_goods.`reach_endtime`>  NOW()';
 
         if (isset($params['start_provice_id']) && !empty($params['start_provice_id'])) {
-            $filter[] = " gl_goods.`start_provice_id` =".$params['start_provice_id'];
+            $filter[] = " gl_goods.`start_provice_id` =".intval($params['start_provice_id']);
         }
 
         if (isset($params['start_city_id']) && !empty($params['start_city_id'])) {
-            $filter[] = " gl_goods.`start_city_id` =".$params['start_city_id'];
+            $filter[] = " gl_goods.`start_city_id` =".intval($params['start_city_id']);
         }
 
         if (isset($params['start_area_id']) && !empty($params['start_area_id'])) {
-            $filter[] = " gl_goods.`start_area_id` =".$params['start_area_id'];
+            $filter[] = " gl_goods.`start_area_id` =".intval($params['start_area_id']);
         }
 
 
         if (isset($params['end_provice_id']) && !empty($params['end_provice_id'])) {
-            $filter[] = " gl_goods.`end_provice_id` =".$params['end_provice_id'];
+            $filter[] = " gl_goods.`end_provice_id` =".intval($params['end_provice_id']);
         }
 
         if (isset($params['end_city_id']) && !empty($params['end_city_id'])) {
-            $filter[] = " gl_goods.`end_city_id` =".$params['end_city_id'];
+            $filter[] = " gl_goods.`end_city_id` =".intval($params['end_city_id']);
         }
 
         if (isset($params['end_area_id']) && !empty($params['end_area_id'])) {
-            $filter[] = " gl_goods.`end_area_id` =".$params['end_area_id'];
+            $filter[] = " gl_goods.`end_area_id` =".intval($params['end_area_id']);
         }
         if (isset($params['off_starttime']) && $params['off_starttime'] != '') {
-            $filter[] = " gl_goods.`off_starttime` >= '{$params['off_starttime']}'";
+            $filter[] = " unix_timestamp(gl_goods.`off_starttime`) >= unix_timestamp('{$params['off_starttime']} 00:00:00')";
         }
         if (isset($params['off_endtime']) && $params['off_endtime'] != '') {
-            $filter[] = " gl_goods.`off_endtime` <= '{$params['off_endtime']}'";
+            $filter[] = " unix_timestamp(gl_goods.`off_endtime`) <= unix_timestamp('{$params['off_endtime']} 00:00:00')";
         }
         if (isset($params['reach_starttime']) && $params['reach_starttime'] != '') {
-            $filter[] = " gl_goods.`reach_starttime` >= '{$params['reach_starttime']}'";
+            $filter[] = " unix_timestamp(gl_goods.`reach_starttime`) >= unix_timestamp('{$params['reach_starttime']} 00:00:00')";
         }
-
         if (isset($params['reach_endtime']) && $params['reach_endtime'] != '') {
-            $filter[] = " gl_goods.`reach_endtime` <= '{$params['reach_endtime']}'";
+            $filter[] = " unix_timestamp(gl_goods.`reach_endtime`) <= unix_timestamp('{$params['reach_endtime']} 00:00:00')";
         }
-
         if (isset($params['product_id']) && !empty($params['product_id'])) {
             $product = implode(',',$params['product_id']);
             $filter[] = "gl_goods.`product_id` in({$product})";
