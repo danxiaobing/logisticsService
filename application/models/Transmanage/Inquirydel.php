@@ -285,6 +285,8 @@ class Transmanage_InquirydelModel
     {
         if (isset($params['id']) && $params['id'] != '') {
             $filter[] = " gl_inquiry.`id` = {$params['id']}";
+        }else{
+            return false;
         }
 
         if(isset($params['cid']) && $params['cid'] != ''){
