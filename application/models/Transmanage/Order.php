@@ -278,21 +278,45 @@ class Transmanage_OrderModel
               godl.`id` ,
               godl.`dispatch_id` ,
               godl.`status` ,
-              godl.`created_at`, 
-              godp.`pic`
+              godl.`created_at`
             FROM
               gl_order_dispatch_log godl
-            LEFT JOIN 
-              gl_order_dispatch_pic godp
-            ON 
-              godl.dispatch_id = godp.dispatch_id
             WHERE godl.dispatch_id = ".intval($dispatchid)."
             ORDER BY
               godl.`status` ASC";
      $res = $this->dbh->select($sql);
+
      if(empty($res)){
         return false;
      }
+
+     $sql = "SELECT DISTINCT
+               id ,
+               dispatch_id ,
+               pic ,
+               `STATUS`
+             FROM
+               gl_order_dispatch_pic
+             WHERE
+               dispatch_id = ".intval($dispatchid).'
+             order by `status` asc';
+      $pic =  $this->dbh->select($sql);
+
+    
+      foreach ($res as $key => $value) {
+        $res[$key]['pic'] = '';
+        if(!empty($pic)){
+          if($value['status'] == 3){
+            $res[$key]['pic'] = $pic[0]['pic'];
+          }elseif($value['status'] == 5){
+            $res[$key]['pic'] = $pic[1]['pic'];
+          }
+        }
+      }
+  
+
+
+
      //单据凭证
      // $sql = 'SELECT pic,status FROM gl_order_dispatch_pic   godp WHERE is_del = 0 AND dispatch_id='.intval($dispatchid);
      // $pic = $this->dbh->select($sql);
