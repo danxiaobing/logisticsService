@@ -295,7 +295,7 @@ class Transrange_ReceivingModel
                     $filter[] = " ( r.`start_province_id` = 0 OR r.`start_city_id` = 0 OR r.`start_area_id` = 0 OR r.`start_area_id` = '{$params['start_area_id']}' ) ";
                 }else{
                     //全市
-                    $filter[] = " ( r.`start_province_id` = 0 OR OR r.`start_city_id` = 0 r.`start_city_id` = '{$params['start_city_id']}' ) ";
+                    $filter[] = " ( r.`start_province_id` = 0 OR r.`start_city_id` = 0 OR r.`start_city_id` = '{$params['start_city_id']}' ) ";
                 }
             }else{
                 //全省
@@ -310,7 +310,7 @@ class Transrange_ReceivingModel
                     $filter[] = " ( r.`end_province_id` = 0 OR r.`end_city_id` = 0 OR r.`end_area_id` = 0 OR r.`end_area_id` = '{$params['end_area_id']}' ) ";
                 }else{
                     //全市
-                    $filter[] = " ( r.`end_province_id` = 0 OR OR r.`end_city_id` = 0 r.`end_city_id` = '{$params['end_city_id']}' ) ";
+                    $filter[] = " ( r.`end_province_id` = 0 OR r.`end_city_id` = 0 OR r.`end_city_id` = '{$params['end_city_id']}' ) ";
                 }
             }else{
                 //全省
