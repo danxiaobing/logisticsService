@@ -269,6 +269,16 @@ class Examine_CarModel
         if (isset($params['endtime']) && $params['endtime'] != '') {
             $filter_r[] = " unix_timestamp(r.`end_time`) <= unix_timestamp('{$params['endtime']} 23:59:59')";
         }
+
+        //重量
+        if (isset($params['load']) && $params['load'] != '') {
+            $filter_z[] = " z.`max_load` >=  " . intval($params['load']);
+            $filter_z[] = " z.`min_load` <=  " . intval($params['load']);
+
+            $filter_r[] = " r.`max_load` >=  " . intval($params['load']);
+            $filter_r[] = " r.`min_load` <=  " . intval($params['load']);
+        }
+
         if (count($filter_r) > 0) {
             $where_r .= implode(" AND ", $filter_r);
         }
@@ -279,7 +289,6 @@ class Examine_CarModel
             'totalRow' => 0,
             'list' => array()
         );
-
 
         $sql = "SELECT COUNT(*) FROM(
                  SELECT z.start_province_id,z.start_city_id,z.id,z.cid,z.car_type,z.price_type,z.price,z.min_load,z.max_load,z.loss,p.product_id,1 AS ctype,com.company_name

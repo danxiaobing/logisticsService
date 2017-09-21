@@ -272,7 +272,7 @@ class Transrange_ReceivingModel
         $psql = "select p.rule_id from gl_rule_product as p where p.`is_del` = 0 AND p.`product_id` = ".$params['product_id'];
         $products = $this->dbh->select($psql);
         if( ! count($products) ){
-            return false;
+            return false;die;
         }
         foreach ($products as $k => $v) {
             $pro_id .= $v['rule_id'] . ',';
