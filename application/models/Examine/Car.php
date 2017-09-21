@@ -221,7 +221,45 @@ class Examine_CarModel
             $filter_r[] = " r.`cid` = " . intval($params['cid']);
             $filter_z[] = " z.`cid` = " . intval($params['cid']);
         }
-        //筛选起始省份
+        if( isset($params['start_province_id']) && $params['start_province_id'] != '' && $params['start_province_id'] != '0'){
+            if( isset($params['start_city_id']) && $params['start_city_id'] != '' && $params['start_city_id'] != '0'){
+                if( isset($params['start_area_id']) && $params['start_area_id'] != '' && $params['start_area_id'] != '0'){
+                    //全县
+                    $filter_r[] = "  r.`start_province_id` = '{$params['start_province_id']}'  AND ( r.`start_city_id` = 0 OR r.`start_area_id` = 0 OR r.`start_area_id` = '{$params['start_area_id']}' ) ";
+                    $filter_z[] = "  z.`start_province_id` = '{$params['start_province_id']}'  AND (z.`start_city_id` = 0 OR z.`start_area_id` = 0 OR z.`start_area_id` = '{$params['start_area_id']}' ) ";
+                }else{
+                    //全市
+                    $filter_r[] = "  r.`start_province_id` = '{$params['start_province_id']}'  AND ( r.`start_city_id` = 0 OR r.`start_city_id` = '{$params['start_city_id']}' ) ";
+                    $filter_z[] = "  z.`start_province_id` = '{$params['start_province_id']}'  AND ( z.`start_city_id` = 0 OR z.`start_city_id` = '{$params['start_city_id']}' ) ";
+                }
+            }else{
+                //全省
+                $filter_r[] = "  r.`start_province_id` = '{$params['start_province_id']}'  ";
+                $filter_z[] = "  z.`start_province_id` = '{$params['start_province_id']}' ";
+            }
+        }
+
+        if( isset($params['end_province_id']) && $params['end_province_id'] != '' && $params['end_province_id'] != '0'){
+            if( isset($params['end_city_id']) && $params['end_city_id'] != '' && $params['end_city_id'] != '0'){
+                if( isset($params['end_area_id']) && $params['end_area_id'] != '' && $params['end_area_id'] != '0'){
+                    //全县
+                    $filter_r[] = " r.`end_province_id` = '{$params['end_province_id']}' AND ( r.`end_city_id` = 0 OR r.`end_city_id` = '{$params['end_city_id']}' OR r.`end_area_id` = 0 OR r.`end_area_id` = '{$params['end_area_id']}' ) ";
+                    $filter_z[] = " z.`end_province_id` = '{$params['end_province_id']}' AND ( z.`end_city_id` = 0 OR z.`end_city_id` = '{$params['end_city_id']}' OR z.`end_area_id` = 0 OR z.`end_area_id` = '{$params['end_area_id']}' ) ";
+                }else{
+                    //全市
+                    $filter_r[] = "  r.`end_province_id` = '{$params['end_province_id']}' AND ( r.`end_city_id` = 0 OR r.`end_city_id` = '{$params['end_city_id']}' ) ";
+                    $filter_z[] = "  z.`end_province_id` = '{$params['end_province_id']}' AND ( z.`end_city_id` = 0 OR z.`end_city_id` = '{$params['end_city_id']}' ) ";
+                }
+            }else{
+                //全省
+                $filter_r[] = "  r.`end_province_id` = '{$params['end_province_id']}'  ";
+                $filter_z[] = "  z.`end_province_id` = '{$params['end_province_id']}'  ";
+            }
+        }
+
+
+
+      /*  //筛选起始省份
         if (isset($params['start_provice_id']) && !empty($params['start_provice_id'])) {
             $filter_r[] = " r.`start_province_id` = " . intval($params['start_provice_id']);
             $filter_z[] = " z.`start_province_id` = " . intval($params['start_provice_id']);
@@ -250,7 +288,7 @@ class Examine_CarModel
         if (isset($params['end_area_id']) && !empty($params['end_area_id'])) {
             $filter_r[] = " r.`end_area_id` = " . intval($params['end_area_id']);
             $filter_z[] = " z.`end_area_id` = " . intval($params['end_area_id']);
-        }
+        }*/
           //筛选分类
         if (isset($params['category_id']) && !empty($params['category_id'])) {
             $filter_r[] = " r.`category_id` = " . intval($params['category_id']);
@@ -302,6 +340,7 @@ class Examine_CarModel
                   LEFT JOIN gl_products AS pro ON pro.id = r.product_id
                  LEFT JOIN gl_companies AS com ON com.id = r.cid {$where_r}
                 ) AS ss ";
+        //print_r($sql);die;
         $result['totalRow'] = $this->dbh->select_one($sql);
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
@@ -317,6 +356,7 @@ class Examine_CarModel
                    LEFT JOIN gl_products AS pro ON pro.id = r.product_id
                  LEFT JOIN gl_companies AS com ON com.id = r.cid {$where_r}
                 ORDER BY id DESC ";
+       //print_r($sql);die;
         $result['list'] = $this->dbh->select_page($sql);
         if( count($result['list']) ){
             foreach ($result['list'] as $k => $v) {
