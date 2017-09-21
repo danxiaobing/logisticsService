@@ -272,11 +272,11 @@ class Examine_CarModel
 
         //重量
         if (isset($params['load']) && $params['load'] != '') {
-            $filter_z[] = " z.`max_load` >=  " . intval($params['load']);
-            $filter_z[] = " z.`min_load` <=  " . intval($params['load']);
+            $filter_z[] = " z.`max_load` <=  " . intval($params['load']);
+            $filter_z[] = " z.`min_load` >=  " . intval($params['load']);
 
-            $filter_r[] = " r.`max_load` >=  " . intval($params['load']);
-            $filter_r[] = " r.`min_load` <=  " . intval($params['load']);
+            $filter_r[] = " r.`max_load` <=  " . intval($params['load']);
+            $filter_r[] = " r.`min_load` >=  " . intval($params['load']);
         }
 
         if (count($filter_r) > 0) {
