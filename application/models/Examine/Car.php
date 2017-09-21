@@ -211,8 +211,8 @@ class Examine_CarModel
      */
     public function getBackAndLineCarPage($params){
         $filed = array();
-        $filter_r[] = " WHERE r.`is_del` = 0 AND r.`status` = 1 ";//回程车
-        $filter_z[] = " WHERE z.`is_del` = 0 AND z.`set_line` = 1 AND z.`is_use` = 1";//专线车
+        $filter_r[] = " WHERE r.`is_del` = 0 AND r.`status` = 1 AND pro.`delete` = 0";//回程车
+        $filter_z[] = " WHERE z.`is_del` = 0 AND z.`set_line` = 1 AND z.`is_use` = 1 AND pro.`delete` = 0";//专线车
         $where_r = "  ";
         $where_z = "  ";
 
@@ -291,27 +291,31 @@ class Examine_CarModel
         );
 
         $sql = "SELECT COUNT(*) FROM(
-                 SELECT z.start_province_id,z.start_city_id,z.id,z.cid,z.car_type,z.price_type,z.price,z.min_load,z.max_load,z.loss,p.product_id,1 AS ctype,com.company_name
+                 SELECT z.start_province_id,z.start_city_id,z.id,z.cid,z.car_type,z.price_type,z.price,z.min_load,z.max_load,z.loss,p.product_id,1 AS ctype,com.company_name,pro.zh_name
                  FROM gl_rule AS z
                  LEFT JOIN gl_rule_product AS p ON p.rule_id = z.id
+                   LEFT JOIN gl_products AS pro ON pro.id = p.product_id
                  LEFT JOIN gl_companies AS com ON com.id = z.cid {$where_z}
                 UNION
-                 SELECT r.start_province_id,r.start_city_id,r.id,r.cid,0 AS car_type,r.price_type,r.price,r.min_load,r.max_load,3 AS loss,r.product_id,2 AS ctype,com.company_name
+                 SELECT r.start_province_id,r.start_city_id,r.id,r.cid,0 AS car_type,r.price_type,r.price,r.min_load,r.max_load,3 AS loss,r.product_id,2 AS ctype,com.company_name,pro.zh_name
                  FROM gl_return_car AS r
-                LEFT JOIN gl_companies AS com ON com.id = r.cid {$where_r}
+                  LEFT JOIN gl_products AS pro ON pro.id = r.product_id
+                 LEFT JOIN gl_companies AS com ON com.id = r.cid {$where_r}
                 ) AS ss ";
         $result['totalRow'] = $this->dbh->select_one($sql);
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
-        $sql = "SELECT '' as starttime,z.start_province_id,z.start_city_id,z.end_province_id,z.end_city_id,z.id,z.cid,z.car_type,z.price_type,z.price,z.min_load,z.max_load,z.loss,p.product_id,1 AS ctype,com.company_name
+        $sql = "SELECT '' as starttime,z.start_province_id,z.start_city_id,z.end_province_id,z.end_city_id,z.id,z.cid,z.car_type,z.price_type,z.price,z.min_load,z.max_load,z.loss,p.product_id,1 AS ctype,com.company_name,pro.zh_name AS product_name
                  FROM gl_rule AS z
                  LEFT JOIN gl_rule_product AS p ON p.rule_id = z.id
+                 LEFT JOIN gl_products AS pro ON pro.id = p.product_id
                  LEFT JOIN gl_companies AS com ON com.id = z.cid {$where_z}
                 UNION
-                 SELECT r.start_time as starttime,r.start_province_id,r.start_city_id,r.end_province_id,r.end_city_id,r.id,r.cid,0 AS car_type,r.price_type,r.price,r.min_load,r.max_load,3 AS loss,r.product_id,2 AS ctype,com.company_name
+                 SELECT r.start_time as starttime,r.start_province_id,r.start_city_id,r.end_province_id,r.end_city_id,r.id,r.cid,0 AS car_type,r.price_type,r.price,r.min_load,r.max_load,3 AS loss,r.product_id,2 AS ctype,com.company_name,pro.zh_name AS product_name
                  FROM gl_return_car AS r
-                LEFT JOIN gl_companies AS com ON com.id = r.cid {$where_r}
+                   LEFT JOIN gl_products AS pro ON pro.id = r.product_id
+                 LEFT JOIN gl_companies AS com ON com.id = r.cid {$where_r}
                 ORDER BY id DESC ";
         $result['list'] = $this->dbh->select_page($sql);
         if( count($result['list']) ){
