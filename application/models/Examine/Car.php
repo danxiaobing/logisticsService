@@ -271,12 +271,12 @@ class Examine_CarModel
         }
 
         //重量
-        if (isset($params['load']) && $params['load'] != '') {
-            $filter_z[] = " z.`max_load` <=  " . intval($params['load']);
-            $filter_z[] = " z.`min_load` >=  " . intval($params['load']);
+        if (isset($params['load']) && !empty($params['load'])) {
+            $filter_z[] = " z.`max_load` >=  " . intval($params['load']);
+            $filter_z[] = " z.`min_load` <=  " . intval($params['load']);
 
-            $filter_r[] = " r.`max_load` <=  " . intval($params['load']);
-            $filter_r[] = " r.`min_load` >=  " . intval($params['load']);
+            $filter_r[] = " r.`max_load` >=  " . intval($params['load']);
+            $filter_r[] = " r.`min_load` <=  " . intval($params['load']);
         }
 
         if (count($filter_r) > 0) {
@@ -300,7 +300,6 @@ class Examine_CarModel
                  FROM gl_return_car AS r
                 LEFT JOIN gl_companies AS com ON com.id = r.cid {$where_r}
                 ) AS ss ";
-
         $result['totalRow'] = $this->dbh->select_one($sql);
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
