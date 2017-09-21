@@ -231,6 +231,7 @@ class Examine_CarrierModel
 
     public function showfile($id){
         $sql = "SELECT  gl_companies_pic.`type`,gl_companies_pic.`path` FROM gl_companies_pic WHERE is_del = 0  AND cid = ".intval($id);
+
         $res = $this->dbh->select($sql);
         $data['danger_file'] = '';
         $data['other_file'] = '';
@@ -377,22 +378,22 @@ class Examine_CarrierModel
                 }
             }
 
-            $res = $this->dbh->update('gl_companies_pic',['is_del'=>1],'cid='.$cooperate);
+            $res = $this->dbh->update('gl_companies_pic',['is_del'=>1],'cid='.$id);
             if(empty($res)){
                 $this->dbh->rollback();
                 return false;
             }
 
             $pic = array(
-                0=>['path'=>$params['danger_file'],'type'=>2,'cid'=>$cooperate,'created_at'=>'=NOW()','updated_at'=>'=NOW()'],
-                1=>['path'=>$params['business_license'],'type'=>1,'cid'=>$cooperate,'created_at'=>'=NOW()','updated_at'=>'=NOW()']
+                0=>['path'=>$params['danger_file'],'type'=>2,'cid'=>$id,'created_at'=>'=NOW()','updated_at'=>'=NOW()'],
+                1=>['path'=>$params['business_license'],'type'=>1,'cid'=>$id,'created_at'=>'=NOW()','updated_at'=>'=NOW()']
             ) ;
 
-
+            $params['other_file'] = array_filter($params['other_file']);
             $n = 2;
             if(1 <= count($params['other_file'])){
                 foreach ($params['other_file'] as $v){
-                    $pic[$n] = ['path'=>$v,'type'=>3,'cid'=>$cooperate,'created_at'=>'=NOW()','updated_at'=>'=NOW()'];
+                    $pic[$n] = ['path'=>$v,'type'=>3,'cid'=>$id,'created_at'=>'=NOW()','updated_at'=>'=NOW()'];
                     $n++;
                 }
             }
@@ -405,7 +406,6 @@ class Examine_CarrierModel
                     return false;
                 }
             }
-
 
             $this->dbh->commit();
             return true;
