@@ -38,9 +38,9 @@ class Examine_DriverModel
             if($serach['status'] == 0){
                $filter[] = " gd.status  ={$serach['status']} ";
             }elseif($serach['status'] == 1){
-               $filter[] = " gd.is_use  ={$serach['status']} ";
-            }else{
-               $filter[] = "gd.status !=0 AND gd.is_use  =0";  
+               $filter[] = " gd.status =1 AND gd.is_use  ={$serach['status']} ";
+            }elseif($serach['status'] == 2){
+               $filter[] = " gd.status !=0 AND gd.is_use = 0 ";  
             }
             
         }
