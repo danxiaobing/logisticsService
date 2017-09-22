@@ -26,69 +26,69 @@ class Order_OrderModel
 
         $filter = array();
 
-        $where = 'gl_order.is_del = 0 and gl_goods.is_del = 0 ';
+        $where = 'o.is_del = 0 and g.is_del = 0 ';
 
         if (isset($params['cid']) && !empty($params['cid'])) {
-            $filter[] = " gl_goods.`cid` =".$params['cid'];
+            $filter[] = " g.`cid` =".$params['cid'];
         }
          /*     if (isset($params['cid']) && $params['cid'] != '') {
-            $filter[] = " gl_order.`cargo_id` = {$params['cid']}";
+            $filter[] = " o.`cargo_id` = {$params['cid']}";
         }*/
         if (isset($params['uid']) && !empty($params['uid'])) {
-            $filter[] = " gl_goods.`uid` =".$params['uid'];
+            $filter[] = " g.`uid` =".$params['uid'];
         }
         if (isset($params['start_provice_id']) && $params['start_provice_id'] != '') {
-            $filter[] = " gl_goods.`start_provice_id` =".$params['start_provice_id'];
+            $filter[] = " g.`start_provice_id` =".$params['start_provice_id'];
         }
 
         if (isset($params['start_city_id']) && $params['start_city_id'] != '') {
-            $filter[] = " gl_goods.`start_city_id` =".$params['start_city_id'];
+            $filter[] = " g.`start_city_id` =".$params['start_city_id'];
         }
 
         if (isset($params['start_area_id']) && $params['start_area_id'] != '') {
-            $filter[] = " gl_goods.`start_area_id` =".$params['start_area_id'];
+            $filter[] = " g.`start_area_id` =".$params['start_area_id'];
         }
 
         if (isset($params['end_provice_id']) && $params['end_provice_id'] != '') {
-            $filter[] = " gl_goods.`end_provice_id` =".$params['end_provice_id'];
+            $filter[] = " g.`end_provice_id` =".$params['end_provice_id'];
         }
 
         if (isset($params['end_city_id']) && $params['end_city_id'] != '') {
-            $filter[] = " gl_goods.`end_city_id` =".$params['end_city_id'];
+            $filter[] = " g.`end_city_id` =".$params['end_city_id'];
         }
 
         if (isset($params['end_area_id']) && $params['end_area_id'] != '') {
-            $filter[] = " gl_goods.`end_area_id` =".$params['end_area_id'];
+            $filter[] = " g.`end_area_id` =".$params['end_area_id'];
         }
 
         if (isset($params['start_weights']) && $params['start_weights'] != '') {
-            $filter[] = " gl_goods.`weights` >= ".intval($params['start_weights']);
+            $filter[] = " g.`weights` >= ".intval($params['start_weights']);
         }
 
         if (isset($params['end_weights']) && $params['end_weights'] != '') {
-            $filter[] = " gl_goods.`weights` <= ".intval($params['end_weights']);
+            $filter[] = " g.`weights` <= ".intval($params['end_weights']);
         }
         if (isset($params['start_weights']) && $params['start_weights'] != ''&& isset($params['end_weights']) && $params['end_weights'] != '') {
             if($params['start_weights']>$params['end_weights']){
-                $filter[] = " gl_goods.`weights` >= ".intval($params['end_weights']);
-                $filter[] = " gl_goods.`weights` <= ".intval($params['start_weights']);
+                $filter[] = " g.`weights` >= ".intval($params['end_weights']);
+                $filter[] = " g.`weights` <= ".intval($params['start_weights']);
             }
         }
 
         if (isset($params['status']) && $params['status'] != '') {
-            $filter[] = " gl_order.`status` = '{$params['status']}'";
+            $filter[] = " o.`status` = '{$params['status']}'";
         }
 
         if (isset($params['starttime']) && $params['starttime'] != '') {
-            $filter[] = " unix_timestamp(gl_order.`created_at`) >= unix_timestamp('{$params['starttime']} 00:00:00')";
+            $filter[] = " unix_timestamp(o.`created_at`) >= unix_timestamp('{$params['starttime']} 00:00:00')";
         }
 
         if (isset($params['endtime']) && $params['endtime'] != '') {
-            $filter[] = " unix_timestamp(gl_order.`created_at`) <= unix_timestamp('{$params['endtime']} 23:59:59')";
+            $filter[] = " unix_timestamp(o.`created_at`) <= unix_timestamp('{$params['endtime']} 23:59:59')";
         }
 
         if (isset($params['number']) && $params['number'] != '') {
-            $filter[] = " gl_order.`number` LIKE '%" . trim($params['number']) . "%'";
+            $filter[] = " o.`number` LIKE '%" . trim($params['number']) . "%'";
         }
 
         if (count($filter) > 0) {
@@ -96,7 +96,7 @@ class Order_OrderModel
         }
 
 
-        $sql = "SELECT count(1) FROM gl_order  LEFT JOIN gl_goods ON gl_order.goods_id = gl_goods.id  WHERE {$where}";
+        $sql = "SELECT count(1) FROM gl_order  o LEFT JOIN gl_goods g ON o.goods_id = g.id  WHERE {$where}";
 
         $result['totalRow'] = $this->dbh->select_one($sql);
 
@@ -104,19 +104,19 @@ class Order_OrderModel
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
         $sql = "SELECT
-                gl_order.id,
-                gl_goods.start_provice_id,
-                gl_goods.end_provice_id,
-                gl_goods.product_id,
-                gl_goods.weights,
-                gl_goods.price,
-                gl_order.number,
-                gl_order.status,
-                gl_order.created_at,
+                o.id,
+                g.start_provice_id,
+                g.end_provice_id,
+                g.product_id,
+                g.weights,
+                g.price,
+                o.number,
+                o.status,
+                o.created_at,
                 gl_products.zh_name as product_name
-                FROM gl_order
-                LEFT JOIN gl_goods ON gl_order.goods_id = gl_goods.id
-                 LEFT JOIN gl_products ON gl_products.id = gl_goods.product_id
+                FROM gl_order o
+                LEFT JOIN gl_goods g ON o.goods_id = g.id
+                 LEFT JOIN gl_products ON gl_products.id = g.product_id
                 WHERE  {$where}
                 ORDER BY id DESC";
         $result['list']  = $this->dbh->select_page($sql);
@@ -129,22 +129,19 @@ class Order_OrderModel
      */
     public function getInfo($orderid = 0)
     {
-      /*  $sql = "SELECT
-                id,
-                number,
-                cargo_id,
-                goods_id,
-                company_id,
-                estimate_freight,
-                fact_freight,
-                pay_time,
-                status,
-                reasons
-                 FROM gl_order WHERE gl_order.id=".$id;
 
-        return $this->dbh->select_row($sql);*/
         //获取托运单基本信息
-        $sql = "SELECT go.id,go.number,go.goods_id,go.cargo_id,go.company_id,go.status,go.reasons,go.estimate_freight,go.fact_freight,go.pay_time FROM gl_order go WHERE go.id=".intval($orderid);
+        $sql = "SELECT go.id,
+                        go.number,
+                        go.goods_id,
+                        go.cargo_id,
+                        go.company_id,
+                        go.status,
+                        go.reasons,
+                        go.estimate_freight,
+                        go.fact_freight,
+                        go.pay_time
+                     FROM gl_order go WHERE go.id=".intval($orderid);
         $info = $this->dbh->select_row($sql);
 
         //获取托运单的调度信息
