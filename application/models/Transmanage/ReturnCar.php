@@ -31,11 +31,11 @@ class Transmanage_ReturnCarModel
             $order = $params['order'];
         }
         if (isset($params['status']) && $params['status'] != '') {
-            $filter[] = " gl_return_car.`status`=" . $params['status'];
+            $filter[] = " r.`status`=" . $params['status'];
         }
         if (isset($params['cid']) && $params['cid'] != '') {
 
-            $filter[] = " gl_return_car.`cid`=" . $params['cid'];
+            $filter[] = " r.`cid`=" . $params['cid'];
         }
         if (count($filter) > 0) {
             $where .= implode(" AND ", $filter);
@@ -47,7 +47,7 @@ class Transmanage_ReturnCarModel
         );
 
         $sql = "SELECT count(1)
-                FROM `gl_return_car`
+                FROM `gl_return_car` r
                 {$where}";
 
         $result['totalRow'] = $this->dbh->select_one($sql);
@@ -55,35 +55,35 @@ class Transmanage_ReturnCarModel
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
-        $sql = "SELECT gl_return_car.`id`,
-                       gl_return_car.`start_province_id`,
-                       gl_return_car.`start_city_id`,
-                       gl_return_car.`start_area_id`,
-                       gl_return_car.`end_province_id`,
-                       gl_return_car.`end_city_id`,
-                       gl_return_car.`end_area_id`,
-                       gl_return_car.`start_time`,
-                       gl_return_car.`end_time`,
-                       gl_return_car.`price_type`,
-                       gl_return_car.`min_load`,
-                       gl_return_car.`max_load`,
-                       gl_return_car.`category_id`,
-                       gl_return_car.`product_id`,
-                       gl_return_car.`inquiry_id`,
-                       gl_return_car.`order_id`,
-                       gl_return_car.`price`,
-                       gl_return_car.`status`,
-                       gl_inquiry.`gid` as goods_id
-                     FROM `gl_return_car`
-                     LEFT JOIN gl_inquiry  ON gl_return_car.`id` = gl_inquiry.`car_id`  {$where}
-                     ORDER BY gl_return_car.status=3 ASC, gl_return_car.`{$order}` DESC";
+        $sql = "SELECT  r.`id`,
+                         r.`start_province_id`,
+                         r.`start_city_id`,
+                         r.`start_area_id`,
+                         r.`end_province_id`,
+                         r.`end_city_id`,
+                         r.`end_area_id`,
+                         r.`start_time`,
+                         r.`end_time`,
+                         r.`price_type`,
+                         r.`min_load`,
+                         r.`max_load`,
+                         r.`category_id`,
+                         r.`product_id`,
+                         r.`inquiry_id`,
+                         r.`order_id`,
+                         r.`price`,
+                         r.`status`,
+                        gl_inquiry.`gid` as goods_id
+                     FROM `gl_return_car` r
+                     LEFT JOIN gl_inquiry  ON  r.`id` = gl_inquiry.`car_id`  {$where}
+                     ORDER BY  r.status=3 ASC,  r.`{$order}` DESC";
         $result['list'] = $this->dbh->select_page($sql);
 
         return $result;
     }
    //获取详细
     public function getInfo($id){
-        $sql = "SELECT
+/*        $sql = "SELECT
                         `id`,
                         `cid`,
                         `start_province_id`,
@@ -101,36 +101,37 @@ class Transmanage_ReturnCarModel
                         `product_id`,
                         `price`,
                         `status`
-                        FROM `gl_return_car` WHERE `id` = {$id}  AND `is_del`= 0";
+                        FROM `gl_return_car` WHERE `id` = {$id}  AND `is_del`= 0";*/
 
-      /*  $sql = "SELECT gl_return_car.`id`,
-                        gl_return_car.`cid`,
-                        gl_return_car.`start_province_id`,
-                        gl_return_car.`start_city_id`,
+      $sql = "SELECT   r.`id`,
+                        r.`cid`,
+                        r.`start_province_id`,
+                        r.`start_city_id`,
                         start_city.`city` as start_city,
-                        gl_return_car.`start_area_id`,
+                        r.`start_area_id`,
                         start_area.`area` as start_area,
-                        gl_return_car.`end_province_id`,
-                        gl_return_car.`end_city_id`,
+                        r.`end_province_id`,
+                        r.`end_city_id`,
                         end_city.`city` as end_city,
-                        gl_return_car.`end_area_id`,
+                        r.`end_area_id`,
                         end_area.`area` as end_area,
-                        gl_return_car.`start_time`,
-                        gl_return_car.`end_time`,
-                        gl_return_car.`price_type`,
-                        gl_return_car.`min_load`,
-                        gl_return_car.`max_load`,
-                        gl_return_car.`category_id`,
-                        gl_return_car.`product_id`,
-                        gl_return_car.`price`,
-                        gl_return_car.`status`
-                        FROM `gl_return_car`
-                        LEFT JOIN conf_city  start_city ON gl_return_car.`start_city_id` = start_city.`cityid`
-                        LEFT JOIN conf_city  end_city  ON gl_return_car.`end_city_id` = end_city.`cityid`
-                        LEFT JOIN conf_area  start_area ON gl_return_car.`start_area_id` = start_area.`areaid`
-                        LEFT JOIN conf_area  end_area  ON gl_return_car.`end_area_id` = end_area.`areaid`
-                        WHERE gl_return_car.`id` = {$id}  AND gl_return_car.`is_del`= 0";*/
-      
+                        r.`start_time`,
+                        r.`end_time`,
+                        r.`price_type`,
+                        r.`min_load`,
+                        r.`max_load`,
+                        r.`category_id`,
+                        r.`product_id`,
+                        r.`price`,
+                        r.`status`,
+                        p.`zh_name` as product_name
+                        FROM `gl_return_car`  r
+                        LEFT JOIN conf_city  start_city ON r.`start_city_id` = start_city.`cityid`
+                        LEFT JOIN conf_city  end_city  ON r.`end_city_id` = end_city.`cityid`
+                        LEFT JOIN conf_area  start_area ON r.`start_area_id` = start_area.`areaid`
+                        LEFT JOIN conf_area  end_area  ON r.`end_area_id` = end_area.`areaid`
+                         LEFT JOIN gl_products p ON p.`id` = r.`product_id`
+                          WHERE r.`id` = {$id}  AND r.`is_del`= 0";
         return $this->dbh->select_row($sql);
     }
     //智能发布获取回程车
