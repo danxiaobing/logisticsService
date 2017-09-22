@@ -343,17 +343,17 @@ class Examine_CarrierModel
             'company_telephone' =>$params['company_telephone'],
             'status'            =>$params['status'],
             'code'              =>$params['code'],
+            'pid'               =>$params['pid'],
             'created_at' => '=NOW()',
             'updated_at' => '=NOW()',
         );
+
+
 
         if(!isset($cooperate_arr['code']) && !isset($params['danger_file']) && !isset($params['business_license'])){
             return false;
         }
 
-        if(!$id){
-            $cooperate_arr['pid'] = $params['pid'];
-        }
 
         #开启事物
         $this->dbh->begin();
@@ -364,6 +364,7 @@ class Examine_CarrierModel
                 #添加
                 $cooperate_arr['company_code'] =   COMMON ::getCodeId('ZY56-');
                 $cooperate = $this->dbh->insert('gl_companies', $cooperate_arr);
+                $id = $cooperate;
                 if(empty($cooperate)){
                     $this->dbh->rollback();
                     return false;
