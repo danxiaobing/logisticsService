@@ -33,7 +33,6 @@ class Roster_IndexModel
         if($where)$sql .= "AND $where";
         return $this->dbh->select($sql);
     }
-
     //2017-09-22 添加名单数据
     public function addRoster($params){
 
@@ -70,8 +69,20 @@ class Roster_IndexModel
             $this->dbh->rollback();
             return false;
         }
-    }
 
+
+
+
+
+
+    }
+    //删除名单
+
+
+    public function deleteRoster($where)
+    {
+        return $this->dbh->delete('gl_blacklist',$where);
+    }
 
 
 
