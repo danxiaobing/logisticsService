@@ -20,25 +20,25 @@ class Cargo_GoodsModel
     public function getList($params)
     {
         $filter = $filed = array();
-        $where = 'WHERE gl_goods.is_del = 0 AND gl_goods.source = 0 ';
-        $order = "gl_goods.updated_at";
+        $where = 'WHERE g.is_del = 0 AND g.source = 0 ';
+        $order = "g.updated_at";
 
         if (isset($params['order']) && $params['order'] != '') {
             if($params['order'] == 'o_s'){
-                $order = 'gl_goods.off_starttime';
+                $order = 'g.off_starttime';
             }
             if($params['order'] == 'r_s'){
-                $order = 'gl_goods.reach_starttime';
+                $order = 'g.reach_starttime';
             }
         }
         if (isset($params['cid']) && !empty($params['cid'])) {
-            $filter[] = " gl_goods.cid = " . intval($params['cid']);
+            $filter[] = " g.cid = " . intval($params['cid']);
         }
         if (isset($params['uid']) && !empty($params['uid'])) {
-            $filter[] = " gl_goods.uid = " . intval($params['uid']);
+            $filter[] = " g.uid = " . intval($params['uid']);
         }
         if (isset($params['status']) && $params['status'] != '') {
-            $filter[] = " gl_goods.status=" . intval($params['status']);
+            $filter[] = " g.status=" . intval($params['status']);
         }
         if (1 <= count($filter)) {
             $where .= ' AND ' . implode(' AND ', $filter);
@@ -48,29 +48,29 @@ class Cargo_GoodsModel
             'list' => array()
         );
 
-        $sql = "SELECT count(1) FROM `gl_goods` {$where}";
+        $sql = "SELECT count(1) FROM `gl_goods` g {$where}";
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
         $sql = "SELECT
-               gl_goods.id,
-               gl_goods.start_provice_id,
-               gl_goods.end_provice_id,
-               gl_goods.cate_id,
-               gl_goods.product_id,
-               gl_goods.weights,
-               gl_goods.price,
-               gl_goods.companies_name,
-               gl_goods.off_starttime,
-               gl_goods.off_endtime,
-               gl_goods.reach_starttime,
-               gl_goods.reach_endtime,
-               gl_goods.status,
+               g.id,
+               g.start_provice_id,
+               g.end_provice_id,
+               g.cate_id,
+               g.product_id,
+               g.weights,
+               g.price,
+               g.companies_name,
+               g.off_starttime,
+               g.off_endtime,
+               g.reach_starttime,
+               g.reach_endtime,
+               g.status,
                gl_products.zh_name AS product_name
-               FROM gl_goods
-               LEFT JOIN gl_products ON gl_goods.product_id = gl_products.id
+               FROM gl_goods g
+               LEFT JOIN gl_products ON g.product_id = gl_products.id
                " . $where . "   ORDER BY {$order} DESC";
         $result['list'] = $this->dbh->select_page($sql);
         return $result;
@@ -83,41 +83,13 @@ class Cargo_GoodsModel
     public function getInfo($id = 0)
     {
         $sql = "SELECT
-               gl_goods.id,
-               gl_goods.start_provice_id,
-               gl_goods.start_city_id,
-               gl_goods.start_area_id,
-               gl_goods.end_provice_id,
-               gl_goods.end_city_id,
-               gl_goods.end_area_id,
-               gl_goods.cate_id,
-               gl_goods.product_id,
-               gl_goods.weights,
-               gl_goods.price,
-               gl_goods.companies_name,
-               gl_goods.off_starttime,
-               gl_goods.off_endtime,
-               gl_goods.reach_starttime,
-               gl_goods.reach_endtime,
-               gl_goods.cars_type,
-               gl_goods.loss,
-               gl_goods.offer_status,
-               gl_goods.offer_price,
-               gl_goods.off_address,
-               gl_goods.off_user,
-               gl_goods.off_phone,
-               gl_goods.reach_address,
-               gl_goods.reach_user,
-               gl_goods.reach_phone,
-               gl_goods.consign_user,
-               gl_goods.consign_phone,
-               gl_goods.desc_str,
-               gl_goods.status,
+               g.id,g.start_provice_id,g.start_city_id,g.start_area_id,g.end_provice_id,g.end_city_id,g.end_area_id,g.cate_id,g.product_id,g.weights,g.price,g.companies_name,g.off_starttime,g.off_endtime,g.reach_starttime,
+               g.reach_endtime,g.cars_type,g.loss,g.offer_status,g.offer_price,g.off_address,g.off_user,g.off_phone,g.reach_address,g.reach_user,g.reach_phone,g.consign_user,g.consign_phone,g.desc_str,g.status,
                gl_products.zh_name AS product_name,
                gl_cars_type.name AS cars_type_name
-               FROM gl_goods
-               LEFT JOIN gl_products ON gl_goods.product_id = gl_products.id
-               LEFT JOIN gl_cars_type ON gl_cars_type.id = gl_goods.cars_type WHERE gl_goods.id=".$id;
+               FROM gl_goods g
+               LEFT JOIN gl_products ON g.product_id = gl_products.id
+               LEFT JOIN gl_cars_type ON gl_cars_type.id = g.cars_type WHERE g.id=".$id;
 
         return $this->dbh->select_row($sql);
     }
@@ -152,47 +124,47 @@ class Cargo_GoodsModel
      */
     public function searchGoods($params){
         $filter = array();
-        $where = ' gl_goods.`is_del` = 0 AND gl_goods.`status` = 1 AND gl_goods.source = 0 AND gl_goods.`reach_endtime`>  NOW()';
+        $where = ' g.`is_del` = 0 AND g.`status` = 1 AND g.source = 0 AND g.`reach_endtime`>  NOW()';
 
         if (isset($params['start_provice_id']) && !empty($params['start_provice_id'])) {
-            $filter[] = " gl_goods.`start_provice_id` =".intval($params['start_provice_id']);
+            $filter[] = " g.`start_provice_id` =".intval($params['start_provice_id']);
         }
 
         if (isset($params['start_city_id']) && !empty($params['start_city_id'])) {
-            $filter[] = " gl_goods.`start_city_id` =".intval($params['start_city_id']);
+            $filter[] = " g.`start_city_id` =".intval($params['start_city_id']);
         }
 
         if (isset($params['start_area_id']) && !empty($params['start_area_id'])) {
-            $filter[] = " gl_goods.`start_area_id` =".intval($params['start_area_id']);
+            $filter[] = " g.`start_area_id` =".intval($params['start_area_id']);
         }
 
 
         if (isset($params['end_provice_id']) && !empty($params['end_provice_id'])) {
-            $filter[] = " gl_goods.`end_provice_id` =".intval($params['end_provice_id']);
+            $filter[] = " g.`end_provice_id` =".intval($params['end_provice_id']);
         }
 
         if (isset($params['end_city_id']) && !empty($params['end_city_id'])) {
-            $filter[] = " gl_goods.`end_city_id` =".intval($params['end_city_id']);
+            $filter[] = " g.`end_city_id` =".intval($params['end_city_id']);
         }
 
         if (isset($params['end_area_id']) && !empty($params['end_area_id'])) {
-            $filter[] = " gl_goods.`end_area_id` =".intval($params['end_area_id']);
+            $filter[] = " g.`end_area_id` =".intval($params['end_area_id']);
         }
         if (isset($params['off_starttime']) && $params['off_starttime'] != '') {
-            $filter[] = " unix_timestamp(gl_goods.`off_starttime`) >= unix_timestamp('{$params['off_starttime']} 00:00:00')";
+            $filter[] = " unix_timestamp(g.`off_starttime`) >= unix_timestamp('{$params['off_starttime']} 00:00:00')";
         }
         if (isset($params['off_endtime']) && $params['off_endtime'] != '') {
-            $filter[] = " unix_timestamp(gl_goods.`off_endtime`) <= unix_timestamp('{$params['off_endtime']} 00:00:00')";
+            $filter[] = " unix_timestamp(g.`off_endtime`) <= unix_timestamp('{$params['off_endtime']} 00:00:00')";
         }
         if (isset($params['reach_starttime']) && $params['reach_starttime'] != '') {
-            $filter[] = " unix_timestamp(gl_goods.`reach_starttime`) >= unix_timestamp('{$params['reach_starttime']} 00:00:00')";
+            $filter[] = " unix_timestamp(g.`reach_starttime`) >= unix_timestamp('{$params['reach_starttime']} 00:00:00')";
         }
         if (isset($params['reach_endtime']) && $params['reach_endtime'] != '') {
-            $filter[] = " unix_timestamp(gl_goods.`reach_endtime`) <= unix_timestamp('{$params['reach_endtime']} 00:00:00')";
+            $filter[] = " unix_timestamp(g.`reach_endtime`) <= unix_timestamp('{$params['reach_endtime']} 00:00:00')";
         }
         if (isset($params['product_id']) && !empty($params['product_id'])) {
             $product = implode(',',$params['product_id']);
-            $filter[] = "gl_goods.`product_id` in({$product})";
+            $filter[] = "g.`product_id` in({$product})";
         }
 
         if (count($filter) > 0) {
@@ -200,7 +172,7 @@ class Cargo_GoodsModel
         }
 
 
-        $sql = "SELECT count(1) FROM gl_goods  WHERE {$where}";
+        $sql = "SELECT count(1) FROM gl_goods  g  WHERE {$where}";
 
         $result['totalRow'] = $this->dbh->select_one($sql);
 
@@ -208,39 +180,39 @@ class Cargo_GoodsModel
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
         $sql = "SELECT 
-               gl_goods.id,
-               gl_goods.start_provice_id,
-               gl_goods.start_city_id,
-               gl_goods.start_area_id,
-               gl_goods.end_provice_id,
-               gl_goods.end_city_id,
-               gl_goods.end_area_id,
-               gl_goods.cate_id,
-               gl_goods.product_id,
-               gl_goods.weights,
-               gl_goods.price,
-               gl_goods.companies_name,
-               gl_goods.off_starttime,
-               gl_goods.off_endtime,
-               gl_goods.reach_starttime,
-               gl_goods.reach_endtime,
-               gl_goods.cars_type,
-               gl_goods.loss,
-               gl_goods.off_address,
-               gl_goods.off_user,
-               gl_goods.off_phone,
-               gl_goods.reach_address,
-               gl_goods.reach_user,
-               gl_goods.reach_phone,
-               gl_goods.consign_user,
-               gl_goods.consign_phone,
-               gl_goods.desc_str,
-               gl_goods.status,
+               g.id,
+               g.start_provice_id,
+               g.start_city_id,
+               g.start_area_id,
+               g.end_provice_id,
+               g.end_city_id,
+               g.end_area_id,
+               g.cate_id,
+               g.product_id,
+               g.weights,
+               g.price,
+               g.companies_name,
+               g.off_starttime,
+               g.off_endtime,
+               g.reach_starttime,
+               g.reach_endtime,
+               g.cars_type,
+               g.loss,
+               g.off_address,
+               g.off_user,
+               g.off_phone,
+               g.reach_address,
+               g.reach_user,
+               g.reach_phone,
+               g.consign_user,
+               g.consign_phone,
+               g.desc_str,
+               g.status,
                gl_products.zh_name,
                IFNULL(gl_cars_type.name,'')  AS carname
-                FROM gl_goods 
-                LEFT JOIN gl_products ON gl_products.id = gl_goods.product_id
-                LEFT JOIN gl_cars_type ON gl_cars_type.id =gl_goods.cars_type 
+                FROM gl_goods g
+                LEFT JOIN gl_products ON gl_products.id = g.product_id
+                LEFT JOIN gl_cars_type ON gl_cars_type.id =g.cars_type
                 WHERE  {$where}
                 ORDER BY id DESC 
                 ";
