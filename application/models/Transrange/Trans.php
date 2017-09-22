@@ -194,7 +194,7 @@ class Transrange_TransModel
                     INSTR(gcrb.`blist` , {$parameter['companyid']}) ,
                     '1=1'
                 )
-                AND (INSTR(gcrr.`area_id` , {$parameter['start_area_id']}) && INSTR(gcrr.`area_id`,{$parameter['end_area_id']}) )
+                AND (INSTR(gcrr.`area_id` , {$parameter['start_area_id']}) || INSTR(gcrr.`area_id`,{$parameter['end_area_id']}) )
                 GROUP BY
                     gcr.`user` ,
                     gcr.`mobile`
