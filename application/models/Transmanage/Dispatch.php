@@ -166,7 +166,7 @@ class Transmanage_DispatchModel
             }
 
             if(5 == $params['status']){
-                $count = $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE status != 7 AND order_id = '.$dispatchData['order_id']);
+                $count = $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE status != 6 AND order_id = '.$dispatchData['order_id']);
                 $completeTotal =  $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE status = 5  AND order_id = '.$dispatchData['order_id']);
                 if($count == $completeTotal){
                     $goods = $this->dbh->update('gl_goods',['status'=>6],' id = '.$dispatchData['goods_id']);
