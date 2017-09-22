@@ -34,14 +34,7 @@ class Roster_IndexController extends Rpc {
         $list = $S->addRoster($data);
         return $list;
     }
-    /**
-     * 删除名单
-     */
-    public function delFunc($where){
-        $S = new Roster_IndexModel(Yaf_Registry:: get("db"));
-        $data = $S->deleteRoster($where);
-        return $data;
-    }
+
 
 
 

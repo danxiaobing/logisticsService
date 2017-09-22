@@ -33,26 +33,45 @@ class Roster_IndexModel
         if($where)$sql .= "AND $where";
         return $this->dbh->select($sql);
     }
-    //添加名单
-    public function addRoster($params)
-    {
-        return $this->dbh->insert('gl_blacklist',$params);
+
+    //2017-09-22 添加名单数据
+    public function addRoster($params){
+
+        #开启事物
+        $this->dbh->begin();
+        try{
+            $where = " cid=".$params['cid']." AND type=".$params['type'];
+            $res =  $this->dbh->delete('gl_blacklist',$where);
+            if(empty($res)){
+                $this->dbh->rollback();
+                return false;
+            }else{
+                foreach ($params['info'] as $k=>$v){
+                    $input = array(
+                        'type'=>$params['type'],
+                        'cid'=>$params['cid'],
+                        'join_id'=>$v,
+                        'is_del'=>0,
+                        'created_ad' => '=NOW()',
+                        'updated_at' => '=NOW()'
+                    );
+
+                    $data = $this->dbh->insert('gl_blacklist',$input);
+                    if(empty($data)){
+                        $this->dbh->rollback();
+                        return false;
+                    }
+                }
+            }
+            $this->dbh->commit();
+            return true;
+
+        } catch (Exception $e) {
+            $this->dbh->rollback();
+            return false;
+        }
     }
 
-    //删除名单
-   /* public function deleteRoster($id)
-    {
-        $data = [
-            'is_del' => 1,
-            'updated_at' => '=NOW()'
-        ];
-        return $this->dbh->update('gl_blacklist',$data,'id=' . intval($id));
-    }*/
-
-    public function deleteRoster($where)
-    {
-        return $this->dbh->delete('gl_blacklist',$where);
-    }
 
 
 
