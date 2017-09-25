@@ -214,27 +214,30 @@ class Examine_UsersModel
 
 
 
-           #插入个人信息
+            #插入个人信息
             $user['cid']  = $carrier_id;
             $user_id = $this->dbh->insert('gl_user_info', $user);
 
-            if(!empty($user_id)){
-                #发送短信
-                $smsrpc=Yaf_Registry::get("smsrpc");
-                $this->Wiserun = Client::create( $smsrpc->host.'Wiserun',false);
-                $sms = $this->Wiserun->sendFunc(array('mobile'=>$params['mobile']),'2');
-                if($sms['code'] == "200"){
-                    $this->dbh->commit();
-                    return $user_id;
+            if( $params['is_del'] == 0 ){
+                if(!empty($user_id)){
+                    #发送短信
+                    $smsrpc=Yaf_Registry::get("smsrpc");
+                    $this->Wiserun = Client::create( $smsrpc->host.'Wiserun',false);
+                    $sms = $this->Wiserun->sendFunc(array('mobile'=>$params['mobile']),'2');
+                    if($sms['code'] == "200"){
+                        $this->dbh->commit();
+                        return $user_id;
+                    }else{
+                        $this->dbh->rollback();
+                        return false;
+                    }
                 }else{
                     $this->dbh->rollback();
                     return false;
                 }
             }else{
-                $this->dbh->rollback();
-                return false;
+                return $user_id;
             }
-
         } catch (Exception $e) {
             $this->dbh->rollback();
             return false;
