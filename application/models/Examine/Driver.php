@@ -40,6 +40,8 @@ class Examine_DriverModel
             }elseif($serach['status'] == 1){
                $filter[] = " gd.status =1 AND gd.is_use  ={$serach['status']} ";
             }elseif($serach['status'] == 2){
+               $filter[] = " gd.status =2  ";
+            }elseif($serach['status'] == 3){
                $filter[] = " gd.status !=0 AND gd.is_use = 0 ";  
             }
             
@@ -53,9 +55,9 @@ class Examine_DriverModel
             //获取合作承运商公司id
             $sql = "SELECT GROUP_CONCAT(gc.id) FROM gl_companies  gc WHERE id = {$id} or pid= {$id}";
             $ids = $this->dbh->select_one($sql);
-            $WHERE = " WHERE gd.isdelete = 0 AND gd.status <> 2 AND gd.company_id in ({$ids}) ";           
+            $WHERE = " WHERE gd.isdelete = 0  AND gd.company_id in ({$ids}) ";           
         }else{
-            $WHERE = " WHERE gd.isdelete = 0 AND gd.status <> 2"; 
+            $WHERE = " WHERE gd.isdelete = 0 "; 
         }
 
 
