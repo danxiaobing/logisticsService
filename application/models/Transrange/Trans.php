@@ -195,6 +195,7 @@ class Transrange_TransModel
                     '1=1'
                 )
                 AND (INSTR(gcrr.`area_id` , {$parameter['start_area_id']}) || INSTR(gcrr.`area_id`,{$parameter['end_area_id']}) )
+                AND gcr.`is_del` = 0
                 GROUP BY
                     gcr.`user` ,
                     gcr.`mobile`
