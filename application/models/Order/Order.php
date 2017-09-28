@@ -161,7 +161,7 @@ class Order_OrderModel
               ON
                 gd.id = god.driver_id
               WHERE
-               god.`is_del` = 0 AND god.`order_id` = ".intval($orderid);
+               god.`is_del` = 0 AND  god.`status` NOT IN('6') AND god.`order_id` = ".intval($orderid);
         $res = $this->dbh->select($sql);
         $Schedule =  $res ? $res:[];
         return array('order_info'=>$info,'schedule'=>$Schedule);
