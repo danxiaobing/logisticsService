@@ -218,7 +218,7 @@ class Examine_UsersModel
             $user['cid']  = $carrier_id;
             $user_id = $this->dbh->insert('gl_user_info', $user);
 
-            if( $params['is_del'] == 0 ){
+            if( !isset($params['is_del']) || $params['is_del'] == 0 ){
                 if(!empty($user_id)){
                     #发送短信
                     $this->Wiserun = Client::create('http://service.msg.dev.chinayie.net/Wiserun',false);
@@ -235,6 +235,7 @@ class Examine_UsersModel
                     return false;
                 }
             }else{
+                $this->dbh->commit();
                 return $user_id;
             }
         } catch (Exception $e) {
