@@ -56,7 +56,7 @@ class Cargo_AddressModel
      */
     public function getCargoAddressInfo($id = 0)
     {
-        $sql = "SELECT  id,cid,uid,name,mobile,address,remark,type  FROM gl_cargo_address WHERE id=".$id;
+        $sql = "SELECT  id,cid,uid,provice_id,city_id,area_id,name,mobile,address,remark,type  FROM gl_cargo_address WHERE id=".$id;
         return $this->dbh->select_row($sql);
     }
     //添加货主地址
