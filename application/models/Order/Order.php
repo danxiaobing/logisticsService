@@ -112,11 +112,9 @@ class Order_OrderModel
                 g.price,
                 o.number,
                 o.status,
-                o.created_at,
-                gl_products.zh_name as product_name
+                o.created_at
                 FROM gl_order o
                 LEFT JOIN gl_goods g ON o.goods_id = g.id
-                 LEFT JOIN gl_products ON gl_products.id = g.product_id
                 WHERE  {$where}
                 ORDER BY id DESC";
         $result['list']  = $this->dbh->select_page($sql);

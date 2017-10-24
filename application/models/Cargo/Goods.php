@@ -59,6 +59,7 @@ class Cargo_GoodsModel
                g.start_provice_id,
                g.end_provice_id,
                g.cate_id,
+               g.cate_id_two,
                g.product_id,
                g.weights,
                g.price,
@@ -67,10 +68,8 @@ class Cargo_GoodsModel
                g.off_endtime,
                g.reach_starttime,
                g.reach_endtime,
-               g.status,
-               gl_products.zh_name AS product_name
+               g.status
                FROM gl_goods g
-               LEFT JOIN gl_products ON g.product_id = gl_products.id
                " . $where . "   ORDER BY {$order} DESC";
         $result['list'] = $this->dbh->select_page($sql);
         return $result;
@@ -83,12 +82,10 @@ class Cargo_GoodsModel
     public function getInfo($id = 0)
     {
         $sql = "SELECT
-               g.id,g.start_provice_id,g.start_city_id,g.start_area_id,g.end_provice_id,g.end_city_id,g.end_area_id,g.cate_id,g.product_id,g.weights,g.price,g.companies_name,g.off_starttime,g.off_endtime,g.reach_starttime,
+               g.id,g.start_provice_id,g.start_city_id,g.start_area_id,g.end_provice_id,g.end_city_id,g.end_area_id,g.cate_id,g.cate_id_two,g.product_id,g.weights,g.price,g.companies_name,g.off_starttime,g.off_endtime,g.reach_starttime,
                g.reach_endtime,g.cars_type,g.loss,g.offer_status,g.offer_price,g.off_address,g.off_user,g.off_phone,g.reach_address,g.reach_user,g.reach_phone,g.consign_user,g.consign_phone,g.desc_str,g.status,
-               gl_products.zh_name AS product_name,
                gl_cars_type.name AS cars_type_name
                FROM gl_goods g
-               LEFT JOIN gl_products ON g.product_id = gl_products.id
                LEFT JOIN gl_cars_type ON gl_cars_type.id = g.cars_type WHERE g.id=".$id;
 
         return $this->dbh->select_row($sql);
@@ -124,7 +121,7 @@ class Cargo_GoodsModel
      */
     public function searchGoods($params){
         $filter = array();
-        $where = ' g.`is_del` = 0 AND g.`status` = 1 AND g.source = 0 AND g.`reach_endtime`>  NOW()';
+        $where = ' g.`is_del` = 0 AND g.`status` = 1 AND g.source = 0 ';
 
         if (isset($params['start_provice_id']) && !empty($params['start_provice_id'])) {
             $filter[] = " g.`start_provice_id` =".intval($params['start_provice_id']);
