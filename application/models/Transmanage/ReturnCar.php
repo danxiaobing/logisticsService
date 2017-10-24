@@ -83,27 +83,8 @@ class Transmanage_ReturnCarModel
     }
    //获取详细
     public function getInfo($id){
-/*        $sql = "SELECT
-                        `id`,
-                        `cid`,
-                        `start_province_id`,
-                        `start_city_id`,
-                        `start_area_id`,
-                        `end_province_id`,
-                        `end_city_id`,
-                        `end_area_id`,
-                        `start_time`,
-                        `end_time`,
-                        `price_type`,
-                        `min_load`,
-                        `max_load`,
-                        `category_id`,
-                        `product_id`,
-                        `price`,
-                        `status`
-                        FROM `gl_return_car` WHERE `id` = {$id}  AND `is_del`= 0";*/
 
-      $sql = "SELECT   r.`id`,
+   $sql = "SELECT   r.`id`,
                         r.`cid`,
                         r.`start_province_id`,
                         r.`start_city_id`,
@@ -123,15 +104,13 @@ class Transmanage_ReturnCarModel
                         r.`category_id`,
                         r.`product_id`,
                         r.`price`,
-                        r.`status`,
-                        p.`zh_name` as product_name
+                        r.`status`
                         FROM `gl_return_car`  r
                         LEFT JOIN conf_city  start_city ON r.`start_city_id` = start_city.`cityid`
                         LEFT JOIN conf_city  end_city  ON r.`end_city_id` = end_city.`cityid`
                         LEFT JOIN conf_area  start_area ON r.`start_area_id` = start_area.`areaid`
                         LEFT JOIN conf_area  end_area  ON r.`end_area_id` = end_area.`areaid`
-                         LEFT JOIN gl_products p ON p.`id` = r.`product_id`
-                          WHERE r.`id` = {$id}  AND r.`is_del`= 0";
+                        WHERE r.`id` = {$id}  AND r.`is_del`= 0";
         return $this->dbh->select_row($sql);
     }
     //智能发布获取回程车
@@ -156,14 +135,13 @@ class Transmanage_ReturnCarModel
                         gl_goods.end_city_id,
                         gl_goods.end_area_id,
                         gl_goods.cate_id,
+                        gl_goods.cate_id_two,
                         gl_goods.product_id,
                         gl_goods.weights,
                         gl_goods.status,
-                        gl_goods.reach_endtime,
-                        gl_products.zh_name as product_name
+                        gl_goods.reach_endtime
                         FROM gl_order
-                      LEFT JOIN gl_goods  ON gl_order.`goods_id` = gl_goods.`id`
-                      LEFT JOIN gl_products ON gl_products.id = gl_goods.product_id {$where}";
+                      LEFT JOIN gl_goods  ON gl_order.`goods_id` = gl_goods.`id` {$where}";
 
         return $this->dbh->select($sql);
 
@@ -190,6 +168,7 @@ class Transmanage_ReturnCarModel
                         gl_goods.end_city_id,
                         gl_goods.end_area_id,
                         gl_goods.cate_id,
+                        gl_goods.cate_id_two,
                         gl_goods.product_id,
                         gl_goods.weights,
                         gl_goods.status,
@@ -224,6 +203,7 @@ class Transmanage_ReturnCarModel
                         'end_city_id'=>$v['start_city_id'],
                         'end_area_id'=>$v['start_area_id'],
                         'category_id'=>$v['cate_id'],
+                        'category_id_two'=>$v['cate_id_two'],
                         'product_id'=>$v['product_id'],
                         'start_time'=>$v['reach_endtime'],
                         'end_time'=>date('Y-m-d', strtotime ("+7 day", strtotime($v['reach_endtime']))),
