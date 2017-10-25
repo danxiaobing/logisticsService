@@ -159,9 +159,14 @@ class Cargo_GoodsModel
         if (isset($params['reach_endtime']) && $params['reach_endtime'] != '') {
             $filter[] = " unix_timestamp(g.`reach_endtime`) <= unix_timestamp('{$params['reach_endtime']} 00:00:00')";
         }
+        if (isset($params['cate_id']) && !empty($params['cate_id'])) {
+            $filter[] = "g.`cate_id`=".intval($params['cate_id']);
+        }
+        if (isset($params['cate_id_two']) && !empty($params['cate_id_two'])) {
+            $filter[] = "g.`cate_id_two`=".intval($params['cate_id_two']);
+        }
         if (isset($params['product_id']) && !empty($params['product_id'])) {
-            $product = implode(',',$params['product_id']);
-            $filter[] = "g.`product_id` in({$product})";
+            $filter[] = "g.`product_id`=".intval($params['product_id']);
         }
 
         if (count($filter) > 0) {
@@ -185,6 +190,7 @@ class Cargo_GoodsModel
                g.end_city_id,
                g.end_area_id,
                g.cate_id,
+               g.cate_id_two,
                g.product_id,
                g.weights,
                g.price,
@@ -205,10 +211,8 @@ class Cargo_GoodsModel
                g.consign_phone,
                g.desc_str,
                g.status,
-               gl_products.zh_name,
                IFNULL(gl_cars_type.name,'')  AS carname
                 FROM gl_goods g
-                LEFT JOIN gl_products ON gl_products.id = g.product_id
                 LEFT JOIN gl_cars_type ON gl_cars_type.id =g.cars_type
                 WHERE  {$where}
                 ORDER BY id DESC 
