@@ -8,20 +8,24 @@
 class Transrange_ReceivingModel
 {
     public $dbh = null;
+    public $dbm = null;
 
     /**
      * Constructor
      * @param   object $dbh
      * @return  void
      */
-    public function __construct($dbh, $mch = null)
+    public function __construct($dbh,$dbm,$mch = null)
     {
         $this->dbh = $dbh;
+        $this->dbm = $dbm;
     }
 
 
     public function getPage($params)
     {
+        $result = $params;
+
         $filter[] = " WHERE r.`is_del` = 0 AND rg.`is_del` = 0 ";
         $where = "  ";
 
@@ -30,9 +34,18 @@ class Transrange_ReceivingModel
             $filter[] = " r.`cid` in (".implode(',',$params['company_ids']).")";
         }
 
+        //查询guoyie数据库中的td_category_goods
         if (isset($params['product']) && $params['product'] != '' ) {
-            $filter[] = " p.`zh_name` LIKE '%{$params['product']}%' ";
+            // $filter[] = " p.`zh_name` LIKE '%{$params['product']}%' ";
+            $sql = "SELECT id FROM td_category_goods WHERE title like'%{$params['product']}%' ";
+            $productid = $this->dbm->select_one($sql);
+            if(empty($productid)){
+                return $result['list'] = [];
+            }
+            $filter[] = " rg.produce_id = {$productid} ";
+
         }
+
         if (isset($params['min_load']) && $params['min_load'] != '' && $params['min_load'] != '0') {
             $filter[] = " r.`max_load` >=  '{$params['min_load']}' ";
         }
@@ -72,12 +85,11 @@ class Transrange_ReceivingModel
         COUNT(1)
         FROM `gl_rule` as r
         LEFT JOIN  gl_rule_product as rg ON rg.`rule_id` = r.`id`
-        LEFT JOIN  gl_products as p ON p.`id` = rg.`product_id`
         {$where} 
         GROUP BY r.`id`
         ) as count";
 
-        $result = $params;
+  
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $result['list'] = array();
@@ -88,17 +100,25 @@ class Transrange_ReceivingModel
 
 
         $sql = "SELECT 
-        r.*,substring_index(GROUP_CONCAT(p.zh_name separator ','),',',3) as products
+        r.*
         FROM `gl_rule` as r
         LEFT JOIN  gl_rule_product as rg ON rg.`rule_id` = r.`id`
-        LEFT JOIN  gl_products as p ON p.`id` = rg.`product_id`
         {$where} 
         GROUP BY r.`id`
         ORDER BY r.`updated_at` DESC";
-
         $result['list'] = $this->dbh->select_page($sql);
         if( count($result['list']) ){
             foreach ($result['list'] as $k => $v) {
+                //获取商品名称ids的集合
+                $sql = "SELECT IFNULL(GROUP_CONCAT( DISTINCT produce_id),'') FROM gl_rule_product WHERE rule_id={$v['id']}";
+                $ids = $this->dbh->select_one($sql);
+                $result['list'][$k]['goodsname'] = '';
+                if(!empty($ids)){
+                    //获取品名
+                    $sql = "SELECT substring_index(GROUP_CONCAT(title),',',2) FROM td_category_goods WHERE id in ($ids) ";
+                    $goodsname = $this->dbm->select_one($sql);  
+                    $result['list'][$k]['goodsname'] = $goodsname;                  
+                }
 
                 $type = 'area';
                 if( $v['start_area_id'] == 0 ){
@@ -127,13 +147,14 @@ class Transrange_ReceivingModel
                 $result['list'][$k]['end_name'] = $data ? $data:'';
             }
         }
+
         return $result;
     }
 
 
     public function getInfo($id)
     {
-        $sql = "SELECT gl_rule.*,p.product_id FROM `gl_rule`
+        $sql = "SELECT gl_rule.*,p.`category_id`,p.`product_id`,p.`produce_id` FROM `gl_rule`
                  LEFT JOIN gl_rule_product AS p ON p.rule_id = gl_rule.id WHERE gl_rule.`id` = {$id} ";
         return $this->dbh->select_row($sql);
     }
@@ -253,7 +274,7 @@ class Transrange_ReceivingModel
 
     //获取所有
     public function getRualProducus($id){
-        $sql = " SELECT category_id,product_id FROM gl_rule_product WHERE `is_del` = 0 AND `rule_id` = ".$id;
+        $sql = " SELECT category_id,product_id,produce_id FROM gl_rule_product WHERE `is_del` = 0 AND `rule_id` = ".$id;
         return $this->dbh->select($sql);
     }
     
