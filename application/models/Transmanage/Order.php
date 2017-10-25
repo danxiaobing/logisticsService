@@ -100,6 +100,7 @@ class Transmanage_OrderModel
                g.end_provice_id,
                g.end_city_id,
                g.cate_id,
+               g.cate_id_two,
                g.product_id,
                g.weights,
                g.companies_name,
@@ -111,11 +112,9 @@ class Transmanage_OrderModel
                o.status,
                o.id,
                o.created_at,
-               o.number,
-               p.zh_name
-                FROM gl_order as o 
+               o.number
+                FROM gl_order as o
                 LEFT JOIN gl_goods as g ON g.id = o.goods_id
-                LEFT JOIN gl_products as p ON p.id = g.product_id
                 WHERE  {$where}
                 ORDER BY id DESC 
                 ";
@@ -145,7 +144,41 @@ class Transmanage_OrderModel
       $sql = "SELECT go.id,go.number,go.cargo_id,go.goods_id,go.estimate_freight,go.status,go.fact_freight FROM gl_order go WHERE go.id=".intval($orderid);
       $info = $this->dbh->select_row($sql);
       //获取goods基本信息
-      $sql = "SELECT gd.id, gd.cid ,gd.start_provice_id ,gd.start_city_id,gd.start_area_id ,gd.end_provice_id,gd.end_city_id ,gd.end_area_id ,gd.weights,gd.weights_done,gd.price ,gd.companies_name ,gd.off_starttime ,gd.off_endtime ,gd.reach_starttime ,gd.reach_endtime ,gd.offer_status,gd.offer_price,gd.loss,gd.desc_str ,gd.off_address ,gd.off_user ,gd.off_phone ,gd.reach_address ,gd.reach_user ,gd.reach_phone ,gd.consign_user ,gd.consign_phone,gp.zh_name,gct.`name`,gd.created_at,gd.`status` FROM gl_goods gd LEFT JOIN  gl_products gp ON gp.id = gd.product_id LEFT JOIN gl_cars_type gct ON  gct.id=gd.cars_type WHERE gd.id =".$info['goods_id'];
+      $sql = "SELECT
+                     gd.id,
+                     gd.cid,
+                     gd.start_provice_id,
+                     gd.start_city_id,
+                     gd.start_area_id,
+                     gd.end_provice_id,
+                     gd.end_city_id ,
+                     gd.end_area_id ,
+                     gd.product_id,
+                     gd.weights,
+                     gd.weights_done,
+                     gd.price ,
+                     gd.companies_name ,
+                     gd.off_starttime ,
+                     gd.off_endtime ,
+                     gd.reach_starttime ,
+                     gd.reach_endtime ,
+                     gd.offer_status,
+                     gd.offer_price,
+                     gd.loss,
+                     gd.desc_str ,
+                     gd.off_address ,
+                     gd.off_user ,
+                     gd.off_phone ,
+                     gd.reach_address ,
+                     gd.reach_user ,
+                     gd.reach_phone ,
+                     gd.consign_user ,
+                     gd.consign_phone,
+                     gct.`name`,
+                     gd.created_at,
+                     gd.`status`
+                     FROM gl_goods gd
+                     LEFT JOIN gl_cars_type gct ON  gct.id=gd.cars_type WHERE gd.id =".$info['goods_id'];
       $data = $this->dbh->select_row($sql);
 
       //获取城市信息
