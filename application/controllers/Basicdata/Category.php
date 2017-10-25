@@ -63,7 +63,7 @@ class Basicdata_CategoryController extends Rpc {
     //获取商品类目 daley
     public function getCategoryByGradeFunc($id=0,$grade=1){
         $C = new Basicdata_CategoryModel(Yaf_Registry::get("gy_db"));
-        return $C->getCategoryByGrade($id,$grade);
+        return $C->getGrade($id,$grade);
     }
 
 }
