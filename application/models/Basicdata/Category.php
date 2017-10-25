@@ -111,6 +111,62 @@ class Basicdata_CategoryModel
         return $res ? $res : [];
     }
 
+    /**
+     * 获取商品类目详情
+     * @param $id
+     * @return array
+     * @author daley
+     */
+    public function getDetail($id){
+        $sql = "SELECT
+                    cat1.`id` ,
+                    cat1.`title` ,
+                    cat1.`grade` ,
+                    cat1.`showtype` ,
+                    cat1.`is_recommend` ,
+                    cat1.`order` ,
+                    cat1.`keywords` ,
+                    cat1.`english_name` ,
+                    cat1.`description` ,
+                    cat2.`title` AS pname ,
+                    (
+                        SELECT
+                            COUNT(cat3.id)
+                        FROM
+                            td_category_goods cat3
+                        WHERE
+                            cat3.`pid` = cat1.`id`
+                    ) subclass_count
+                FROM
+                    td_category_goods cat1
+                LEFT JOIN `td_category_goods` cat2 ON cat2.`id` = cat1.`pid`
+                WHERE
+                    cat1.`id` =".intval($id);
+        $res = $this->dbh->select_row($sql);
+        return $res ? $res : [];
+
+    }
+
+    /**
+     * 获取商品类目
+     * @param $id
+     * @param $grade
+     * @return array
+     * @author daley
+     */
+    public function getCategoryByGrade($id,$grade){
+
+        $where = ' WHERE cat.`delete` = 0 ';
+        if($grade){
+            $where .= " AND cat.`grade` = {$grade}";
+        }
+        if( $id && $grade != 1){
+            $where .= " AND cat.`pid` = {$id}";
+        }
+        $sql = "SELECT cat.`id`,cat.`title` FROM td_category_goods cat {$where}  ORDER BY id desc";
+        $res = $this->dbh->select($sql);
+        return $res;
+    }
 
 
 

@@ -48,11 +48,22 @@ class Basicdata_CategoryController extends Rpc {
       return $C->deleteCate($id);
     }
 
-   //获取类目详情接口
+   //获取类目
     public function getGradeFunc($id=0,$grade=1){
         $C = new Basicdata_CategoryModel(Yaf_Registry::get("gy_db"));
         return $C->getGrade($id,$grade); 
     }
 
+    //获取类目详情 daley
+    public function getDetailFunc($id=0){
+        $C = new Basicdata_CategoryModel(Yaf_Registry::get("gy_db"));
+        return $C->getDetail($id);
+    }
+
+    //获取商品类目 daley
+    public function getCategoryByGradeFunc($id=0,$grade=1){
+        $C = new Basicdata_CategoryModel(Yaf_Registry::get("gy_db"));
+        return $C->getCategoryByGrade($id,$grade);
+    }
 
 }
