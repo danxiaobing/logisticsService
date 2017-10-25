@@ -18,8 +18,8 @@ class Basicdata_CategoryController extends Rpc {
     
     //列表信息
     public function getCateInfoFunc($serach){
-    	$C = new Basicdata_CategoryModel(Yaf_Registry::get("db"));
-    	return $C->getCateInfo($serach);
+      $C = new Basicdata_CategoryModel(Yaf_Registry::get("db"));
+      return $C->getCateInfo($serach);
     }
 
     //新增类别
@@ -46,6 +46,12 @@ class Basicdata_CategoryController extends Rpc {
     public function deleteCateFunc($id){
       $C = new Basicdata_CategoryModel(Yaf_Registry::get("db"));
       return $C->deleteCate($id);
+    }
+
+   //获取类目详情接口
+    public function getGradeFunc($id=0,$grade=1){
+        $C = new Basicdata_CategoryModel(Yaf_Registry::get("gy_db"));
+        return $C->getGrade($id,$grade); 
     }
 
 
