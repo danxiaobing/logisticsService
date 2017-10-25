@@ -48,11 +48,5 @@ class Basicdata_CategoryController extends Rpc {
       return $C->deleteCate($id);
     }
 
-   //获取类目详情接口
-    public function getGradeFunc($id=0,$grade=1){
-        $C = new Basicdata_CategoryModel(Yaf_Registry::get("gy_db"));
-        return $C->getGrade($id,$grade); 
-    }
-
 
 }

@@ -89,29 +89,4 @@ class Basicdata_CategoryModel
     public function deleteCate($id){
         return $this->dbh->update('gl_category',array('is_del' => 1),'id='.intval($id));
     }
-
-    //获取商品类目接口
-    public function getGrade($id,$grade){
-        $res = [];
-
-        if($grade == 1 && $id == 0){
-            //一级类目
-            $sql = "SELECT cat.`id`,cat.`title` FROM td_category_goods cat WHERE cat.`pid` = 0 AND cat.`grade`= 1 AND cat.`delete` = 0"; 
-            $res = $this->dbh->select($sql);
-        }elseif($id != 0 && $grade == 2){
-            //二级类目
-            $sql = "SELECT cat.`id`,cat.`title` FROM td_category_goods cat WHERE cat.`pid` = ".intval($id)." AND cat.`grade`= 2 AND cat.`delete` = 0"; 
-            $res = $this->dbh->select($sql);
-        }elseif($id != 0 && $grade == 3){
-            //三级类目
-            $sql = "SELECT cat.`id`,cat.`title` FROM td_category_goods cat WHERE cat.`pid` = ".intval($id)." AND cat.`grade`= 3 AND cat.`delete` = 0"; 
-            $res = $this->dbh->select($sql);
-        }
-     
-        return $res ? $res : [];
-    }
-
-
-
-
 }
