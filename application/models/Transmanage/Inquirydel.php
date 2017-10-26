@@ -177,7 +177,7 @@ class Transmanage_InquirydelModel
                          gd.consign_user ,
                          gd.consign_phone,
                          gct.`name`,
-                         DATE(gd.created_at) AS created_at,
+                         gd.created_at,
                          gd.`status`
                          FROM gl_goods gd
                          LEFT JOIN gl_cars_type gct ON  gct.id=gd.cars_type WHERE gd.id =".intval($id);
@@ -192,8 +192,7 @@ class Transmanage_InquirydelModel
 
     /*获取当前询价单的价格状态信息*/
     public function getInquiryInfo($id){
-        // $sql = "SELECT gi.`id`,gi.`status`,gi.`type`,gii.`minprice`,gii.`maxprice`,gii.`type`,gii.`created_at` FROM gl_inquiry gi LEFT JOIN gl_inquiry_info gii ON gi.id = gii.pid WHERE gii.pid=".intval($id)." AND gi.`is_del`=0  ORDER BY gii.`id` ASC";
-        $sql = "SELECT                     
+        $sql = "SELECT
                     gi.`id` ,
                     gi.`status` ,
                     gi.`type`  as cancel
@@ -209,7 +208,7 @@ class Transmanage_InquirydelModel
                     gii.`minprice` ,
                     gii.`maxprice` ,
                     gii.`type` as operate,
-                    DATE(gii.`created_at`) AS created_at
+                    gii.`created_at`
                 FROM
                     gl_inquiry gi
                 LEFT JOIN gl_inquiry_info gii ON gi.id = gii.pid
