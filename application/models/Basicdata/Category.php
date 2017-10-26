@@ -96,15 +96,15 @@ class Basicdata_CategoryModel
 
         if($grade == 1 && $id == 0){
             //一级类目
-            $sql = "SELECT cat.`id`,cat.`title` FROM td_category_goods cat WHERE cat.`pid` = 0 AND cat.`grade`= 1 AND cat.`delete` = 0"; 
+            $sql = "SELECT cat.`id`,cat.`title` FROM td_category_goods cat WHERE cat.`pid` = 0 AND cat.`grade`= 1 AND cat.`delete` = 0 AND cat.`showtype` <> 3 ";
             $res = $this->dbh->select($sql);
         }elseif($id != 0 && $grade == 2){
             //二级类目
-            $sql = "SELECT cat.`id`,cat.`title` FROM td_category_goods cat WHERE cat.`pid` = ".intval($id)." AND cat.`grade`= 2 AND cat.`delete` = 0"; 
+            $sql = "SELECT cat.`id`,cat.`title` FROM td_category_goods cat WHERE cat.`pid` = ".intval($id)." AND cat.`grade`= 2 AND cat.`delete` = 0 AND cat.`showtype` <> 3 ";
             $res = $this->dbh->select($sql);
         }elseif($id != 0 && $grade == 3){
             //三级类目
-            $sql = "SELECT cat.`id`,cat.`title` FROM td_category_goods cat WHERE cat.`pid` = ".intval($id)." AND cat.`grade`= 3 AND cat.`delete` = 0"; 
+            $sql = "SELECT cat.`id`,cat.`title` FROM td_category_goods cat WHERE cat.`pid` = ".intval($id)." AND cat.`grade`= 3 AND cat.`delete` = 0 AND cat.`showtype` <> 3 ";
             $res = $this->dbh->select($sql);
         }
      
