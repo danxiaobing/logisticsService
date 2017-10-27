@@ -101,6 +101,19 @@ class Examine_CarrierModel
 
         return $data;
     }
+    /**
+     * 获取所有的一级承运商
+     * @return array $data
+     * @author daley
+     * @date 2017/10/27
+     */
+    public function getOnelevelCarrierList(){
+
+        $sql = "SELECT id,company_code,company_name FROM gl_companies  WHERE `status` = 2 and `is_del` = 0 ORDER BY `id` asc";
+        $data =  $this->dbh->select($sql);
+        return $data ? $data:[];
+
+    }
 
     /**
      * 承运商

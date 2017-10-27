@@ -265,12 +265,12 @@ class Examine_CarModel
         //筛选分类
         if (isset($params['category_id_two']) && !empty($params['category_id_two'])) {
             $filter_r[] = " r.`category_id_two` = " . intval($params['category_id_two']);
-            $filter_z[] = " p.`product_id` = " . intval($params['category_id_two']);
+            $filter_z[] = " p.`produce_id` = " . intval($params['category_id_two']);
         }
            //筛选产品
         if (isset($params['product_id']) && !empty($params['product_id'])) {
             $filter_r[] = " r.`product_id` = " . intval($params['product_id']);
-            $filter_z[] = " p.`produce_id` = " . intval($params['product_id']);
+            $filter_z[] = " p.`product_id` = " . intval($params['product_id']);
         }
         //筛选开始时间
         if (isset($params['starttime']) && $params['starttime'] != '') {
