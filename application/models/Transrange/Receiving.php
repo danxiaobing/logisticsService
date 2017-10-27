@@ -110,7 +110,7 @@ class Transrange_ReceivingModel
         if( count($result['list']) ){
             foreach ($result['list'] as $k => $v) {
                 //获取商品名称ids的集合
-                $sql = "SELECT IFNULL(GROUP_CONCAT( DISTINCT produce_id),'') FROM gl_rule_product WHERE rule_id={$v['id']} AND is_del = 0";
+                $sql = "SELECT IFNULL(GROUP_CONCAT( DISTINCT product_id),'') FROM gl_rule_product WHERE rule_id={$v['id']} AND is_del = 0";
                 $ids = $this->dbh->select_one($sql);
                 $result['list'][$k]['goodsname'] = '';
                 if(!empty($ids)){
