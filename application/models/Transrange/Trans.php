@@ -44,10 +44,10 @@ class Transrange_TransModel
         if(count($filter)>0){
             $where .= ' AND '.implode(' AND ',$filter);
         }
+        $result['list'] = array();
 
         $sql = "SELECT COUNT(1) FROM gl_companies_range gcr {$where}";
         $result['totalRow'] = $this->dbh->select_one($sql);
-
         if($result['totalRow']){
             //总的页数
             $result['totalPage']  = ceil($result['totalRow']/$search['pageSize']);  
