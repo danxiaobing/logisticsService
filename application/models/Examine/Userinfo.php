@@ -132,7 +132,7 @@ class Examine_UserinfoModel
 
         if(is_numeric($param) && strlen($param) >10){
             $where .= ' gl_user_info.`mobile` = '.$param;
-        }elseif(preg_match('/^[0-9a-zA-Z]+@(([0-9a-zA-Z]+)[.])+[a-z]{2,4}$/i',$param)){
+        }elseif(preg_match('/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/',$param)){
             $where .= " gl_user_info.`email` = '{$param}'";
         }elseif(is_numeric($param)){
             $where .= " gl_user_info.`id` = '{$param}'";
