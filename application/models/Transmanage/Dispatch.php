@@ -117,41 +117,6 @@ class Transmanage_DispatchModel
                 return false;
             }
 
-            #取消调度单时候改重量
-            if(6 == $params['status']){
-                $goods_arr = $this->dbh->select_row('SELECT weights_done FROM gl_goods WHERE id = '.$dispatchData['goods_id']);
-                $goods = $this->dbh->update('gl_goods',['weights_done'=>$goods_arr['weights_done'] - $dispatchData['weights']],' id = '.$dispatchData['goods_id']);
-                $order = $this->dbh->update('gl_order',['status'=>1],' id ='.$dispatchData['order_id']);
-                if(!$goods && !$order){
-                    $this->dbh->rollback();
-                    return false;
-                }
-            }
-
-
-            #卸货和装货要上传图片
-            if(5 == $params['status'] or 3 == $params['status']){
-                if(empty($params['other_file'])){
-                    $this->dbh->rollback();
-                    return false;
-                }
-                $pic = [];
-                $status = $params['status'] == 3?1:2;
-                foreach ($params['other_file'] as $key=>$v){
-                    $pic[$key] = ['pic'=>$v,'status'=>$status,'dispatch_id'=>$params['id'],'created_at'=>'=NOW()','updated_at'=>'=NOW()'];
-                }
-
-                $data = '';
-                foreach ($pic as $v){
-                    $data = $this->dbh->insert('gl_order_dispatch_pic',$v);
-                    if(empty($data)){
-                        $this->dbh->rollback();
-                        return false;
-                    }
-                }
-            }
-
-
             if(1 == $params['status']){
                 $count = $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE order_id = '.$dispatchData['order_id']);
                 $completeTotal =  $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE status >= 1 AND order_id = '.$dispatchData['order_id']);
@@ -177,7 +142,42 @@ class Transmanage_DispatchModel
                     }
                 }
             }
-      
+
+            #卸货和装货要上传图片
+            if(5 == $params['status'] or 3 == $params['status']){
+                if(empty($params['other_file'])){
+                    $this->dbh->rollback();
+                    return false;
+                }
+                $pic = [];
+                $status = $params['status'] == 3?1:2;
+                foreach ($params['other_file'] as $key=>$v){
+                    $pic[$key] = ['pic'=>$v,'status'=>$status,'dispatch_id'=>$params['id'],'created_at'=>'=NOW()','updated_at'=>'=NOW()'];
+                }
+
+                $data = '';
+                foreach ($pic as $v){
+                    $data = $this->dbh->insert('gl_order_dispatch_pic',$v);
+                    if(empty($data)){
+                        $this->dbh->rollback();
+                        return false;
+                    }
+                }
+            }
+
+
+            #取消调度单时候改重量
+            if(6 == $params['status']){
+                $goods_arr = $this->dbh->select_row('SELECT weights_done FROM gl_goods WHERE id = '.$dispatchData['goods_id']);
+                $goods = $this->dbh->update('gl_goods',['weights_done'=>$goods_arr['weights_done'] - $dispatchData['weights']],' id = '.$dispatchData['goods_id']);
+//                $order = $this->dbh->update('gl_order',['status'=>1],' id ='.$dispatchData['order_id']);
+                if(!$goods){
+                    $this->dbh->rollback();
+                    return false;
+                }
+            }
+
+
             $this->dbh->commit();
             return true;
 
@@ -186,6 +186,7 @@ class Transmanage_DispatchModel
             return false;
         }
     }
+
 
 
 
@@ -273,6 +274,14 @@ class Transmanage_DispatchModel
                     }
                 }
 
+                if($weights_done == 0 ){
+                    $order = $this->dbh->update('gl_order',['status'=>2],' id ='.intval($params['order_id']));
+                    if(!$order){
+                        $this->dbh->rollback();
+                        return false;
+                    }
+                }
+
                 #修改这次已调度重量
                 $weights_done =  $weights_done+$weights_this;
                 $goods = $this->dbh->update('gl_goods',['weights_done'=>$weights_done],' id ='.$params['goods_id']);
@@ -284,12 +293,14 @@ class Transmanage_DispatchModel
                 #判断总吨数和已调度吨数 （修改状态）
                 if($weights_all == $weights_done){
                     $goods = $this->dbh->update('gl_goods',['weights_done'=>$weights_done],' id ='.$params['goods_id']);
-                    $order = $this->dbh->update('gl_order',['status'=>2],' id ='.intval($params['order_id']));
-                    if(!$goods && !$order){
-                        $this->dbh->rollback();
-                        return false;
+                    $count = $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE status not in(6,7) AND status > 1  AND order_id = '.$params['order_id']);
+                    if(!empty($count)){
+                        $order = $this->dbh->update('gl_order',['status'=>3],' id ='.intval($params['order_id']));
+                        if(!$order){
+                            $this->dbh->rollback();
+                            return false;
+                        }
                     }
-
                 }
 
                 $this->dbh->commit();
