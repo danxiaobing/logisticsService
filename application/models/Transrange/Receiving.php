@@ -42,7 +42,7 @@ class Transrange_ReceivingModel
             if(empty($productid)){
                 return $result['list'] = [];
             }
-            $filter[] = " rg.produce_id = {$productid} ";
+            $filter[] = " rg.product_id = {$productid} ";
 
         }
 
@@ -89,7 +89,6 @@ class Transrange_ReceivingModel
         GROUP BY r.`id`
         ) as count";
 
-  
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $result['list'] = array();
