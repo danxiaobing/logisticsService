@@ -326,7 +326,7 @@ class Transmanage_InquirydelModel
             $where .= ' AND '.implode(' AND ', $filter);
         }
 
-        $sql = "SELECT gl_inquiry.`status`,gl_inquiry.`gid`,gl_inquiry.`car_id`,gl_goods.`reach_endtime`
+        $sql = "SELECT gl_inquiry.`status`,gl_inquiry.`gid`,gl_inquiry.`car_id`,gl_goods.`reach_starttime`
                 FROM gl_inquiry  
                 LEFT JOIN gl_goods ON gl_goods.`id` = gl_inquiry.`gid`
                 WHERE  
@@ -352,7 +352,12 @@ class Transmanage_InquirydelModel
                 $this->dbh->rollback();
                 return false;
             }
-            $goods['status']  = time() > strtotime($inquiry['reach_endtime']) ? 3:1;
+            if($inquiry['reach_starttime']!== '0000-00-00 00:00:00'){
+                $goods['status']  = time() > strtotime($inquiry['reach_starttime']) ? 3 : 1;
+            }else{
+                $goods['status'] = 1;
+            }
+
             $data = $this->dbh->update('gl_goods',$goods,'id ='.$inquiry['gid']);
             if(empty($data)){
                 $this->dbh->rollback();

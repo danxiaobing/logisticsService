@@ -116,7 +116,7 @@ class Transmanage_ReturnCarModel
     //智能发布获取回程车
     public function fastBackCar($params){
 
-        $filter[] = " WHERE 1=1 AND gl_order.`status` in(2,3)  AND gl_order.`is_release`=0 ";
+        $filter[] = " WHERE 1=1 AND gl_order.`status` in(2,3,4,5,8)  AND gl_order.`is_release`=0 ";
         $where = "  ";
         if (isset($params['company_id']) && $params['company_id'] != '') {
             $filter[] = " gl_order.`company_id`=" . $params['company_id'];
@@ -139,7 +139,7 @@ class Transmanage_ReturnCarModel
                         gl_goods.product_id,
                         gl_goods.weights,
                         gl_goods.status,
-                        gl_goods.reach_endtime
+                        gl_goods.reach_starttime
                         FROM gl_order
                       LEFT JOIN gl_goods  ON gl_order.`goods_id` = gl_goods.`id` {$where}";
 
@@ -173,7 +173,7 @@ class Transmanage_ReturnCarModel
                         gl_goods.weights,
                         gl_goods.status,
                         gl_goods.status,
-                        gl_goods.reach_endtime
+                        gl_goods.reach_starttime
                         FROM gl_order
                         LEFT JOIN gl_goods  ON gl_order.`goods_id` = gl_goods.`id`
                        {$where}";
@@ -194,6 +194,12 @@ class Transmanage_ReturnCarModel
             $this->dbh->begin();
             try{
                 foreach ($info as $k=>$v){
+
+                    if($v['reach_starttime']!== '0000-00-00 00:00:00'){
+                        $v['reach_starttime'] = substr($v['reach_starttime'],0,10);
+                    }else{
+                        $v['reach_starttime'] = date('Y-m-d');
+                    }
                     $input = array(
                         'cid'=> $v['company_id'],
                         'start_province_id'=>$v['end_provice_id'],
@@ -205,8 +211,8 @@ class Transmanage_ReturnCarModel
                         'category_id'=>$v['cate_id'],
                         'category_id_two'=>$v['cate_id_two'],
                         'product_id'=>$v['product_id'],
-                        'start_time'=>$v['reach_endtime'],
-                        'end_time'=>date('Y-m-d', strtotime ("+7 day", strtotime($v['reach_endtime']))),
+                        'start_time'=>$v['reach_starttime'],
+                        'end_time'=>date('Y-m-d', strtotime ("+7 day", strtotime($v['reach_starttime']))),
                         'price_type'=>$price_type_arr[$k],
                         'price'=>$price_arr[$k],
                         'created_at'=>'=NOW()',

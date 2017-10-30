@@ -251,9 +251,14 @@ class Transmanage_OrderModel
             }
 
             if (isset($params['cargo_id'])  && $params['status'] == 6) {
-                $goodArr = $this->dbh->select_row('SELECT status,source,reach_endtime FROM gl_goods WHERE id = ' . $orderArr['goods_id']);
+                $goodArr = $this->dbh->select_row('SELECT status,source,reach_starttime FROM gl_goods WHERE id = ' . $orderArr['goods_id']);
                 if (!empty($goodArr) && $goodArr['source'] == 0) {
-                    $goodArr['status'] = time() > strtotime($goodArr['reach_endtime']) ? 3 : 1;
+
+                    if($goodArr['reach_starttime']!== '0000-00-00 00:00:00'){
+                        $goodArr['status']  = time() > strtotime($goodArr['reach_starttime']) ? 3 : 1;
+                    }else{
+                        $goodArr['status'] = 1;
+                    }
                     $good = $this->dbh->update('gl_goods', $goodArr, 'id = ' . $orderArr['goods_id']);
 
                     if (empty($good)) {
