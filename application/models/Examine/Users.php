@@ -173,7 +173,7 @@ class Examine_UsersModel
 
 
 
-    public function register($params){
+    public function registerPost($params){
 
         $user = array(
             'email'      => $params['email'],
@@ -205,40 +205,24 @@ class Examine_UsersModel
         $this->dbh->begin();
         try{
             #插入公司
-           $carrier_id = $this->dbh->insert('gl_companies', $carrier);
-
-           if(empty($carrier_id)){
-               $this->dbh->rollback();
-               return false;
-           }
-
-
+            $carrier_id = $this->dbh->insert('gl_companies', $carrier);
+            if(!$carrier_id){
+                $this->dbh->rollback();
+                return array('status'=>0,'msg'=>'公司插入失败');
+            }
 
             #插入个人信息
             $user['cid']  = $carrier_id;
             $user_id = $this->dbh->insert('gl_user_info', $user);
 
-            if( !isset($params['is_del']) || $params['is_del'] == 0 ){
-                if(!empty($user_id)){
-                    #发送短信
-                    $smsrpc = Yaf_Registry::get("smsrpc");
-                    $this->Wiserun = Client::create($smsrpc->host.'Wiserun',false);
-                    $sms = $this->Wiserun->sendFunc(array('mobile'=>$params['mobile']),'2');
-                    if($sms['code'] == "200"){
-                        $this->dbh->commit();
-                        return $user_id;
-                    }else{
-                        $this->dbh->rollback();
-                        return false;
-                    }
-                }else{
-                    $this->dbh->rollback();
-                    return false;
-                }
-            }else{
+            if($user_id){
                 $this->dbh->commit();
-                return $user_id;
+                return array('status'=>1,'msg'=>'插入成功','user_id'=>$user_id);
+            }else{
+                $this->dbh->rollback();
+                return array('status'=>0,'msg'=>'账户插入失败');
             }
+
         } catch (Exception $e) {
             $this->dbh->rollback();
             return false;
