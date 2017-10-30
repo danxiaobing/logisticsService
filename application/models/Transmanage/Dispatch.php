@@ -118,16 +118,14 @@ class Transmanage_DispatchModel
             }
 
             if(1 == $params['status']){
-                $count = $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE order_id = '.$dispatchData['order_id']);
-                $completeTotal =  $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE status >= 1 AND order_id = '.$dispatchData['order_id']);
-
-                if($count == $completeTotal){
-                    $order = $this->dbh->update('gl_order',['status'=>3],' id ='.$dispatchData['order_id']);
-                    if(empty($order)){
-                        $this->dbh->rollback();
-                        return false;
-                    }
+                $goods_arr = $this->dbh->select_row('SELECT weights,weights_done FROM gl_goods WHERE id = '.$dispatchData['goods_id']);
+                $status = $goods_arr['weights'] == $goods_arr['weights_done'] ? 3:8;
+                $order = $this->dbh->update('gl_order',['status'=>$status],' id ='.$dispatchData['order_id']);
+                if(empty($order)){
+                    $this->dbh->rollback();
+                    return false;
                 }
+
             }
 
             if(5 == $params['status']){
