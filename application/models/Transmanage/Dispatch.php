@@ -168,7 +168,7 @@ class Transmanage_DispatchModel
             if(6 == $params['status']){
                 $goods_arr = $this->dbh->select_row('SELECT weights_done FROM gl_goods WHERE id = '.$dispatchData['goods_id']);
                 $goods = $this->dbh->update('gl_goods',['weights_done'=>$goods_arr['weights_done'] - $dispatchData['weights']],' id = '.$dispatchData['goods_id']);
-                $count = $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE status not in(6,7) AND status > 1  AND order_id = '.$dispatchData['order_id']);
+                $count = $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE status > 0  AND status  not in(6,7)   AND order_id = '.$dispatchData['order_id']);
                 $status = !empty($count) ? 8 : 2;
                 $order = $this->dbh->update('gl_order',['status'=>$status],' id ='.$dispatchData['order_id']);
                 if(!$goods && !$order){
@@ -293,7 +293,7 @@ class Transmanage_DispatchModel
                 #判断总吨数和已调度吨数 （修改状态）
                 if($weights_all == $weights_done){
                     $goods = $this->dbh->update('gl_goods',['weights_done'=>$weights_done],' id ='.$params['goods_id']);
-                    $count = $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE status not in(6,7) AND status > 1  AND order_id = '.$params['order_id']);
+                    $count = $this->dbh->select_one('SELECT COUNT(1) FROM gl_order_dispatch WHERE status not in(6,7) AND status > 0  AND order_id = '.$params['order_id']);
                     if(!empty($count)){
                         $order = $this->dbh->update('gl_order',['status'=>3],' id ='.intval($params['order_id']));
                         if(!$order){
