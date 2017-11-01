@@ -83,4 +83,9 @@ class Transmanage_OrderController extends Rpc
         return $L->updateOrder($id,$param);
     }
 
+    public function retreatOrderFunc($id,$param){
+        $L = new Transmanage_OrderModel(Yaf_Registry::get("db"),null,Yaf_Registry::get("gy_db"));
+        return $L->retreatOrder($id,$param);
+    }
+
 }
