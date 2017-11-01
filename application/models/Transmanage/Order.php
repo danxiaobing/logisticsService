@@ -210,6 +210,12 @@ class Transmanage_OrderModel
     }
 
 
+    /**
+     * 货主取消交易
+     * @param $params
+     * @author daley
+     * @return bool
+     */
     public function untreadOrder($params){
 
         $where = ' gl_order.`is_del` = 0 ';
@@ -242,7 +248,7 @@ class Transmanage_OrderModel
         $this->dbh->begin();
         try{
             $orderArr['status'] = $params['status'];
-            $orderArr['reasons'] = !empty($params['reasons']) ? $params['reasons']:'';
+            //$orderArr['reasons'] = !empty($params['reasons']) ? $params['reasons']:'';
             $order = $this->dbh->update('gl_order',$orderArr,'id = '.$orderArr['id']);
 
             if(empty($order)){
