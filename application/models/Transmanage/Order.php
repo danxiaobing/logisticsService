@@ -479,5 +479,27 @@ class Transmanage_OrderModel
         return $this->dbh->update('gl_order', $params, 'id = '.intval($id));
     }
 
+    public function retreatOrder($id,$params){
+        #开启事物
+        $this->dbh->begin();
+        try{
+            $order = $this->dbh->update('gl_order', $params, 'id = '.intval($id));
+            $dispatch = $this->dbh->update('gl_order_dispatch',['status'=>6],'order_id = '.intval($id));
+
+            if(!$order && !$dispatch){
+                $this->dbh->rollback();
+                return false;
+            }
+
+            $this->dbh->commit();
+            return true;
+
+        } catch (Exception $e) {
+            $this->dbh->rollback();
+            return false;
+        }
+
+    }
+
 
 }
