@@ -63,11 +63,11 @@ class Cargo_GoodsModel
                g.product_id,
                g.weights,
                g.price,
+               g.offer_status,
+               g.offer_price,
                g.companies_name,
                g.off_starttime,
-               g.off_endtime,
                g.reach_starttime,
-               g.reach_endtime,
                g.status
                FROM gl_goods g
                " . $where . "   ORDER BY {$order} DESC";
