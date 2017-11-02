@@ -251,7 +251,7 @@ class Cargo_InquiryModel
             //承运方
             $params['company_id'] = $inquiry['company_id'];
             //预成交运费
-            $params['estimate_freight'] = $inquiry_info['minprice']*$inquiry['weights'];
+            $params['estimate_freight'] = round($inquiry_info['minprice'] * $inquiry['weights'],2);
             if(!empty($inquiry['car_id'])){
                 $params['car_id'] = $inquiry['car_id'];
             }
