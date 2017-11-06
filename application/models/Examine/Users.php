@@ -66,6 +66,7 @@ class Examine_UsersModel
                     gl_user_info.user_name,
                     gl_user_info.mobile,
                     gl_user_info.email,
+                    gl_user_info.is_del,
                     gl_companies.company_code,
                     gl_companies.province_id,
                     gl_companies.company_name,
