@@ -47,10 +47,10 @@ class Transrange_ReceivingModel
         }
 
         if (isset($params['min_load']) && $params['min_load'] != '' && $params['min_load'] != '0') {
-            $filter[] = " r.`max_load` >=  '{$params['min_load']}' ";
+            $filter[] = " r.`min_load` >=  '{$params['min_load']}' ";
         }
         if (isset($params['max_load']) && $params['max_load'] != '' && $params['max_load'] != '0') {
-            $filter[] = " r.`min_load` <=  '{$params['max_load']}' ";
+            $filter[] = " r.`max_load` <=  '{$params['max_load']}' ";
         }
         if (isset($params['set_line']) && $params['set_line'] != '' ) {
             $filter[] = " r.`set_line` = '{$params['set_line']}' ";
