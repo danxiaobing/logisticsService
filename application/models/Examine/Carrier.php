@@ -288,7 +288,13 @@ class Examine_CarrierModel
         }
 
         if (isset($params['status']) && $params['status'] != '') {
-            $filter[] = " gl_companies.`status` = ".$params['status'];
+            if($params['status'] == 1){
+              $filter[] = " gl_companies.`status` = 1 ";
+            }elseif($params['status'] == 2){
+              $filter[] = " gl_companies.`is_status` = 0 ";
+            }elseif ($params['status'] == 3) {
+              $filter[] = " gl_companies.`is_status` = 1 ";
+            }
         }
 
         $filter[] = " gl_companies.`pid` = ".intval($params['pid']);
