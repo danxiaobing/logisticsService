@@ -109,7 +109,7 @@ class Examine_CarrierModel
      */
     public function getOnelevelCarrierList(){
 
-        $sql = "SELECT id,company_code,company_name FROM gl_companies  WHERE `status` = 2 and `is_del` = 0 ORDER BY `id` asc";
+        $sql = "SELECT id,company_code,company_name FROM gl_companies  WHERE `status` = 2 and `is_del` = 0 and `pid` = 0 ORDER BY `id` asc";
         $data =  $this->dbh->select($sql);
         return $data ? $data:[];
 
