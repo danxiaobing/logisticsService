@@ -416,12 +416,12 @@ class Transmanage_OrderModel
             $province = array_column($province,'province','provinceid');
 
             //获取货主公司名称
-            $sql = "SELECT IFNULL(company_name,'') name  FROM td_companies WHERE id=";
+            //$sql = "SELECT IFNULL(company_name,'') name  FROM td_companies WHERE id=";
             foreach ($result['list'] as $k => $val) {
                 if(is_null($val['cargo_id'])){
                     $result['list'][$k]['cargoname'] = '';
                 }else{
-                    $sql .= $val['cargo_id'];
+                    $sql = "SELECT IFNULL(company_name,'') name  FROM td_companies WHERE id=".$val['cargo_id'];
                     $name = $this->dbh2->select_one($sql);
                     $result['list'][$k]['cargoname'] = $name ? $name : '';
                 }
