@@ -7,15 +7,17 @@
 class Transmanage_InquirydelModel
 {
     public $dbh = null;
+    public $dbh2 = null;
 
     /**
      * Constructor
      * @param   object $dbh
      * @return  void
      */
-    public function __construct($dbh, $mch = null)
+    public function __construct($dbh,$dbh2,$mch = null)
     {
         $this->dbh = $dbh;
+        $this->dbh2 = $dbh2;
     }
 
     public function getInquiryList($search){
@@ -131,12 +133,15 @@ class Transmanage_InquirydelModel
         $this->dbh->set_page_rows($search['rows'] ? $search['rows'] : 8);
 
         $result['list'] = $this->dbh->select_page($sql);
-
+        
         if(!empty($result['list'])){
             $city = array_column($this->dbh->select('SELECT cityid,city FROM conf_city'),'city','cityid');
             foreach($result['list'] as $key=>$value){
                 $result['list'][$key]['start_city'] = $city[$value['start_city_id']];
                 $result['list'][$key]['end_city'] = $city[$value['end_city_id']];
+                //获取产品名称
+                $sql = "SELECT IFNULL(title,'')  FROM td_category_goods WHERE id=".intval($value['product_id']);
+                $result['list'][$key]['product_name'] = $this->dbh2->select_one($sql);
             }
             unset($city);
         }
