@@ -70,7 +70,7 @@ class Transmanage_OrderModel
         }
 
         if (isset($params['max']) && $params['max'] != '') {
-            $filter[] = " g.`weights` <= '{$params['min']}'";
+            $filter[] = " g.`weights` <= '{$params['max']}'";
         }
 
         if(isset($params['id']) && $params['id'] != ''){
