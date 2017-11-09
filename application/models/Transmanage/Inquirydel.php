@@ -141,7 +141,8 @@ class Transmanage_InquirydelModel
                 $result['list'][$key]['end_city'] = $city[$value['end_city_id']];
                 //获取产品名称
                 $sql = "SELECT IFNULL(title,'')  FROM td_category_goods WHERE id=".intval($value['product_id']);
-                $result['list'][$key]['product_name'] = $this->dbh2->select_one($sql);
+                $goodsname = $this->dbh2->select_one($sql);
+                $result['list'][$key]['product_name'] = $goodsname ? $goodsname :'无' ; 
             }
             unset($city);
         }
@@ -153,6 +154,7 @@ class Transmanage_InquirydelModel
 
     /*获取询价单基本信息*/
     public function getGoodsInfo($id){
+        $res = [];
         //goods基本信息
         $sql  = "SELECT
                          gd.id,
@@ -186,7 +188,14 @@ class Transmanage_InquirydelModel
                          gd.`status`
                          FROM gl_goods gd
                          LEFT JOIN gl_cars_type gct ON  gct.id=gd.cars_type WHERE gd.id =".intval($id);
-        $result['info'] = $this->dbh->select_row($sql);
+        $res = $this->dbh->select_row($sql);
+        if(!empty($res)){
+            $sql = "SELECT title FROM td_category_goods WHERE id=".intval($res['product_id']);
+            $goodsname = $this->dbh2->select_one($sql);
+            $res['goodsname'] = $goodsname ? $goodsname : '';
+        }
+        $result['info'] = $res;
+
 
         //获取市的信息
         $result['city'] = $this->dbh->select('SELECT cityid,city FROM conf_city');
@@ -225,6 +234,11 @@ class Transmanage_InquirydelModel
 
 
         $data['gii'] =  $this->dbh->select($sql);
+
+        //获取询价单的信息
+        $sql = "SELECT go.id,go.number,go.cargo_id,go.goods_id,go.estimate_freight,go.status,go.fact_freight FROM gl_order go WHERE go.id=".intval($id);
+        $info = $this->dbh->select_row($sql);
+        $data['xunjia'] = $info;
         // unset($data[0]);
         return $data;
     }
