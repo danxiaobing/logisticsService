@@ -180,6 +180,11 @@ class Transmanage_OrderModel
                      FROM gl_goods gd
                      LEFT JOIN gl_cars_type gct ON  gct.id=gd.cars_type WHERE gd.id =".$info['goods_id'];
       $data = $this->dbh->select_row($sql);
+      if(!empty($data)){
+        $sql ="SELECT title FROM td_category_goods WHERE id=".intval($data['product_id']);
+        $goodsname = $this->dbh2->select_one($sql);
+        $data['zh_name'] = $goodsname ? $goodsname : '无';
+      }
 
       //获取城市信息
       $city = $this->dbh->select('SELECT cityid,city FROM conf_city');
