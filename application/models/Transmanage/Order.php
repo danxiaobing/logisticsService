@@ -385,7 +385,7 @@ class Transmanage_OrderModel
         $filter[] = " god.`dispatch_number` = '{$serach['dispatch_number']}' ";
       } 
       if(isset($serach['carryname']) && $serach['carryname'] != ''){
-        $filter[] = " god.`c_name` like '%{$serach['dispatch_number']}%' ";
+        $filter[] = " god.`c_name` like '%{$serach['carryname']}%' ";
       } 
 
       $WHERE = " WHERE god.`is_del` = 0 ";
