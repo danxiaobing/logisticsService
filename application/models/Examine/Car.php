@@ -307,7 +307,7 @@ class Examine_CarModel
                  LEFT JOIN gl_rule_product AS p ON p.rule_id = z.id
                  LEFT JOIN gl_companies AS com ON com.id = z.cid {$where_z}
                 UNION
-                 SELECT r.start_province_id,r.start_city_id,r.id,r.cid,0 AS car_type,r.price_type,r.price,r.min_load,r.max_load,3 AS loss,r.product_id,2 AS ctype,com.company_name
+                 SELECT r.start_province_id,r.start_city_id,r.id,r.cid,0 AS car_type,r.price_type,r.price,r.min_load,r.max_load,r.loss,r.product_id,2 AS ctype,com.company_name
                  FROM gl_return_car AS r
                  LEFT JOIN gl_companies AS com ON com.id = r.cid {$where_r}
                 ) AS ss ";
@@ -320,7 +320,7 @@ class Examine_CarModel
                  LEFT JOIN gl_rule_product AS p ON p.rule_id = z.id
                  LEFT JOIN gl_companies AS com ON com.id = z.cid {$where_z}
                 UNION
-                 SELECT r.start_time as starttime,r.start_province_id,r.start_city_id,r.end_province_id,r.end_city_id,r.id,r.cid,0 AS car_type,r.price_type,r.price,r.min_load,r.max_load,3 AS loss,r.product_id,2 AS ctype,com.company_name
+                 SELECT r.start_time as starttime,r.start_province_id,r.start_city_id,r.end_province_id,r.end_city_id,r.id,r.cid,0 AS car_type,r.price_type,r.price,r.min_load,r.max_load,r.loss,r.product_id,2 AS ctype,com.company_name
                  FROM gl_return_car AS r
                  LEFT JOIN gl_companies AS com ON com.id = r.cid {$where_r}
                 ORDER BY id DESC ";

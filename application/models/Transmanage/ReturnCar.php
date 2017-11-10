@@ -172,6 +172,7 @@ class Transmanage_ReturnCarModel
                         gl_goods.product_id,
                         gl_goods.weights,
                         gl_goods.status,
+                        gl_goods.loss,
                         gl_goods.status,
                         gl_goods.reach_starttime
                         FROM gl_order
@@ -215,12 +216,14 @@ class Transmanage_ReturnCarModel
                         'end_time'=>date('Y-m-d', strtotime ("+7 day", strtotime($v['reach_starttime']))),
                         'price_type'=>$price_type_arr[$k],
                         'price'=>$price_arr[$k],
+                        'loss'=>$v['loss'],
                         'created_at'=>'=NOW()',
                         'updated_at'=>'=NOW()',
                     );
 
                     if($weights_type_arr[$k]==1){
                         $input['min_load'] =$v['weights'];
+                        $input['max_load'] = 2500;
                     }else{
                         $input['max_load'] = $v['weights'];
                     }
