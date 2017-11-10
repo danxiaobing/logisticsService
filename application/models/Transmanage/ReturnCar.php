@@ -73,9 +73,11 @@ class Transmanage_ReturnCarModel
                          r.`order_id`,
                          r.`price`,
                          r.`status`,
-                        gl_inquiry.`gid` as goods_id
+                        gl_inquiry.`gid` as goods_id,
+                        gl_order.`status` as order_status
                      FROM `gl_return_car` r
-                     LEFT JOIN gl_inquiry  ON  r.`id` = gl_inquiry.`car_id`  {$where}
+                     LEFT JOIN gl_inquiry  ON  r.`id` = gl_inquiry.`car_id`
+                     LEFT JOIN gl_order  ON  r.`order_id` = gl_order.`id`  {$where}
                      ORDER BY  r.status=3 ASC,  r.`{$order}` DESC";
         $result['list'] = $this->dbh->select_page($sql);
 
