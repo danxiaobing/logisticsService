@@ -76,11 +76,12 @@ class Transmanage_InquirydelModel
         //货主／承运商
         if(isset($search['company']) && $search['company'] != ''){
             $filter[] = " ( g.`companies_name` like '%{$search['company']}%' OR l.`c_name` like '%{$search['company']}%') ";
-        } 
-        //产品
-      /*  if(isset($search['product_name']) && $search['product_name'] != ''){
-            $filter[] = " p.`zh_name` like '%{$search['product_name']}%'  ";
-        }  */
+        }
+
+//        //产品
+//        if(isset($search['product_name']) && $search['product_name'] != ''){
+//            $filter[] = " p.`zh_name` like '%{$search['product_name']}%'  ";
+//        }
 
         //重量
         if(isset($search['min']) && $search['min'] != ''){
@@ -139,11 +140,8 @@ class Transmanage_InquirydelModel
             foreach($result['list'] as $key=>$value){
                 $result['list'][$key]['start_city'] = $city[$value['start_city_id']];
                 $result['list'][$key]['end_city'] = $city[$value['end_city_id']];
-                //获取产品名称
-                $sql = "SELECT IFNULL(title,'')  FROM td_category_goods WHERE id=".intval($value['product_id']);
-                $goodsname = $this->dbh2->select_one($sql);
-                $result['list'][$key]['product_name'] = $goodsname ? $goodsname :'无' ; 
             }
+
             unset($city);
         }
 
