@@ -191,7 +191,6 @@ class Order_OrderModel
             $goods_info  = $params;
             unset($goods_info['number']);
             unset($goods_info['car_id']);
-            unset($goods_info['carriers_id']);
             unset($goods_info['carriers_price']);
             unset($goods_info['offer_price']);
             unset($goods_info['stype']);

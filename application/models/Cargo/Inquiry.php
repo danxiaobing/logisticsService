@@ -308,8 +308,6 @@ class Cargo_InquiryModel
 
             $goods_info  = $params;
             unset($goods_info['car_id']);
-            unset($goods_info['carriers_id']);
-            unset($goods_info['offer_price']);
             unset($goods_info['stype']);
 
             $gid = $this->dbh->insert('gl_goods',$goods_info);
