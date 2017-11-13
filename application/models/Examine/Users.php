@@ -205,6 +205,7 @@ class Examine_UsersModel
 
         #开启事物
         $this->dbh->begin();
+        echo 1;die;
         try{
             #插入公司
             $carrier_id = $this->dbh->insert('gl_companies', $carrier);
