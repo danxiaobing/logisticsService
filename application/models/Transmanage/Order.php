@@ -412,7 +412,7 @@ class Transmanage_OrderModel
             $this ->dbh ->set_page_num($serach['pageCurrent']);
             $this ->dbh ->set_page_rows($serach['pageSize']); 
             //数据获取
-            $sql = "SELECT god.`order_id`,god.`order_number`,go.`cargo_id`,CONCAT(god.`c_name`,'',gc.`company_telephone`) cname,god.`start_provice_id`,god.`end_provice_id`,god.`weights`,god.`start_weights`,god.`end_weights` FROM gl_order_dispatch god LEFT JOIN gl_order go  ON go.id = god.order_id LEFT JOIN gl_companies gc ON gc.id = go.company_id {$WHERE} ORDER BY god.id  DESC";
+            $sql = "SELECT god.`order_id`,god.`order_number`,go.`cargo_id`,god.`c_name` cname,god.`start_provice_id`,god.`end_provice_id`,god.`weights`,god.`start_weights`,god.`end_weights` FROM gl_order_dispatch god LEFT JOIN gl_order go  ON go.id = god.order_id LEFT JOIN gl_companies gc ON gc.id = go.company_id {$WHERE} ORDER BY god.id  DESC";
             $result['list'] = $this->dbh->select_page($sql);
 
             //获取省名
