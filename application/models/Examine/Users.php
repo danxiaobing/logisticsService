@@ -21,9 +21,6 @@ class Examine_UsersModel
      */
     public function __construct($dbh, $mc = null)
     {
-//        $rpc=Yaf_Registry::get("msg");
-//        $this->Verify=Client::create( $rpc->host.'Verify',false);
-
         $this->dbh = $dbh;
     }
 
@@ -200,7 +197,7 @@ class Examine_UsersModel
             'created_at'          => '=NOW()',
             'updated_at'          => '=NOW()'
         );
-
+        echo 1;die;
         $carrier['company_code'] =   COMMON ::getCodeId('ZY56-');
 
         #开启事物
