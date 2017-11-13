@@ -60,6 +60,7 @@ class Examine_UserInfoController extends Rpc
     public function registerPostFunc($params){
         $User = new Examine_UsersModel(Yaf_Registry::get("db"));
         $data = $User->registerPost($params);
+        var_dump($data);die;
         return $data;
     }
 

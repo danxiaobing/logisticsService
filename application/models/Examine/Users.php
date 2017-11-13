@@ -197,7 +197,7 @@ class Examine_UsersModel
             'created_at'          => '=NOW()',
             'updated_at'          => '=NOW()'
         );
-        echo 1;die;
+
         $carrier['company_code'] =   COMMON ::getCodeId('ZY56-');
 
         #开启事物
@@ -217,7 +217,6 @@ class Examine_UsersModel
 
             if($user_id){
                 $this->dbh->commit();
-                echo 3;die;
                 return array('status'=>1,'msg'=>'插入成功','user_id'=>$user_id);
             }else{
                 $this->dbh->rollback();
