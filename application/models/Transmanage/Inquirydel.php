@@ -78,10 +78,10 @@ class Transmanage_InquirydelModel
             $filter[] = " ( g.`companies_name` like '%{$search['company']}%' OR l.`c_name` like '%{$search['company']}%') ";
         }
 
-//        //产品
-//        if(isset($search['product_name']) && $search['product_name'] != ''){
-//            $filter[] = " p.`zh_name` like '%{$search['product_name']}%'  ";
-//        }
+        //产品
+        if(!empty($search['product_id']) && $search['product_id'] != ''){
+            $filter[] = " g.`product_id` = {$search['product_id']}";
+        }
 
         //重量
         if(isset($search['min']) && $search['min'] != ''){
