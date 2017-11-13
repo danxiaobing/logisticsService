@@ -220,6 +220,7 @@ class Examine_UsersModel
 
             if($user_id){
                 $this->dbh->commit();
+                echo 3;die;
                 return array('status'=>1,'msg'=>'插入成功','user_id'=>$user_id);
             }else{
                 $this->dbh->rollback();
