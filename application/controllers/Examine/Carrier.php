@@ -23,6 +23,17 @@ class Examine_CarrierController extends Rpc {
         $data = $Carrier->getCarrierList($params,$pid);
         return $data;
     }
+    /**
+     * 获取所有一级承运商列表
+     * @return array $data
+     * @author daley
+     * @date 2017/10/27
+     */
+    public function getOnelevelCarrierListFunc(){
+        $Carrier = new Examine_CarrierModel(Yaf_Registry::get("db"));
+        $data = $Carrier->getOnelevelCarrierList();
+        return $data;
+    }
 
     /**
      * 获取承运商

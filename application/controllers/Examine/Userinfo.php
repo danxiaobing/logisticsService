@@ -6,7 +6,7 @@
  * Time: 13:29
  */
 
-class Examine_UserinfoController extends Rpc
+class Examine_UserInfoController extends Rpc
 {
 
 
@@ -22,7 +22,7 @@ class Examine_UserinfoController extends Rpc
      * @return array $data
      */
     public function getUserInfoListFunc($params){
-        $User = new Examine_UserinfoModel(Yaf_Registry::get("db"));
+        $User = new Examine_UsersModel(Yaf_Registry::get("db"));
         $data = $User->getUserList($params);
         return $data;
     }
@@ -34,7 +34,7 @@ class Examine_UserinfoController extends Rpc
      * @return bool
      */
     public function updateUserInfoFunc($id,$params,$where=''){
-        $User = new Examine_UserinfoModel(Yaf_Registry::get("db"));
+        $User = new Examine_UsersModel(Yaf_Registry::get("db"));
         $data = $User->updateUser($id,$params,$where);
         return $data;
     }
@@ -47,7 +47,7 @@ class Examine_UserinfoController extends Rpc
      */
     public function getUserInfoFunc($params,$password = ''){
 
-        $User = new Examine_UserinfoModel(Yaf_Registry::get("db"));
+        $User = new Examine_UsersModel(Yaf_Registry::get("db"));
         $data = $User->getUser($params,$password);
         return $data;
     }
@@ -58,7 +58,7 @@ class Examine_UserinfoController extends Rpc
      * @return array
      */
     public function registerPostFunc($params){
-        $User = new Examine_UserinfoModel(Yaf_Registry::get("db"));
+        $User = new Examine_UsersModel(Yaf_Registry::get("db"));
         $data = $User->registerPost($params);
         return $data;
     }
@@ -67,7 +67,7 @@ class Examine_UserinfoController extends Rpc
 
     public function getCodeFunc($mobile,$code){
 
-        $L = new Examine_UserinfoModel(Yaf_Registry::get("sms"));
+        $L = new Examine_UsersModel(Yaf_Registry::get("sms"));
         $data = $L->getCode($mobile,$code);
         return $data;
     }

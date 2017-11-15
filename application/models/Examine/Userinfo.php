@@ -7,7 +7,7 @@
  */
 
 use Hprose\Client;
-class Examine_UserinfoModel
+class Examine_UsersModel
 {
     public $dbh = null;
     public $mc = null;
@@ -21,9 +21,6 @@ class Examine_UserinfoModel
      */
     public function __construct($dbh, $mc = null)
     {
-//        $rpc=Yaf_Registry::get("msg");
-//        $this->Verify=Client::create( $rpc->host.'Verify',false);
-
         $this->dbh = $dbh;
     }
 
@@ -35,7 +32,7 @@ class Examine_UserinfoModel
      */
     public function getUserList($params){
         $filter = array();
-        $where = '';
+        $where = '  gl_user_info.`is_del` = 0  ';
 
         #检测参数
         if (isset($params['mobile']) && $params['mobile'] != '') {
@@ -49,7 +46,7 @@ class Examine_UserinfoModel
             $filter[] = " gl_user_info.`user_name` LIKE  '%{$params['user_name']}%'";
         }
 
-        $where .= ' gl_companies.`is_del` = 0 ';
+        $where .= ' AND gl_companies.`is_del` = 0 ';
         #条件
         if (1 <= count($filter)) {
             $where .= ' AND ' . implode(' AND ', $filter);
@@ -62,10 +59,11 @@ class Examine_UserinfoModel
         #sql语句
         $sql = "SELECT 
                     gl_user_info.id,
-                    gl_user_info.is_del,
+                    gl_user_info.status,
                     gl_user_info.user_name,
                     gl_user_info.mobile,
                     gl_user_info.email,
+                    gl_user_info.is_del,
                     gl_companies.company_code,
                     gl_companies.province_id,
                     gl_companies.company_name,
@@ -132,7 +130,7 @@ class Examine_UserinfoModel
 
         if(is_numeric($param) && strlen($param) >10){
             $where .= ' gl_user_info.`mobile` = '.$param;
-        }elseif(preg_match('/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/',$param)){
+        }elseif(preg_match('/^[0-9a-zA-Z]+@(([0-9a-zA-Z]+)[.])+[a-z]{2,4}$/i',$param)){
             $where .= " gl_user_info.`email` = '{$param}'";
         }elseif(is_numeric($param)){
             $where .= " gl_user_info.`id` = '{$param}'";
@@ -181,6 +179,7 @@ class Examine_UserinfoModel
             'mobile'     => $params['mobile'],
             'user_name'  => $params['user_name'],
             'is_del'     => $params['is_del']?$params['is_del']:0,
+            'status'     => $params['status'],
             'created_at' => '=NOW()',
             'updated_at' => '=NOW()'
         );
@@ -203,12 +202,13 @@ class Examine_UserinfoModel
 
         #开启事物
         $this->dbh->begin();
+
         try{
             #插入公司
             $carrier_id = $this->dbh->insert('gl_companies', $carrier);
             if(!$carrier_id){
-               $this->dbh->rollback();
-               return array('status'=>0,'msg'=>'公司插入失败');
+                $this->dbh->rollback();
+                return array('status'=>0,'msg'=>'公司插入失败');
             }
 
             #插入个人信息
@@ -222,12 +222,23 @@ class Examine_UserinfoModel
                 $this->dbh->rollback();
                 return array('status'=>0,'msg'=>'账户插入失败');
             }
-           
+
         } catch (Exception $e) {
             $this->dbh->rollback();
             return false;
         }
     }
+
+//    public function getMessage()
+//    {
+//        $data = $this->Verify->sendFunc('18627607669','你的手机号为18627607669');
+//        if(!empty($data)){
+//            return true;
+//        }else{
+//            return false;
+//        }
+//
+//    }
 
 
     /**

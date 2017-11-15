@@ -7,15 +7,17 @@
 class Transmanage_InquirydelModel
 {
     public $dbh = null;
+    public $dbh2 = null;
 
     /**
      * Constructor
      * @param   object $dbh
      * @return  void
      */
-    public function __construct($dbh, $mch = null)
+    public function __construct($dbh,$dbh2,$mch = null)
     {
         $this->dbh = $dbh;
+        $this->dbh2 = $dbh2;
     }
 
     public function getInquiryList($search){
@@ -74,11 +76,12 @@ class Transmanage_InquirydelModel
         //货主／承运商
         if(isset($search['company']) && $search['company'] != ''){
             $filter[] = " ( g.`companies_name` like '%{$search['company']}%' OR l.`c_name` like '%{$search['company']}%') ";
-        } 
+        }
+
         //产品
-        if(isset($search['product_name']) && $search['product_name'] != ''){
-            $filter[] = " p.`zh_name` like '%{$search['product_name']}%'  ";
-        }  
+        if(!empty($search['product_id']) && $search['product_id'] != ''){
+            $filter[] = " g.`product_id` = {$search['product_id']}";
+        }
 
         //重量
         if(isset($search['min']) && $search['min'] != ''){
@@ -97,9 +100,8 @@ class Transmanage_InquirydelModel
         if(count($filter)>0){
             $where .= ' AND '.implode(' AND ', $filter);
         }
-        // echo "<pre>";print_r($where);echo "</pre>";die; 
         //总数
-        $sql = " SELECT count(1) FROM gl_inquiry as l LEFT JOIN gl_goods as g ON g.id = l.gid  LEFT JOIN gl_products as p ON p.id = g.product_id {$where}";
+        $sql = " SELECT count(1) FROM gl_inquiry as l LEFT JOIN gl_goods as g ON g.id = l.gid  {$where}";
         $result['totalRow'] = $this->dbh->select_one($sql);
         $result['list'] = array();
 
@@ -120,12 +122,10 @@ class Transmanage_InquirydelModel
             g.`end_provice_id`,
             g.`end_city_id`,
             g.`product_id`,
-            g.`weights`,
-            p.`zh_name`
+            g.`weights`
             FROM
             gl_inquiry as l 
             LEFT JOIN gl_goods as g ON g.id = l.gid
-            LEFT JOIN gl_products as p ON p.id = g.product_id
             {$where}
           ORDER BY l.`updated_at` DESC";
 
@@ -134,13 +134,14 @@ class Transmanage_InquirydelModel
         $this->dbh->set_page_rows($search['rows'] ? $search['rows'] : 8);
 
         $result['list'] = $this->dbh->select_page($sql);
-
+        
         if(!empty($result['list'])){
             $city = array_column($this->dbh->select('SELECT cityid,city FROM conf_city'),'city','cityid');
             foreach($result['list'] as $key=>$value){
                 $result['list'][$key]['start_city'] = $city[$value['start_city_id']];
                 $result['list'][$key]['end_city'] = $city[$value['end_city_id']];
             }
+
             unset($city);
         }
 
@@ -151,9 +152,48 @@ class Transmanage_InquirydelModel
 
     /*获取询价单基本信息*/
     public function getGoodsInfo($id){
+        $res = [];
         //goods基本信息
-        $sql  = "SELECT gd.id, gd.cid ,gd.start_provice_id ,gd.start_city_id ,gd.end_provice_id ,gd.end_city_id ,gd.weights ,gd.price ,gd.companies_name ,gd.off_starttime ,gd.off_endtime ,gd.reach_starttime ,gd.reach_endtime ,gd.offer_status,gd.offer_price,gd.loss,gd.desc_str ,gd.off_address ,gd.off_user ,gd.off_phone ,gd.reach_address ,gd.reach_user ,gd.reach_phone ,gd.consign_user ,gd.consign_phone,gp.zh_name,gct.`name`,DATE(gd.created_at) AS created_at,gd.`status` FROM gl_goods gd LEFT JOIN  gl_products gp ON gp.id = gd.product_id LEFT JOIN gl_cars_type gct ON  gct.id=gd.cars_type WHERE gd.id =".intval($id);
-        $result['info'] = $this->dbh->select_row($sql);
+        $sql  = "SELECT
+                         gd.id,
+                         gd.cid ,
+                         gd.start_provice_id ,
+                         gd.start_city_id ,
+                         gd.end_provice_id ,
+                         gd.end_city_id ,
+                         gd.product_id ,
+                         gd.weights ,
+                         gd.price ,
+                         gd.companies_name ,
+                         gd.off_starttime ,
+                         gd.off_endtime ,
+                         gd.reach_starttime ,
+                         gd.reach_endtime ,
+                         gd.offer_status,
+                         gd.offer_price,
+                         gd.loss,
+                         gd.desc_str ,
+                         gd.off_address ,
+                         gd.off_user ,
+                         gd.off_phone ,
+                         gd.reach_address ,
+                         gd.reach_user ,
+                         gd.reach_phone ,
+                         gd.consign_user ,
+                         gd.consign_phone,
+                         gct.`name`,
+                         gd.created_at,
+                         gd.`status`
+                         FROM gl_goods gd
+                         LEFT JOIN gl_cars_type gct ON  gct.id=gd.cars_type WHERE gd.id =".intval($id);
+        $res = $this->dbh->select_row($sql);
+        if(!empty($res)){
+            $sql = "SELECT title FROM td_category_goods WHERE id=".intval($res['product_id']);
+            $goodsname = $this->dbh2->select_one($sql);
+            $res['goodsname'] = $goodsname ? $goodsname : '';
+        }
+        $result['info'] = $res;
+
 
         //获取市的信息
         $result['city'] = $this->dbh->select('SELECT cityid,city FROM conf_city');
@@ -164,8 +204,7 @@ class Transmanage_InquirydelModel
 
     /*获取当前询价单的价格状态信息*/
     public function getInquiryInfo($id){
-        // $sql = "SELECT gi.`id`,gi.`status`,gi.`type`,gii.`minprice`,gii.`maxprice`,gii.`type`,gii.`created_at` FROM gl_inquiry gi LEFT JOIN gl_inquiry_info gii ON gi.id = gii.pid WHERE gii.pid=".intval($id)." AND gi.`is_del`=0  ORDER BY gii.`id` ASC";
-        $sql = "SELECT                     
+        $sql = "SELECT
                     gi.`id` ,
                     gi.`status` ,
                     gi.`type`  as cancel
@@ -181,7 +220,7 @@ class Transmanage_InquirydelModel
                     gii.`minprice` ,
                     gii.`maxprice` ,
                     gii.`type` as operate,
-                    DATE(gii.`created_at`) AS created_at
+                    gii.`created_at`
                 FROM
                     gl_inquiry gi
                 LEFT JOIN gl_inquiry_info gii ON gi.id = gii.pid
@@ -193,6 +232,11 @@ class Transmanage_InquirydelModel
 
 
         $data['gii'] =  $this->dbh->select($sql);
+
+        //获取询价单的信息
+        $sql = "SELECT go.id,go.number,go.cargo_id,go.goods_id,go.estimate_freight,go.status,go.fact_freight FROM gl_order go WHERE go.id=".intval($id);
+        $info = $this->dbh->select_row($sql);
+        $data['xunjia'] = $info;
         // unset($data[0]);
         return $data;
     }
@@ -299,7 +343,7 @@ class Transmanage_InquirydelModel
             $where .= ' AND '.implode(' AND ', $filter);
         }
 
-        $sql = "SELECT gl_inquiry.`status`,gl_inquiry.`gid`,gl_inquiry.`car_id`,gl_goods.`reach_endtime`
+        $sql = "SELECT gl_inquiry.`status`,gl_inquiry.`gid`,gl_inquiry.`car_id`,gl_goods.`reach_starttime`
                 FROM gl_inquiry  
                 LEFT JOIN gl_goods ON gl_goods.`id` = gl_inquiry.`gid`
                 WHERE  
@@ -325,7 +369,12 @@ class Transmanage_InquirydelModel
                 $this->dbh->rollback();
                 return false;
             }
-            $goods['status']  = time() > strtotime($inquiry['reach_endtime']) ? 3:1;
+            if($inquiry['reach_starttime']!== '0000-00-00 00:00:00'){
+                $goods['status']  = time() > strtotime($inquiry['reach_starttime']) ? 3 : 1;
+            }else{
+                $goods['status'] = 1;
+            }
+
             $data = $this->dbh->update('gl_goods',$goods,'id ='.$inquiry['gid']);
             if(empty($data)){
                 $this->dbh->rollback();
@@ -389,7 +438,7 @@ class Transmanage_InquirydelModel
             }elseif($inquiryid != 0){
 
                 //获取询价单相关信息
-                $where = " gl_inquiry.`is_del` = 0 AND gl_inquiry.`id` = {$inquiryid}";
+                $where = " gl_inquiry.`is_del` = 0 AND gl_inquiry.`id` = {$inquiryid} AND  gl_inquiry.`status` in(1,2)";
                 $sql = "SELECT gl_inquiry.`status`,gl_inquiry.`gid`,gl_inquiry.`car_id` FROM gl_inquiry WHERE {$where}";
                 $inquiry = $this->dbh->select_row($sql);
                 if(!$inquiry){

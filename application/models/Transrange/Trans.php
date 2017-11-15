@@ -44,17 +44,16 @@ class Transrange_TransModel
         if(count($filter)>0){
             $where .= ' AND '.implode(' AND ',$filter);
         }
-
+        $result['list'] = array();
 
         $sql = "SELECT COUNT(1) FROM gl_companies_range gcr {$where}";
         $result['totalRow'] = $this->dbh->select_one($sql);
-        $result['list'] = array();
         if($result['totalRow']){
             //总的页数
             $result['totalPage']  = ceil($result['totalRow']/$search['pageSize']);  
             //设置当前页 和 pagesize
-            $this->dbh->set_page_num($search['pageCurrent']);
-            $this->dbh->set_page_rows($search['pageSize']);
+            $this->dbh->set_page_num($search['pageCurrent']?$search['pageCurrent'] : 1);
+            $this->dbh->set_page_rows($search['pageSize']?$search['pageSize'] : 15);
             //数据获取
             $sql = "SELECT gcr.`id`,gcr.`areaname`,gcr.`user`,gcr.`mobile`,gcr.`is_black`,IFNULL(gcrr.`province_id`,0) province_id FROM gl_companies_range gcr LEFT JOIN  gl_companies_range_region gcrr ON gcrr.`r_id` = gcr.`id` {$where} order by gcr.`updated_at` DESC";
             $datas = $this->dbh->select_page($sql);
