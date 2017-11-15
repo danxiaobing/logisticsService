@@ -438,7 +438,7 @@ class Transmanage_InquirydelModel
             }elseif($inquiryid != 0){
 
                 //获取询价单相关信息
-                $where = " gl_inquiry.`is_del` = 0 AND gl_inquiry.`id` = {$inquiryid}";
+                $where = " gl_inquiry.`is_del` = 0 AND gl_inquiry.`id` = {$inquiryid} AND  gl_inquiry.`status` in(1,2)";
                 $sql = "SELECT gl_inquiry.`status`,gl_inquiry.`gid`,gl_inquiry.`car_id` FROM gl_inquiry WHERE {$where}";
                 $inquiry = $this->dbh->select_row($sql);
                 if(!$inquiry){
