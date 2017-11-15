@@ -217,7 +217,7 @@ class Cargo_InquiryModel
         $inquiry_info = $this->dbh->select_row($sql);
         
         //获取询价单相关信息
-        $where = " gl_inquiry.`is_del` = 0 AND gl_inquiry.`id` = {$id}";
+        $where = " gl_inquiry.`is_del` = 0 AND gl_inquiry.`status` in (1,2) AND gl_inquiry.`id` = {$id}";
         $sql = "SELECT gl_inquiry.`cid` AS company_id,gl_inquiry.`status`,gl_inquiry.`gid`,gl_inquiry.`car_id`,gl_goods.`reach_endtime`,gl_goods.`cid` AS cargo_id,gl_goods.`weights`
                 FROM gl_inquiry
                 LEFT JOIN gl_goods ON gl_goods.`id` = gl_inquiry.`gid`
@@ -234,6 +234,7 @@ class Cargo_InquiryModel
         //开始事物
         $this->dbh->begin();
         try{
+
             //修改货源状态
             $goods['status']  = 4;
             $result = $this->dbh->update('gl_goods',$goods,'id ='.$inquiry['gid']);
@@ -241,6 +242,7 @@ class Cargo_InquiryModel
                 $this->dbh->rollback();
                 return false;
             }
+
 
 
             //新增托运单信息
