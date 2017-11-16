@@ -73,9 +73,11 @@ class Transmanage_ReturnCarModel
                          r.`order_id`,
                          r.`price`,
                          r.`status`,
-                        gl_inquiry.`gid` as goods_id
+                        gl_inquiry.`gid` as goods_id,
+                        gl_order.`status` as order_status
                      FROM `gl_return_car` r
-                     LEFT JOIN gl_inquiry  ON  r.`id` = gl_inquiry.`car_id`  {$where}
+                     LEFT JOIN gl_inquiry  ON  r.`id` = gl_inquiry.`car_id`
+                     LEFT JOIN gl_order  ON  r.`order_id` = gl_order.`id`  {$where}
                      ORDER BY  r.status=3 ASC,  r.`{$order}` DESC";
         $result['list'] = $this->dbh->select_page($sql);
 
@@ -83,27 +85,8 @@ class Transmanage_ReturnCarModel
     }
    //获取详细
     public function getInfo($id){
-/*        $sql = "SELECT
-                        `id`,
-                        `cid`,
-                        `start_province_id`,
-                        `start_city_id`,
-                        `start_area_id`,
-                        `end_province_id`,
-                        `end_city_id`,
-                        `end_area_id`,
-                        `start_time`,
-                        `end_time`,
-                        `price_type`,
-                        `min_load`,
-                        `max_load`,
-                        `category_id`,
-                        `product_id`,
-                        `price`,
-                        `status`
-                        FROM `gl_return_car` WHERE `id` = {$id}  AND `is_del`= 0";*/
 
-      $sql = "SELECT   r.`id`,
+   $sql = "SELECT   r.`id`,
                         r.`cid`,
                         r.`start_province_id`,
                         r.`start_city_id`,
@@ -123,21 +106,19 @@ class Transmanage_ReturnCarModel
                         r.`category_id`,
                         r.`product_id`,
                         r.`price`,
-                        r.`status`,
-                        p.`zh_name` as product_name
+                        r.`status`
                         FROM `gl_return_car`  r
                         LEFT JOIN conf_city  start_city ON r.`start_city_id` = start_city.`cityid`
                         LEFT JOIN conf_city  end_city  ON r.`end_city_id` = end_city.`cityid`
                         LEFT JOIN conf_area  start_area ON r.`start_area_id` = start_area.`areaid`
                         LEFT JOIN conf_area  end_area  ON r.`end_area_id` = end_area.`areaid`
-                         LEFT JOIN gl_products p ON p.`id` = r.`product_id`
-                          WHERE r.`id` = {$id}  AND r.`is_del`= 0";
+                        WHERE r.`id` = {$id}  AND r.`is_del`= 0";
         return $this->dbh->select_row($sql);
     }
     //智能发布获取回程车
     public function fastBackCar($params){
 
-        $filter[] = " WHERE 1=1 AND gl_order.`status` in(2,3)  AND gl_order.`is_release`=0 ";
+        $filter[] = " WHERE 1=1 AND gl_order.`status` in(2,3,4,5,8)  AND gl_order.`is_release`=0 ";
         $where = "  ";
         if (isset($params['company_id']) && $params['company_id'] != '') {
             $filter[] = " gl_order.`company_id`=" . $params['company_id'];
@@ -156,14 +137,13 @@ class Transmanage_ReturnCarModel
                         gl_goods.end_city_id,
                         gl_goods.end_area_id,
                         gl_goods.cate_id,
+                        gl_goods.cate_id_two,
                         gl_goods.product_id,
                         gl_goods.weights,
                         gl_goods.status,
-                        gl_goods.reach_endtime,
-                        gl_products.zh_name as product_name
+                        gl_goods.reach_starttime
                         FROM gl_order
-                      LEFT JOIN gl_goods  ON gl_order.`goods_id` = gl_goods.`id`
-                      LEFT JOIN gl_products ON gl_products.id = gl_goods.product_id {$where}";
+                      LEFT JOIN gl_goods  ON gl_order.`goods_id` = gl_goods.`id` {$where}";
 
         return $this->dbh->select($sql);
 
@@ -190,11 +170,13 @@ class Transmanage_ReturnCarModel
                         gl_goods.end_city_id,
                         gl_goods.end_area_id,
                         gl_goods.cate_id,
+                        gl_goods.cate_id_two,
                         gl_goods.product_id,
                         gl_goods.weights,
                         gl_goods.status,
+                        gl_goods.loss,
                         gl_goods.status,
-                        gl_goods.reach_endtime
+                        gl_goods.reach_starttime
                         FROM gl_order
                         LEFT JOIN gl_goods  ON gl_order.`goods_id` = gl_goods.`id`
                        {$where}";
@@ -215,6 +197,12 @@ class Transmanage_ReturnCarModel
             $this->dbh->begin();
             try{
                 foreach ($info as $k=>$v){
+
+                    if($v['reach_starttime']!== '0000-00-00 00:00:00'){
+                        $v['reach_starttime'] = substr($v['reach_starttime'],0,10);
+                    }else{
+                        $v['reach_starttime'] = date('Y-m-d');
+                    }
                     $input = array(
                         'cid'=> $v['company_id'],
                         'start_province_id'=>$v['end_provice_id'],
@@ -224,17 +212,20 @@ class Transmanage_ReturnCarModel
                         'end_city_id'=>$v['start_city_id'],
                         'end_area_id'=>$v['start_area_id'],
                         'category_id'=>$v['cate_id'],
+                        'category_id_two'=>$v['cate_id_two'],
                         'product_id'=>$v['product_id'],
-                        'start_time'=>$v['reach_endtime'],
-                        'end_time'=>date('Y-m-d', strtotime ("+7 day", strtotime($v['reach_endtime']))),
+                        'start_time'=>$v['reach_starttime'],
+                        'end_time'=>date('Y-m-d', strtotime ("+7 day", strtotime($v['reach_starttime']))),
                         'price_type'=>$price_type_arr[$k],
                         'price'=>$price_arr[$k],
+                        'loss'=>$v['loss'],
                         'created_at'=>'=NOW()',
                         'updated_at'=>'=NOW()',
                     );
 
                     if($weights_type_arr[$k]==1){
                         $input['min_load'] =$v['weights'];
+                        $input['max_load'] = 2500;
                     }else{
                         $input['max_load'] = $v['weights'];
                     }

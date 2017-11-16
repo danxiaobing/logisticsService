@@ -59,18 +59,17 @@ class Cargo_GoodsModel
                g.start_provice_id,
                g.end_provice_id,
                g.cate_id,
+               g.cate_id_two,
                g.product_id,
                g.weights,
                g.price,
+               g.offer_status,
+               g.offer_price,
                g.companies_name,
                g.off_starttime,
-               g.off_endtime,
                g.reach_starttime,
-               g.reach_endtime,
-               g.status,
-               gl_products.zh_name AS product_name
+               g.status
                FROM gl_goods g
-               LEFT JOIN gl_products ON g.product_id = gl_products.id
                " . $where . "   ORDER BY {$order} DESC";
         $result['list'] = $this->dbh->select_page($sql);
         return $result;
@@ -83,12 +82,10 @@ class Cargo_GoodsModel
     public function getInfo($id = 0)
     {
         $sql = "SELECT
-               g.id,g.start_provice_id,g.start_city_id,g.start_area_id,g.end_provice_id,g.end_city_id,g.end_area_id,g.cate_id,g.product_id,g.weights,g.price,g.companies_name,g.off_starttime,g.off_endtime,g.reach_starttime,
-               g.reach_endtime,g.cars_type,g.loss,g.offer_status,g.offer_price,g.off_address,g.off_user,g.off_phone,g.reach_address,g.reach_user,g.reach_phone,g.consign_user,g.consign_phone,g.desc_str,g.status,
-               gl_products.zh_name AS product_name,
+               g.id,g.start_provice_id,g.start_city_id,g.start_area_id,g.end_provice_id,g.end_city_id,g.end_area_id,g.cate_id,g.cate_id_two,g.product_id,g.weights,g.price,g.companies_name,g.off_starttime,g.off_endtime,g.reach_starttime,
+               g.reach_endtime,g.cars_type,g.loss,g.offer_status,g.carriers_id,g.offer_price,g.off_address,g.off_user,g.off_phone,g.reach_address,g.reach_user,g.reach_phone,g.consign_user,g.consign_phone,g.desc_str,g.status,
                gl_cars_type.name AS cars_type_name
                FROM gl_goods g
-               LEFT JOIN gl_products ON g.product_id = gl_products.id
                LEFT JOIN gl_cars_type ON gl_cars_type.id = g.cars_type WHERE g.id=".$id;
 
         return $this->dbh->select_row($sql);
@@ -97,6 +94,42 @@ class Cargo_GoodsModel
     public function addInfo($params)
     {
         return $this->dbh->insert('gl_goods',$params);
+    }
+
+    //货源指定承运商
+    public function goodsAppointCarrier($params){
+
+        $this->dbh->begin();
+        try{
+            $params['status'] = 2;
+            $goods_id =  $this->dbh->insert('gl_goods',$params);
+
+            if(!$goods_id){
+                $this->dbh->rollback();
+                return false;
+            }
+            $insertInfo = array(
+                'gid'=>$goods_id,
+                'cid'=>$params['carriers_id'],//承运商id
+                'status'=>1,
+                'created_at'=>'=NOW()',
+                'updated_at'=>'=NOW()',
+            );
+
+            $inquiry = $this->dbh->insert('gl_inquiry',$insertInfo);
+            if(!$inquiry){
+                $this->dbh->rollback();
+                return false;
+            }
+
+            $this->dbh->commit();
+            return true;
+
+        }catch (Exception $e){
+            $this->dbh->rollback();
+            return false;
+        }
+
     }
 
     //修改
@@ -124,7 +157,7 @@ class Cargo_GoodsModel
      */
     public function searchGoods($params){
         $filter = array();
-        $where = ' g.`is_del` = 0 AND g.`status` = 1 AND g.source = 0 AND g.`reach_endtime`>  NOW()';
+        $where = ' g.`is_del` = 0 AND g.`status` = 1 AND g.source = 0 ';
 
         if (isset($params['start_provice_id']) && !empty($params['start_provice_id'])) {
             $filter[] = " g.`start_provice_id` =".intval($params['start_provice_id']);
@@ -154,17 +187,22 @@ class Cargo_GoodsModel
             $filter[] = " unix_timestamp(g.`off_starttime`) >= unix_timestamp('{$params['off_starttime']} 00:00:00')";
         }
         if (isset($params['off_endtime']) && $params['off_endtime'] != '') {
-            $filter[] = " unix_timestamp(g.`off_endtime`) <= unix_timestamp('{$params['off_endtime']} 00:00:00')";
+            $filter[] = " unix_timestamp(g.`off_starttime`) <= unix_timestamp('{$params['off_endtime']} 00:00:00')";
         }
         if (isset($params['reach_starttime']) && $params['reach_starttime'] != '') {
             $filter[] = " unix_timestamp(g.`reach_starttime`) >= unix_timestamp('{$params['reach_starttime']} 00:00:00')";
         }
         if (isset($params['reach_endtime']) && $params['reach_endtime'] != '') {
-            $filter[] = " unix_timestamp(g.`reach_endtime`) <= unix_timestamp('{$params['reach_endtime']} 00:00:00')";
+            $filter[] = " unix_timestamp(g.`reach_starttime`) <= unix_timestamp('{$params['reach_endtime']} 00:00:00')";
+        }
+        if (isset($params['cate_id']) && !empty($params['cate_id'])) {
+            $filter[] = "g.`cate_id`=".intval($params['cate_id']);
+        }
+        if (isset($params['cate_id_two']) && !empty($params['cate_id_two'])) {
+            $filter[] = "g.`cate_id_two`=".intval($params['cate_id_two']);
         }
         if (isset($params['product_id']) && !empty($params['product_id'])) {
-            $product = implode(',',$params['product_id']);
-            $filter[] = "g.`product_id` in({$product})";
+            $filter[] = "g.`product_id`=".intval($params['product_id']);
         }
 
         if (count($filter) > 0) {
@@ -188,6 +226,7 @@ class Cargo_GoodsModel
                g.end_city_id,
                g.end_area_id,
                g.cate_id,
+               g.cate_id_two,
                g.product_id,
                g.weights,
                g.price,
@@ -208,10 +247,8 @@ class Cargo_GoodsModel
                g.consign_phone,
                g.desc_str,
                g.status,
-               gl_products.zh_name,
                IFNULL(gl_cars_type.name,'')  AS carname
                 FROM gl_goods g
-                LEFT JOIN gl_products ON gl_products.id = g.product_id
                 LEFT JOIN gl_cars_type ON gl_cars_type.id =g.cars_type
                 WHERE  {$where}
                 ORDER BY id DESC 

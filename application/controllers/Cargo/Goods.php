@@ -47,6 +47,15 @@ class Cargo_GoodsController extends Rpc {
         $list = $S->addInfo($data);
         return $list;
     }
+    /**
+     * 货源指定承运商
+     */
+    public function goodsAppointCarrierFunc($data)
+    {
+        $S = new Cargo_GoodsModel(Yaf_Registry:: get("db"));
+        $list = $S->goodsAppointCarrier($data);
+        return $list;
+    }
 
     /**
      * 细节
