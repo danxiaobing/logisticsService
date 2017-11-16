@@ -13,7 +13,7 @@ class Examine_UserInfoController extends Rpc
     public function init()
     {
         parent::init();
-
+ 
     }
 
     /**
