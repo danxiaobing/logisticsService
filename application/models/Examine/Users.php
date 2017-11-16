@@ -21,7 +21,7 @@ class Examine_UsersModel
      */
     public function __construct($dbh, $mc = null)
     {
-        $this->dbh = $dbh;
+        $this->dbh = $dbh; 
     }
 
 
