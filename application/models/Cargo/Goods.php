@@ -209,6 +209,16 @@ class Cargo_GoodsModel
             $where .= ' AND '.implode(" AND ", $filter);
         }
 
+        /*  add  将所有未接单并且时间已过期的修改为过期状态*/
+        $sql = "SELECT g.id,g.reach_starttime,g.status FROM gl_goods g WHERE  g.`is_del` = 0 AND g.`status` = 1 AND g.`source` = 0 AND g.`reach_starttime`!= '0000-00-00 00:00:00'";
+        $list= $this->dbh->select($sql);
+        foreach ($list as $key=>$value){
+            $date = substr($value['reach_starttime'],0,10) .' 23:59:59';
+            if(time()>strtotime($date)){
+                $this->updata(array('status'=>3),$value['id']);
+            }
+        }
+        /*  end */
 
         $sql = "SELECT count(1) FROM gl_goods  g  WHERE {$where}";
 
