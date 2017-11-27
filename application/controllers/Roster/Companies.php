@@ -40,4 +40,13 @@ class Roster_CompaniesController extends Rpc {
         $data = $L->getCompanys($id);
         return $data;
     }
+
+    /**
+     * 获取承运商信息ById
+     */
+    public function getInfoByIdFunc($id){
+        $L = new Roster_CompaniesModel(Yaf_Registry::get("db"));
+        $data = $L->getInfoById($id);
+        return $data;        
+    }
 }

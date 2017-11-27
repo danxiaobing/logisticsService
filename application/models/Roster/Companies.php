@@ -44,5 +44,12 @@ class Roster_CompaniesModel
         return $this->dbh->select($sql);
     }
 
+    /**
+     * 获取承运商ById
+     */
+    public function getInfoById($id){
+        $sql = "SELECT id,company_name,company_user,company_telephone FROM `gl_companies` WHERE `is_del` = 0  AND  `id` = {$id} ";
+        return $this->dbh->select_row($sql);
+    }
 
 }
