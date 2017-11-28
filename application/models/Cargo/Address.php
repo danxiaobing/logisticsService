@@ -24,7 +24,12 @@ class Cargo_AddressModel
 
         $filter = $filed = array();
         if (isset($params['type']) && $params['type'] != '') {
-            $filter[] = " type = " . $params['type'];
+            if($params['type']==1||$params['type']==2){
+                $filter[] = " type in(1,2)";
+            }else{
+                $filter[] = " type = " . $params['type'];
+            }
+
         }
         if (isset($params['uid']) && !empty($params['uid'])) {
             $filter[] = " uid = " . $params['uid'];

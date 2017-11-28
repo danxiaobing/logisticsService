@@ -104,6 +104,8 @@ class Transmanage_ReturnCarModel
                         r.`min_load`,
                         r.`max_load`,
                         r.`category_id`,
+                        r.`category_id_two`,
+                        r.`loss`,
                         r.`product_id`,
                         r.`price`,
                         r.`status`
