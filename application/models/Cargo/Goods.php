@@ -37,7 +37,7 @@ class Cargo_GoodsModel
         if (isset($params['uid']) && !empty($params['uid'])) {
             $filter[] = " g.uid = " . intval($params['uid']);
         }
-        if (isset($params['status']) && $params['status'] != '') {
+        if (isset($params['status']) && !empty($params['status'])) {
             $filter[] = " g.status=" . intval($params['status']);
         }
         if (1 <= count($filter)) {

@@ -71,7 +71,7 @@ class Cargo_InquiryModel
         }
 
 
-        if (isset($params['status']) && $params['status'] != '') {
+        if (isset($params['status']) && !empty($params['status'])) {
             $filter[] = " i.`status` = '{$params['status']}'";
         }
 
