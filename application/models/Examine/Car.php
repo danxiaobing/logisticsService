@@ -303,7 +303,11 @@ class Examine_CarModel
 
         /** 新增对回程车发车时间判断  **/
         $date = date('Y-m-d');
-        $sql = "SELECT r.id,r.end_time,r.status FROM gl_return_car AS r LEFT JOIN gl_companies AS com ON com.id = r.cid WHERE r.`is_del` = 0 AND r.`status` = 1  AND r.`end_time`<'{$date}'  ORDER BY id DESC";
+        $filter_where = "WHERE  com.`is_del` = 0 AND r.`is_del` = 0 AND r.`status` = 1  AND r.`end_time`<'{$date}'";
+        if (isset($params['cid']) && $params['cid'] != '') {
+            $filter_where .= " AND r.`cid`=" . $params['cid'];
+        }
+        $sql = "SELECT r.id,r.end_time,r.status FROM gl_return_car AS r LEFT JOIN gl_companies AS com ON com.id = r.cid {$filter_where}";
         $list = $this->dbh->select($sql);
 
         if($list){
