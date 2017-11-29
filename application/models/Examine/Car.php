@@ -212,7 +212,7 @@ class Examine_CarModel
     public function getBackAndLineCarPage($params){
         $filed = array();
         $filter_r[] = " WHERE r.`is_del` = 0 AND r.`status` = 1 ";//回程车
-        $filter_z[] = " WHERE z.`is_del` = 0 AND z.`set_line` = 1 AND z.`is_use` = 1 ";//专线车
+        $filter_z[] = " WHERE z.`is_del` = 0 AND z.`set_line` = 1 AND z.`is_use` = 1 AND p.`is_del`= 0 " ;//专线车
         $where_r = "  ";
         $where_z = "  ";
 

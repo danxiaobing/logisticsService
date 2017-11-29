@@ -158,6 +158,26 @@ class Transrange_ReceivingModel
         return $this->dbh->select_row($sql);
     }
 
+    /**
+     * @param $id
+     * @param $product_id
+     * @return mixed
+     * @time 2017-11-29
+     * $author daley
+     */
+    public function getInfoByProductId($id,$product_id)
+    {
+        $where = " AND p.`is_del` = 0 ";
+        if($product_id!=0){
+            $where.= " AND p.`product_id` = {$product_id}";
+        }
+        $sql = "SELECT gl_rule.*,p.`category_id`,p.`product_id`,p.`produce_id` FROM `gl_rule`
+                 LEFT JOIN gl_rule_product AS p ON p.rule_id = gl_rule.id WHERE gl_rule.`id` = {$id} {$where}";
+        return $this->dbh->select_row($sql);
+    }
+
+
+
     public function add($params)
     {        
         $products = $params['products'];
