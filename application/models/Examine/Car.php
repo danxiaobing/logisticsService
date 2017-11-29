@@ -301,6 +301,20 @@ class Examine_CarModel
             'list' => array()
         );
 
+        /** 新增对回程车发车时间判断  **/
+        $date = date('Y-m-d');
+        $sql = "SELECT r.id,r.end_time,r.status FROM gl_return_car AS r LEFT JOIN gl_companies AS com ON com.id = r.cid WHERE r.`is_del` = 0 AND r.`status` = 1  AND r.`end_time`<'{$date}'  ORDER BY id DESC";
+        $list = $this->dbh->select($sql);
+
+        if($list){
+            foreach($list as $key=>$val){
+                $info['status'] = 3;
+               $this->dbh->update('gl_return_car',$info,'id ='.$val['id']);
+            }
+        }
+        /** 对回程车发车时间判断 **/
+
+
         $sql = "SELECT COUNT(*) FROM(
                  SELECT z.start_province_id,z.start_city_id,z.id,z.cid,z.car_type,z.price_type,z.price,z.min_load,z.max_load,z.loss,p.product_id,1 AS ctype,com.company_name
                  FROM gl_rule AS z

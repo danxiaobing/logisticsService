@@ -46,6 +46,18 @@ class Transmanage_ReturnCarModel
             'list' => array()
         );
 
+        /** 新增对回程车发车时间判断  **/
+        $date = date('Y-m-d');
+        $sql = "SELECT r.id,r.end_time,r.status FROM gl_return_car AS r LEFT JOIN gl_companies AS com ON com.id = r.cid WHERE r.`is_del` = 0 AND r.`status` = 1  AND r.`end_time`<'{$date}'  ORDER BY id DESC";
+        $list = $this->dbh->select($sql);
+        if($list){
+            foreach($list as $key=>$val){
+                $info['status'] = 3;
+                $this->dbh->update('gl_return_car',$info,'id ='.$val['id']);
+            }
+        }
+        /** 对回程车发车时间判断 **/
+
         $sql = "SELECT count(1)
                 FROM `gl_return_car` r
                 {$where}";
