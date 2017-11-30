@@ -283,5 +283,31 @@ class Examine_DriverModel
     }
 
 
+    //数据唯一性验证
+    public function unique($data){
+        $sql1 = "SELECT DISTINCT count(1) FROM gl_driver WHERE mobile='{$data['mobile']}'";
+        $sql2 = "SELECT DISTINCT count(1) FROM gl_driver WHERE cid='{$data['cid']}'";
+        if(0 != $data['id'] ){
+            $str = ' AND id <>'.intval($data['id']);
+            $sql1 .= $str;
+            $sql2 .= $str;
+        }
+        $sum1 = $this->dbh->select_one($sql1);
+        $sum2= $this->dbh->select_one($sql2);
+        $msg = '';
+        if($sum1 != 0 && $sum2 == 0){
+            $msg = '手机号不能重复';
+        }elseif($sum1 == 0 && $sum2 != 0){
+            $msg = '身份证号不能重复';
+        }elseif($sum1 != 0 && $sum2 != 0){
+            $msg = '手机号、身份证号不能重复';
+        }
+        if($msg != ''){
+            return array('code' => 300,'msg'=> $msg);
+        }else{
+           return array('code' => 200,'msg'=> $msg); 
+        }
+    }
+
 
 }

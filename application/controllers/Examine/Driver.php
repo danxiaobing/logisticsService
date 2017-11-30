@@ -100,5 +100,10 @@ class Examine_DriverController extends Rpc {
         return $D->getDiverPic($id);          
     }
 
+    //数据唯一性验证
+    public function uniqueFunc($data){
+        $D = new Examine_DriverModel(Yaf_Registry::get("db"));
+        return $D->unique($data);
+    }
 
 }
