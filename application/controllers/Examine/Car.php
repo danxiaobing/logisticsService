@@ -23,10 +23,10 @@ class Examine_CarController extends Rpc {
         $data = $L->getCarByType($params);
         return $data;
     }
-    public function checkNumberFunc($id)
+    public function checkNumberFunc($id,$car_id)
     {
         $L = new Examine_CarModel(Yaf_Registry::get("db"));
-        $data = $L->checkNumber($id);
+        $data = $L->checkNumber($id,$car_id);
         return $data;
     }
     public function showfileFunc($id)
