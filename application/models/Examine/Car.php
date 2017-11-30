@@ -185,7 +185,11 @@ class Examine_CarModel
         $sql = "SELECT * FROM gl_cars WHERE id=".$id;
         return $this->dbh->select_row($sql);
     }
-
+    public function checkNumber($number = 0)
+    {
+        $sql = "SELECT * FROM gl_cars WHERE number = ".$number;
+        return $this->dbh->select_row($sql);
+    }
     //获取文件
     public function getFileByType($id, $type)
     {

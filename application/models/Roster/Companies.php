@@ -40,7 +40,7 @@ class Roster_CompaniesModel
      * 获取合作承运商
      */
     public function getCompanys($id){
-        $sql = "SELECT id,company_name,company_user,company_telephone FROM `gl_companies` WHERE `is_del` = 0  AND  `pid` = {$id} ";
+        $sql = "SELECT id,company_name,company_user,company_telephone FROM `gl_companies` WHERE `is_del` = 0 AND `status` =2  AND  `pid` = {$id} ";
         return $this->dbh->select($sql);
     }
 

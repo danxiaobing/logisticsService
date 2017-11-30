@@ -97,6 +97,19 @@ class Examine_DriverModel
         return $this->dbh->select($sql);
     }
 
+
+    public function getDriver($cid)
+    {
+        $sql = "SELECT id,name,mobile FROM `gl_driver`  WHERE `status` = 1 AND `is_use` = 1 AND `isdelete` = 0 AND `type` in (1,3) AND `company_id` = {$cid}";
+        return $this->dbh->select($sql);
+    }
+
+    public function getEscort($cid)
+    {
+        $sql = "SELECT id,name,mobile FROM `gl_driver`  WHERE `status` = 1 AND `is_use` = 1 AND `isdelete` = 0 AND `type` in (2,3) AND `company_id` = {$cid}";
+        return $this->dbh->select($sql);
+    }
+
     //更新状态
     public function updateStatus($status,$where){
        return $this->dbh->update('gl_driver',$status,$where); 

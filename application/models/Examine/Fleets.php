@@ -92,6 +92,12 @@ class Examine_FleetsModel
         return $this->dbh->select($sql);
     }
 
+    public function getFleets($cid)
+    {
+        $sql = "SELECT id,name FROM `gl_fleets`  WHERE `company_id` = {$cid} ";
+        return $this->dbh->select($sql);
+    }
+
    /**
     * 获取承运商列表
     * @param string $fields
