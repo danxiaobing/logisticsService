@@ -178,7 +178,7 @@ class Cargo_GoodsModel
             }
 
             $this->dbh->commit();
-            return true;
+            return $res;
 
         }catch (Exception $e){
             $this->dbh->rollback();
