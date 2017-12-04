@@ -75,7 +75,6 @@ class Examine_CarModel
                 LEFT JOIN `gl_driver` AS d ON d.`id` = c.`driver_id`
                 LEFT JOIN `gl_driver` AS d2 ON d2.`id` = c.`escort_id`
                 {$where}";
-        //echo "<pre>";print_r($filter);echo "</pre>";die;
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $this ->dbh ->set_page_num($params['pageCurrent']?$params['pageCurrent']:1);
@@ -191,7 +190,8 @@ class Examine_CarModel
         if( $car_id ){
             $wheres = " AND id != {$car_id}";
         }
-        $sql = "SELECT * FROM gl_cars WHERE number = ".$number.$wheres;
+        $sql = "SELECT * FROM gl_cars WHERE number = '".$number."'".$wheres;
+
         return $this->dbh->select_row($sql);
     }
     //获取文件
