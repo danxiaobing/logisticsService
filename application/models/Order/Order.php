@@ -75,7 +75,7 @@ class Order_OrderModel
             }
         }
 
-        if (isset($params['status']) && $params['status'] != '') {
+        if (isset($params['status']) && !empty($params['status'])) {
             $filter[] = " o.`status` = '{$params['status']}'";
         }
 
@@ -195,7 +195,8 @@ class Order_OrderModel
             unset($goods_info['offer_price']);
             unset($goods_info['stype']);
 
-            $gid = $this->dbh->insert('gl_goods',$goods_info);
+            $Goods = new Cargo_GoodsModel($this->dbh);
+            $gid = $Goods->addInfo($goods_info);
             if(!$gid){
                 $this->dbh->rollback();
                 return false;

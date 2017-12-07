@@ -75,7 +75,6 @@ class Examine_CarModel
                 LEFT JOIN `gl_driver` AS d ON d.`id` = c.`driver_id`
                 LEFT JOIN `gl_driver` AS d2 ON d2.`id` = c.`escort_id`
                 {$where}";
-        //echo "<pre>";print_r($filter);echo "</pre>";die;
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $this ->dbh ->set_page_num($params['pageCurrent']?$params['pageCurrent']:1);
@@ -185,7 +184,16 @@ class Examine_CarModel
         $sql = "SELECT * FROM gl_cars WHERE id=".$id;
         return $this->dbh->select_row($sql);
     }
+    public function checkNumber($number = 0,$car_id = 0)
+    {
+        $wheres = ' ';
+        if( $car_id ){
+            $wheres = " AND id != {$car_id}";
+        }
+        $sql = "SELECT * FROM gl_cars WHERE number = '".$number."'".$wheres;
 
+        return $this->dbh->select_row($sql);
+    }
     //获取文件
     public function getFileByType($id, $type)
     {
@@ -212,7 +220,7 @@ class Examine_CarModel
     public function getBackAndLineCarPage($params){
         $filed = array();
         $filter_r[] = " WHERE r.`is_del` = 0 AND r.`status` = 1 ";//回程车
-        $filter_z[] = " WHERE z.`is_del` = 0 AND z.`set_line` = 1 AND z.`is_use` = 1 ";//专线车
+        $filter_z[] = " WHERE z.`is_del` = 0 AND z.`set_line` = 1 AND z.`is_use` = 1 AND p.`is_del`= 0 " ;//专线车
         $where_r = "  ";
         $where_z = "  ";
 
@@ -300,6 +308,24 @@ class Examine_CarModel
             'totalRow' => 0,
             'list' => array()
         );
+
+        /** 新增对回程车发车时间判断  **/
+        $date = date('Y-m-d');
+        $filter_where = "WHERE  com.`is_del` = 0 AND r.`is_del` = 0 AND r.`status` = 1  AND r.`end_time`<'{$date}'";
+        if (isset($params['cid']) && $params['cid'] != '') {
+            $filter_where .= " AND r.`cid`=" . $params['cid'];
+        }
+        $sql = "SELECT r.id,r.end_time,r.status FROM gl_return_car AS r LEFT JOIN gl_companies AS com ON com.id = r.cid {$filter_where}";
+        $list = $this->dbh->select($sql);
+
+        if($list){
+            foreach($list as $key=>$val){
+                $info['status'] = 3;
+               $this->dbh->update('gl_return_car',$info,'id ='.$val['id']);
+            }
+        }
+        /** 对回程车发车时间判断 **/
+
 
         $sql = "SELECT COUNT(*) FROM(
                  SELECT z.start_province_id,z.start_city_id,z.id,z.cid,z.car_type,z.price_type,z.price,z.min_load,z.max_load,z.loss,p.product_id,1 AS ctype,com.company_name

@@ -37,7 +37,7 @@ class Cargo_GoodsModel
         if (isset($params['uid']) && !empty($params['uid'])) {
             $filter[] = " g.uid = " . intval($params['uid']);
         }
-        if (isset($params['status']) && $params['status'] != '') {
+        if (isset($params['status']) && !empty($params['status'])) {
             $filter[] = " g.status=" . intval($params['status']);
         }
         if (1 <= count($filter)) {
@@ -84,16 +84,114 @@ class Cargo_GoodsModel
         $sql = "SELECT
                g.id,g.start_provice_id,g.start_city_id,g.start_area_id,g.end_provice_id,g.end_city_id,g.end_area_id,g.cate_id,g.cate_id_two,g.product_id,g.weights,g.price,g.companies_name,g.off_starttime,g.off_endtime,g.reach_starttime,
                g.reach_endtime,g.cars_type,g.loss,g.offer_status,g.carriers_id,g.offer_price,g.off_address,g.off_user,g.off_phone,g.reach_address,g.reach_user,g.reach_phone,g.consign_user,g.consign_phone,g.desc_str,g.status,
-               gl_cars_type.name AS cars_type_name
+               gl_cars_type.name AS cars_type_name,
+               start_city.`city` as start_city,
+               start_area.`area` as start_area,
+               end_city.`city` as end_city,
+               end_area.`area` as end_area
                FROM gl_goods g
-               LEFT JOIN gl_cars_type ON gl_cars_type.id = g.cars_type WHERE g.id=".$id;
+                LEFT JOIN conf_city  start_city ON g.`start_city_id` = start_city.`cityid`
+                LEFT JOIN conf_city  end_city  ON g.`end_city_id` = end_city.`cityid`
+                LEFT JOIN conf_area  start_area ON g.`start_area_id` = start_area.`areaid`
+                LEFT JOIN conf_area  end_area  ON g.`end_area_id` = end_area.`areaid`
+            LEFT JOIN gl_cars_type ON gl_cars_type.id = g.cars_type WHERE g.id=".$id;
 
         return $this->dbh->select_row($sql);
     }
     //添加
     public function addInfo($params)
     {
-        return $this->dbh->insert('gl_goods',$params);
+        $this->dbh->begin();
+        try{
+            $Address = new Cargo_AddressModel($this->dbh);
+
+            /**对发货地址进行判断 start**/
+            $fahuo_params['cid'] = $params['cid'];
+            $fahuo_params['provice_id'] = $params['start_provice_id'];
+            $fahuo_params['city_id'] = $params['start_city_id'];
+            $fahuo_params['area_id'] = $params['start_area_id'];
+            $fahuo_params['address'] = $params['off_address'];
+            $fahuo_params['type'] = 2;
+            $res = $Address->getCargoAddres($fahuo_params);
+            if(!$res){
+
+            /* 发货地址新增*/
+            $fahuo_params['uid'] = $params['uid'];
+            $fahuo_params['name'] = $params['off_user'];
+            $fahuo_params['mobile'] =$params['off_phone'];
+            $fahuo_params['remark'] ='';
+            /*   $fahuo_params['test'] = 1;*/
+            $Address->addCargoAddress($fahuo_params);
+
+            }else{
+
+            /*常用地址加一*/
+            /* $sql ="update gl_cargo_address set test= test+1 WHERE id=".$res['id'];
+            $this->dbh->exe($sql);*/
+            }
+
+            /**对卸货地址进行判断 start**/
+
+            $xiehuo_params['cid'] = $params['cid'];
+            $xiehuo_params['provice_id'] = $params['end_provice_id'];
+            $xiehuo_params['city_id'] = $params['end_city_id'];
+            $xiehuo_params['area_id'] = $params['end_area_id'];
+            $xiehuo_params['address'] = $params['reach_address'];
+
+            $xiehuo_params['type'] = 1;
+            $res = $Address->getCargoAddres($xiehuo_params);
+            if(!$res){
+
+            /* 发货地址新增*/
+            $xiehuo_params['uid'] = $params['uid'];
+            $xiehuo_params['name'] = $params['reach_user'];
+            $xiehuo_params['mobile'] =$params['reach_phone'];
+            $xiehuo_params['remark'] = '';
+            /*  $xiehuo_params['test'] =1;*/
+            $Address->addCargoAddress($xiehuo_params);
+
+            }else{
+
+            /*常用地址加一*/
+            /*  $sql ="update gl_cargo_address set test= test+1 WHERE id=".$res['id'];
+            $this->dbh->exe($sql);*/
+            }
+
+
+            /**对联系人进行判断 start**/
+            $lianxiren_params['cid'] = $params['cid'];
+            $lianxiren_params['name'] = $params['consign_user'];
+            $lianxiren_params['mobile'] = $params['consign_phone'];
+            $lianxiren_params['type'] = 3;
+            $res = $Address->getCargoAddres($lianxiren_params);
+            if(!$res){
+
+            /* 发货地址新增*/
+            $lianxiren_params['uid'] = $params['uid'];
+            $lianxiren_params['remark'] = '';
+            /*  $lianxiren_params['test'] = 1;*/
+            $Address->addCargoAddress($lianxiren_params);
+
+            }else{
+
+            /*常用地址加一*/
+            /*  $sql ="update gl_cargo_address set test= test+1 WHERE id=".$res['id'];
+            $this->dbh->exe($sql);*/
+            }
+
+            $res = $this->dbh->insert('gl_goods',$params);
+            if(!$res){
+                $this->dbh->rollback();
+                return false;
+            }
+
+            $this->dbh->commit();
+            return $res;
+
+        }catch (Exception $e){
+            $this->dbh->rollback();
+            return false;
+        }
     }
 
     //货源指定承运商
@@ -102,8 +200,8 @@ class Cargo_GoodsModel
         $this->dbh->begin();
         try{
             $params['status'] = 2;
-            $goods_id =  $this->dbh->insert('gl_goods',$params);
 
+            $goods_id =   $this->addInfo($params);
             if(!$goods_id){
                 $this->dbh->rollback();
                 return false;
@@ -135,7 +233,95 @@ class Cargo_GoodsModel
     //修改
     public function updata($params,$id)
     {
-        return $this->dbh->update('gl_goods',$params,'id=' . intval($id));
+        $this->dbh->begin();
+        try{
+                $Address = new Cargo_AddressModel($this->dbh);
+
+                /**对发货地址进行判断 start**/
+                $fahuo_params['cid'] = $params['cid'];
+                $fahuo_params['provice_id'] = $params['start_provice_id'];
+                $fahuo_params['city_id'] = $params['start_city_id'];
+                $fahuo_params['area_id'] = $params['start_area_id'];
+                $fahuo_params['address'] = $params['off_address'];
+                $fahuo_params['type'] = 2;
+                $res = $Address->getCargoAddres($fahuo_params);
+                if(!$res){
+
+                    /* 发货地址新增*/
+                    $fahuo_params['uid'] = $params['uid'];
+                    $fahuo_params['name'] = $params['off_user'];
+                    $fahuo_params['mobile'] =$params['off_phone'];
+                    $fahuo_params['remark'] ='';
+                    /*   $fahuo_params['test'] = 1;*/
+                    $Address->addCargoAddress($fahuo_params);
+
+                }else{
+
+                    /*常用地址加一*/
+                    /* $sql ="update gl_cargo_address set test= test+1 WHERE id=".$res['id'];
+                     $this->dbh->exe($sql);*/
+                }
+
+                /**对卸货地址进行判断 start**/
+
+                $xiehuo_params['cid'] = $params['cid'];
+                $xiehuo_params['provice_id'] = $params['end_provice_id'];
+                $xiehuo_params['city_id'] = $params['end_city_id'];
+                $xiehuo_params['area_id'] = $params['end_area_id'];
+                $xiehuo_params['address'] = $params['reach_address'];
+
+                $xiehuo_params['type'] = 1;
+                $res = $Address->getCargoAddres($xiehuo_params);
+                if(!$res){
+
+                    /* 发货地址新增*/
+                    $xiehuo_params['uid'] = $params['uid'];
+                    $xiehuo_params['name'] = $params['reach_user'];
+                    $xiehuo_params['mobile'] =$params['reach_phone'];
+                    $xiehuo_params['remark'] = '';
+                    /*  $xiehuo_params['test'] =1;*/
+                    $Address->addCargoAddress($xiehuo_params);
+
+                }else{
+
+                    /*常用地址加一*/
+                    /*  $sql ="update gl_cargo_address set test= test+1 WHERE id=".$res['id'];
+                      $this->dbh->exe($sql);*/
+                }
+
+
+                /**对联系人进行判断 start**/
+                $lianxiren_params['cid'] = $params['cid'];
+                $lianxiren_params['name'] = $params['consign_user'];
+                $lianxiren_params['mobile'] = $params['consign_phone'];
+                $lianxiren_params['type'] = 3;
+                $res = $Address->getCargoAddres($lianxiren_params);
+                if(!$res){
+
+                    /* 发货地址新增*/
+                    $lianxiren_params['uid'] = $params['uid'];
+                    $lianxiren_params['remark'] = '';
+                    /*  $lianxiren_params['test'] = 1;*/
+                    $Address->addCargoAddress($lianxiren_params);
+
+                }else{
+
+                    /*常用地址加一*/
+                    /*  $sql ="update gl_cargo_address set test= test+1 WHERE id=".$res['id'];
+                      $this->dbh->exe($sql);*/
+                }
+            $res = $this->dbh->update('gl_goods',$params,'id=' . intval($id));
+            if(!$res){
+                $this->dbh->rollback();
+                return false;
+            }
+            $this->dbh->commit();
+            return true;
+
+        }catch (Exception $e){
+            $this->dbh->rollback();
+            return false;
+        }
     }
 
     //删除
@@ -209,6 +395,16 @@ class Cargo_GoodsModel
             $where .= ' AND '.implode(" AND ", $filter);
         }
 
+        /*  add  将所有未接单并且时间已过期的修改为过期状态*/
+        $sql = "SELECT g.id,g.reach_starttime,g.status FROM gl_goods g WHERE  g.`is_del` = 0 AND g.`status` = 1 AND g.`source` = 0 AND g.`reach_starttime`!= '0000-00-00 00:00:00'";
+        $list= $this->dbh->select($sql);
+        foreach ($list as $key=>$value){
+            $date = substr($value['reach_starttime'],0,10) .' 23:59:59';
+            if(time()>strtotime($date)){
+                $this->updata(array('status'=>3),$value['id']);
+            }
+        }
+        /*  end */
 
         $sql = "SELECT count(1) FROM gl_goods  g  WHERE {$where}";
 
@@ -313,5 +509,6 @@ class Cargo_GoodsModel
 
         return $data;
     }
+
 
 }

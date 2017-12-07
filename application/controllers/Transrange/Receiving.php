@@ -33,6 +33,13 @@ class Transrange_ReceivingController extends Rpc {
         return $data;
     }
 
+    public function getInfoByProductIdFunc($id,$product_id)
+    {
+        $Dw = new Transrange_ReceivingModel(Yaf_Registry::get("db"),Yaf_Registry::get("gy_db"));
+        $data = $Dw->getInfoByProductId($id,$product_id);
+        return $data;
+    }
+
     public function addFunc($params)
     {
         $Dw = new Transrange_ReceivingModel(Yaf_Registry::get("db"),Yaf_Registry::get("gy_db"));
