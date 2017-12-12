@@ -70,7 +70,7 @@ class Transmanage_OrderModel
         }
 
         if (isset($params['max']) && $params['max'] != '') {
-            $filter[] = " g.`weights` <= '{$params['min']}'";
+            $filter[] = " g.`weights` <= '{$params['max']}'";
         }
 
         if(isset($params['id']) && $params['id'] != ''){
@@ -100,6 +100,7 @@ class Transmanage_OrderModel
                g.end_provice_id,
                g.end_city_id,
                g.cate_id,
+               g.cate_id_two,
                g.product_id,
                g.weights,
                g.companies_name,
@@ -111,11 +112,9 @@ class Transmanage_OrderModel
                o.status,
                o.id,
                o.created_at,
-               o.number,
-               p.zh_name
-                FROM gl_order as o 
+               o.number
+                FROM gl_order as o
                 LEFT JOIN gl_goods as g ON g.id = o.goods_id
-                LEFT JOIN gl_products as p ON p.id = g.product_id
                 WHERE  {$where}
                 ORDER BY id DESC 
                 ";
@@ -145,8 +144,47 @@ class Transmanage_OrderModel
       $sql = "SELECT go.id,go.number,go.cargo_id,go.goods_id,go.estimate_freight,go.status,go.fact_freight FROM gl_order go WHERE go.id=".intval($orderid);
       $info = $this->dbh->select_row($sql);
       //获取goods基本信息
-      $sql = "SELECT gd.id, gd.cid ,gd.start_provice_id ,gd.start_city_id,gd.start_area_id ,gd.end_provice_id,gd.end_city_id ,gd.end_area_id ,gd.weights,gd.weights_done,gd.price ,gd.companies_name ,gd.off_starttime ,gd.off_endtime ,gd.reach_starttime ,gd.reach_endtime ,gd.offer_status,gd.offer_price,gd.loss,gd.desc_str ,gd.off_address ,gd.off_user ,gd.off_phone ,gd.reach_address ,gd.reach_user ,gd.reach_phone ,gd.consign_user ,gd.consign_phone,gp.zh_name,gct.`name`,gd.created_at,gd.`status` FROM gl_goods gd LEFT JOIN  gl_products gp ON gp.id = gd.product_id LEFT JOIN gl_cars_type gct ON  gct.id=gd.cars_type WHERE gd.id =".$info['goods_id'];
+      $sql = "SELECT
+                     gd.id,
+                     gd.cid,
+                     gd.start_provice_id,
+                     gd.start_city_id,
+                     gd.start_area_id,
+                     gd.end_provice_id,
+                     gd.end_city_id ,
+                     gd.end_area_id ,
+                     gd.product_id,
+                     gd.weights,
+                     gd.weights_done,
+                     gd.price ,
+                     gd.companies_name ,
+                     gd.off_starttime ,
+                     gd.off_endtime ,
+                     gd.reach_starttime ,
+                     gd.reach_endtime ,
+                     gd.offer_status,
+                     gd.offer_price,
+                     gd.loss,
+                     gd.desc_str ,
+                     gd.off_address ,
+                     gd.off_user ,
+                     gd.off_phone ,
+                     gd.reach_address ,
+                     gd.reach_user ,
+                     gd.reach_phone ,
+                     gd.consign_user ,
+                     gd.consign_phone,
+                     gct.`name`,
+                     gd.created_at,
+                     gd.`status`
+                     FROM gl_goods gd
+                     LEFT JOIN gl_cars_type gct ON  gct.id=gd.cars_type WHERE gd.id =".$info['goods_id'];
       $data = $this->dbh->select_row($sql);
+      if(!empty($data)){
+        $sql ="SELECT title FROM td_category_goods WHERE id=".intval($data['product_id']);
+        $goodsname = $this->dbh2->select_one($sql);
+        $data['zh_name'] = $goodsname ? $goodsname : '无';
+      }
 
       //获取城市信息
       $city = $this->dbh->select('SELECT cityid,city FROM conf_city');
@@ -177,6 +215,12 @@ class Transmanage_OrderModel
     }
 
 
+    /**
+     * 货主取消交易
+     * @param $params
+     * @author daley
+     * @return bool
+     */
     public function untreadOrder($params){
 
         $where = ' gl_order.`is_del` = 0 ';
@@ -209,7 +253,7 @@ class Transmanage_OrderModel
         $this->dbh->begin();
         try{
             $orderArr['status'] = $params['status'];
-            $orderArr['reasons'] = !empty($params['reasons']) ? $params['reasons']:'';
+            //$orderArr['reasons'] = !empty($params['reasons']) ? $params['reasons']:'';
             $order = $this->dbh->update('gl_order',$orderArr,'id = '.$orderArr['id']);
 
             if(empty($order)){
@@ -218,9 +262,14 @@ class Transmanage_OrderModel
             }
 
             if (isset($params['cargo_id'])  && $params['status'] == 6) {
-                $goodArr = $this->dbh->select_row('SELECT status,source,reach_endtime FROM gl_goods WHERE id = ' . $orderArr['goods_id']);
+                $goodArr = $this->dbh->select_row('SELECT status,source,reach_starttime FROM gl_goods WHERE id = ' . $orderArr['goods_id']);
                 if (!empty($goodArr) && $goodArr['source'] == 0) {
-                    $goodArr['status'] = time() > strtotime($goodArr['reach_endtime']) ? 3 : 1;
+
+                    if($goodArr['reach_starttime']!== '0000-00-00 00:00:00'){
+                        $goodArr['status']  = time() > strtotime($goodArr['reach_starttime']) ? 3 : 1;
+                    }else{
+                        $goodArr['status'] = 1;
+                    }
                     $good = $this->dbh->update('gl_goods', $goodArr, 'id = ' . $orderArr['goods_id']);
 
                     if (empty($good)) {
@@ -341,7 +390,7 @@ class Transmanage_OrderModel
         $filter[] = " god.`dispatch_number` = '{$serach['dispatch_number']}' ";
       } 
       if(isset($serach['carryname']) && $serach['carryname'] != ''){
-        $filter[] = " god.`c_name` like '%{$serach['dispatch_number']}%' ";
+        $filter[] = " god.`c_name` like '%{$serach['carryname']}%' ";
       } 
 
       $WHERE = " WHERE god.`is_del` = 0 ";
@@ -363,7 +412,7 @@ class Transmanage_OrderModel
             $this ->dbh ->set_page_num($serach['pageCurrent']);
             $this ->dbh ->set_page_rows($serach['pageSize']); 
             //数据获取
-            $sql = "SELECT god.`order_id`,god.`order_number`,go.`cargo_id`,CONCAT(god.`c_name`,'',gc.`company_telephone`) cname,god.`start_provice_id`,god.`end_provice_id`,god.`weights`,god.`start_weights`,god.`end_weights` FROM gl_order_dispatch god LEFT JOIN gl_order go  ON go.id = god.order_id LEFT JOIN gl_companies gc ON gc.id = go.company_id {$WHERE} ORDER BY god.id  DESC";
+            $sql = "SELECT god.`order_id`,god.`order_number`,go.`cargo_id`,god.`c_name` cname,god.`start_provice_id`,god.`end_provice_id`,god.`weights`,god.`start_weights`,god.`end_weights` FROM gl_order_dispatch god LEFT JOIN gl_order go  ON go.id = god.order_id LEFT JOIN gl_companies gc ON gc.id = go.company_id {$WHERE} ORDER BY god.id  DESC";
             $result['list'] = $this->dbh->select_page($sql);
 
             //获取省名
@@ -372,12 +421,12 @@ class Transmanage_OrderModel
             $province = array_column($province,'province','provinceid');
 
             //获取货主公司名称
-            $sql = "SELECT IFNULL(company_name,'') name  FROM td_companies WHERE id=";
+            //$sql = "SELECT IFNULL(company_name,'') name  FROM td_companies WHERE id=";
             foreach ($result['list'] as $k => $val) {
                 if(is_null($val['cargo_id'])){
                     $result['list'][$k]['cargoname'] = '';
                 }else{
-                    $sql .= $val['cargo_id'];
+                    $sql = "SELECT IFNULL(company_name,'') name  FROM td_companies WHERE id=".$val['cargo_id'];
                     $name = $this->dbh2->select_one($sql);
                     $result['list'][$k]['cargoname'] = $name ? $name : '';
                 }
@@ -439,6 +488,28 @@ class Transmanage_OrderModel
     public function updateOrder($id,$params){
 
         return $this->dbh->update('gl_order', $params, 'id = '.intval($id));
+    }
+
+    public function retreatOrder($id,$params){
+        #开启事物
+        $this->dbh->begin();
+        try{
+            $order = $this->dbh->update('gl_order', $params, 'id = '.intval($id));
+            $dispatch = $this->dbh->update('gl_order_dispatch',['status'=>6],'order_id = '.intval($id));
+
+            if(!$order && !$dispatch){
+                $this->dbh->rollback();
+                return false;
+            }
+
+            $this->dbh->commit();
+            return true;
+
+        } catch (Exception $e) {
+            $this->dbh->rollback();
+            return false;
+        }
+
     }
 
 

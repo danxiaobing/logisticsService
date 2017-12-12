@@ -71,7 +71,7 @@ class Cargo_InquiryModel
         }
 
 
-        if (isset($params['status']) && $params['status'] != '') {
+        if (isset($params['status']) && !empty($params['status'])) {
             $filter[] = " i.`status` = '{$params['status']}'";
         }
 
@@ -95,11 +95,9 @@ class Cargo_InquiryModel
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
-        $sql = "SELECT i.id,g.start_provice_id,g.end_provice_id,g.product_id,g.weights,g.price,i.order_id,i.status,i.created_at,
-                 gl_products.zh_name as product_name
+        $sql = "SELECT i.id,g.start_provice_id,g.end_provice_id,g.product_id,g.weights,g.price,i.order_id,i.status,i.created_at
                 FROM gl_goods g
                 LEFT JOIN gl_inquiry i ON i.gid = g.id
-                 LEFT JOIN gl_products ON gl_products.id = g.product_id
                 WHERE  {$where}
                 ORDER BY id DESC";
         $result['list']  = $this->dbh->select_page($sql);
@@ -219,7 +217,7 @@ class Cargo_InquiryModel
         $inquiry_info = $this->dbh->select_row($sql);
         
         //获取询价单相关信息
-        $where = " gl_inquiry.`is_del` = 0 AND gl_inquiry.`id` = {$id}";
+        $where = " gl_inquiry.`is_del` = 0 AND gl_inquiry.`status` in (1,2) AND gl_inquiry.`id` = {$id}";
         $sql = "SELECT gl_inquiry.`cid` AS company_id,gl_inquiry.`status`,gl_inquiry.`gid`,gl_inquiry.`car_id`,gl_goods.`reach_endtime`,gl_goods.`cid` AS cargo_id,gl_goods.`weights`
                 FROM gl_inquiry
                 LEFT JOIN gl_goods ON gl_goods.`id` = gl_inquiry.`gid`
@@ -236,6 +234,7 @@ class Cargo_InquiryModel
         //开始事物
         $this->dbh->begin();
         try{
+
             //修改货源状态
             $goods['status']  = 4;
             $result = $this->dbh->update('gl_goods',$goods,'id ='.$inquiry['gid']);
@@ -243,6 +242,7 @@ class Cargo_InquiryModel
                 $this->dbh->rollback();
                 return false;
             }
+
 
 
             //新增托运单信息
@@ -253,7 +253,7 @@ class Cargo_InquiryModel
             //承运方
             $params['company_id'] = $inquiry['company_id'];
             //预成交运费
-            $params['estimate_freight'] = $inquiry_info['minprice']*$inquiry['weights'];
+            $params['estimate_freight'] = round($inquiry_info['minprice'] * $inquiry['weights'],2);
             if(!empty($inquiry['car_id'])){
                 $params['car_id'] = $inquiry['car_id'];
             }
@@ -310,8 +310,6 @@ class Cargo_InquiryModel
 
             $goods_info  = $params;
             unset($goods_info['car_id']);
-            unset($goods_info['carriers_id']);
-            unset($goods_info['offer_price']);
             unset($goods_info['stype']);
 
             $gid = $this->dbh->insert('gl_goods',$goods_info);

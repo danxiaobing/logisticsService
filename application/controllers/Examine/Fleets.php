@@ -23,6 +23,13 @@ class Examine_FleetsController extends Rpc {
         $data = $L->getAllFleets($company_ids);
         return $data;
     }
+
+    public function getFleetsFunc($cid)
+    {
+        $L = new Examine_FleetsModel(Yaf_Registry::get("db"));
+        $data = $L->getFleets($cid);
+        return $data;
+    }
     /**
      * 新增车队信息
      */

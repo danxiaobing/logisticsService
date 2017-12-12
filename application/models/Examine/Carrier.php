@@ -101,6 +101,19 @@ class Examine_CarrierModel
 
         return $data;
     }
+    /**
+     * 获取所有的一级承运商
+     * @return array $data
+     * @author daley
+     * @date 2017/10/27
+     */
+    public function getOnelevelCarrierList(){
+
+        $sql = "SELECT id,company_code,company_name FROM gl_companies  WHERE `status` = 2 and `is_del` = 0 and `pid` = 0 ORDER BY `id` asc";
+        $data =  $this->dbh->select($sql);
+        return $data ? $data:[];
+
+    }
 
     /**
      * 承运商
@@ -275,7 +288,13 @@ class Examine_CarrierModel
         }
 
         if (isset($params['status']) && $params['status'] != '') {
-            $filter[] = " gl_companies.`status` = ".$params['status'];
+            if($params['status'] == 1){
+              $filter[] = " gl_companies.`status` = 1 ";
+            }elseif($params['status'] == 2){
+              $filter[] = " gl_companies.`is_status` = 0 ";
+            }elseif ($params['status'] == 3) {
+              $filter[] = " gl_companies.`is_status` = 1 ";
+            }
         }
 
         $filter[] = " gl_companies.`pid` = ".intval($params['pid']);
