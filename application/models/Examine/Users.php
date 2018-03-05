@@ -35,6 +35,9 @@ class Examine_UsersModel
         $where = '  gl_user_info.`is_del` = 0  ';
 
         #检测参数
+        if (isset($params['status']) && $params['status'] != '') {
+            $filter[] = "gl_user_info.`status` = {$params['status']}";
+        }
         if (isset($params['mobile']) && $params['mobile'] != '') {
 
             $filter[] = "gl_user_info.`mobile` LIKE '%{$params['mobile']}%'";
@@ -63,7 +66,10 @@ class Examine_UsersModel
                     gl_user_info.user_name,
                     gl_user_info.mobile,
                     gl_user_info.email,
+                    gl_user_info.is_con,
                     gl_user_info.is_del,
+                    gl_user_info.created_at,
+                    gl_user_info.updated_at,
                     gl_companies.company_code,
                     gl_companies.province_id,
                     gl_companies.company_name,
