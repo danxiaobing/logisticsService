@@ -48,6 +48,19 @@ class Examine_UsersModel
         if (isset($params['user_name']) && $params['user_name'] != '') {
             $filter[] = " gl_user_info.`user_name` LIKE  '%{$params['user_name']}%'";
         }
+        if (isset($params['company']) && $params['company'] != '') {
+            $filter[] = " ( gl_companies.`company_user` LIKE  '%{$params['company']}%' OR gl_companies.`company_telephone` LIKE  '%{$params['company']}%' )";
+        }
+        if (isset($params['is_con']) && $params['is_con'] != '') {
+            $filter[] = "gl_user_info.`is_con` = {$params['is_con']}";
+        }
+        if (isset($params['starttime']) && $params['starttime'] != '') {
+            $filter[] = " unix_timestamp(gl_user_info.`created_at`) >= unix_timestamp('{$params['starttime']} 00:00:00')";
+        }
+
+        if (isset($params['endtime']) && $params['endtime'] != '') {
+            $filter[] = " unix_timestamp(gl_user_info.`created_at`) <= unix_timestamp('{$params['endtime']} 23:59:59')";
+        }
 
         $where .= ' AND gl_companies.`is_del` = 0 ';
         #条件
@@ -58,6 +71,16 @@ class Examine_UsersModel
         #设置分页参数
         $page = isset($params['pageCurrent'])? intval($params['pageCurrent']) : 1;
         $pageSize = isset($params['pageSize'])? intval($params['pageSize']) : 9;
+
+
+        if (isset($params['orders']) && !empty($params['orders'])){
+            $ord = explode(",",$params['orders']);
+            $ord_str = "tcg1.".implode(",tcg1.", $ord);
+            $ord_str = str_replace("tcg1.patname","tcg1.pid",$ord_str);
+            $order = "order by order desc , updated_at,".$ord_str;
+        }else{
+            $order = " order by tcg1.`order` desc , tcg1 .`updated_at` desc";
+        }
 
         #sql语句
         $sql = "SELECT 
@@ -90,7 +113,6 @@ class Examine_UsersModel
                 ORDER BY gl_user_info.`updated_at` DESC";
 
         $countSql = "SELECT COUNT(1) FROM  gl_user_info LEFT JOIN gl_companies ON gl_companies.id = gl_user_info.cid WHERE {$where}";
-
         $data['totalRow'] = $this->dbh->select_one($countSql);
         $data['list'] = array();
 
