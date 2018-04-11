@@ -120,6 +120,7 @@ class Basicdata_CategoryModel
     public function getDetail($id){
         $sql = "SELECT
                     cat1.`id` ,
+                    cat1.`pid` ,
                     cat1.`title` ,
                     cat1.`grade` ,
                     cat1.`showtype` ,

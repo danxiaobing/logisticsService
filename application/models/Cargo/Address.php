@@ -49,7 +49,7 @@ class Cargo_AddressModel
         if (1 <= count($filter)) {
             $where .= ' AND ' . implode(' AND ', $filter);
         }
-        $sql = "SELECT id,uid,name,mobile,address,remark,type FROM gl_cargo_address " . $where . " ORDER BY id DESC  ";
+        $sql = "SELECT id,uid,provice_id,city_id,area_id,name,mobile,address,remark,type FROM gl_cargo_address " . $where . " ORDER BY id DESC  ";
         $data =  $this->dbh->select($sql);
 
         return $data;
