@@ -80,6 +80,7 @@ class Basicdata_CategoryModel
         return $this->dbh->select_row($sql);
     }
 
+
     //更新数据
     public function updateCate($id,$input){
         return $this->dbh->update('gl_category',$input,'id='.intval($id));
@@ -136,6 +137,39 @@ class Basicdata_CategoryModel
         $res = $this->dbh->select_row($sql);
         return $res ? $res : [];
 
+    }
+
+    /**
+     * 根据三级分类名称获取对应一级，二级分类
+     */
+
+    public function getCateByName($name){
+
+
+        //获取三级分类
+        $sql = "SELECT cat.`id`,cat.`title`,cat.`pid`,cat.`grade` FROM td_category_goods cat WHERE cat.`title` = '".trim($name)."' AND cat.`grade`= 3 AND cat.`delete` = 0 AND cat.`showtype` = 1 ";
+
+        $cateGrade3 = $this->dbh->select_row($sql);
+        if(!empty($cateGrade3)){
+            //二级类目
+            $sql = "SELECT cat.`id`,cat.`title`,cat.`pid`,cat.`grade` FROM td_category_goods cat WHERE cat.`id` = ".intval($cateGrade3['pid'])." AND cat.`grade`= 2 AND cat.`delete` = 0 AND cat.`showtype` = 1 ";
+
+            $cateGrade2 = $this->dbh->select_row($sql);
+            if(!empty($cateGrade2)){
+                //一级类目
+                $sql = "SELECT cat.`id`,cat.`title`,cat.`pid`,cat.`grade` FROM td_category_goods cat WHERE cat.`id` = ".intval($cateGrade2['pid'])." AND cat.`grade`= 1 AND cat.`delete` = 0 AND cat.`showtype` = 1 ";
+                $cateGrade1 = $this->dbh->select_row($sql);
+            }
+
+        }else{
+            $cateGrade3 = null;
+        }
+        $data = [
+            'cateGradeOne'=>$cateGrade1,
+            'cateGradeTwo'=>$cateGrade2,
+            'cateGradeThree'=>$cateGrade3
+        ];
+        return $data;
     }
 
 
