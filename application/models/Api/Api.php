@@ -208,6 +208,28 @@ class Api_ApiModel{
         return $result;
     }
 
+    /**
+     * 根据运单号检测运单是否存在
+     */
+    public function checkConsignsByNumber($params){
+
+        $filter[] = "";
+        $where= "  WHERE `is_del` = 0 ";
+
+        if (isset($params['number']) && !empty($params['number'])) {
+            $filter[] = " `number` = " . trim($params['number']);
+        }else{
+            return false;
+        }
+        if (count($filter) > 0) {
+            $where .= implode(" AND ", $filter);
+        }
+        $sql = "SELECT id FROM gl_order {$where}";
+        $res = $this->dbh->select_row($sql);
+        return $res?$res['id']:false;
+
+    }
+
 
 
 
