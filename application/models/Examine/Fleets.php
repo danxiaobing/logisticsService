@@ -124,7 +124,32 @@ class Examine_FleetsModel
     //修改信息
     public function update($params, $id)
     {
-        return $this->dbh->update('gl_fleets',$params,'id=' . intval($id));
+        #开启事物
+        $this->dbh->begin();
+        try{
+
+            $res = $this->dbh->update('gl_fleets',$params,'id=' . intval($id));
+            if(empty($res)){
+                $this->dbh->rollback();
+                return false;
+            }else{
+                $sql = "SELECT id,number FROM `gl_cars`  WHERE `fleets_id` = {$id} ";
+                $carlist  = $this->dbh->select($sql);
+                if(!empty($carlist)){
+                    foreach ($carlist as $k => $val){
+                        $this->dbh->update('gl_cars',$params,'id=' . intval($val['id']));
+                    }
+                }
+
+            }
+
+            $this->dbh->commit();
+            return true;
+
+        } catch (Exception $e) {
+            $this->dbh->rollback();
+            return false;
+        }
     }
     //删除
     public function del($id)

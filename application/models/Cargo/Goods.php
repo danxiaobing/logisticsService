@@ -38,7 +38,10 @@ class Cargo_GoodsModel
             $filter[] = " g.uid = " . intval($params['uid']);
         }
         if (isset($params['status']) && !empty($params['status'])) {
-            $filter[] = " g.status=" . intval($params['status']);
+            $filter[] = " g.status =" . intval($params['status']);
+        }
+        if (isset($params['orderno']) && !empty($params['orderno'])) {
+            $filter[] = " g.orderno =" . $params['orderno'];
         }
         if (1 <= count($filter)) {
             $where .= ' AND ' . implode(' AND ', $filter);
@@ -66,10 +69,13 @@ class Cargo_GoodsModel
                g.offer_status,
                g.offer_price,
                g.companies_name,
+               com.company_name as carrier_name,
                g.off_starttime,
                g.reach_starttime,
+               g.desc_str,
                g.status
                FROM gl_goods g
+               LEFT JOIN gl_companies com ON com.id = g.carriers_id
                " . $where . "   ORDER BY {$order} DESC";
         $result['list'] = $this->dbh->select_page($sql);
         return $result;

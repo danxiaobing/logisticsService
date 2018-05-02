@@ -79,6 +79,10 @@ class Order_OrderModel
             $filter[] = " o.`status` = '{$params['status']}'";
         }
 
+        if (isset($params['orderno']) && !empty($params['orderno'])) {
+            $filter[] = " g.`orderno` = '{$params['orderno']}'";
+        }
+
         if (isset($params['starttime']) && $params['starttime'] != '') {
             $filter[] = " unix_timestamp(o.`created_at`) >= unix_timestamp('{$params['starttime']} 00:00:00')";
         }
@@ -109,12 +113,16 @@ class Order_OrderModel
                 g.end_provice_id,
                 g.product_id,
                 g.weights,
+                g.companies_name,
+                com.company_name as carrier_name,
                 g.price,
+                g.desc_str,
                 o.number,
                 o.status,
                 o.created_at
                 FROM gl_order o
                 LEFT JOIN gl_goods g ON o.goods_id = g.id
+                LEFT JOIN gl_companies com ON com.id = o.company_id
                 WHERE  {$where}
                 ORDER BY id DESC";
         $result['list']  = $this->dbh->select_page($sql);
