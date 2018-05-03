@@ -41,7 +41,7 @@ class Cargo_GoodsModel
             $filter[] = " g.status =" . intval($params['status']);
         }
         if (isset($params['orderno']) && !empty($params['orderno'])) {
-            $filter[] = " g.orderno =" . $params['orderno'];
+            $filter[] = " g.orderno ='" . $params['orderno']."'";
         }
         if (1 <= count($filter)) {
             $where .= ' AND ' . implode(' AND ', $filter);
@@ -60,7 +60,11 @@ class Cargo_GoodsModel
         $sql = "SELECT
                g.id,
                g.start_provice_id,
+               g.start_city_id,
+               g.start_area_id,
                g.end_provice_id,
+               g.end_city_id,
+               g.end_area_id,
                g.cate_id,
                g.cate_id_two,
                g.product_id,
@@ -78,6 +82,36 @@ class Cargo_GoodsModel
                LEFT JOIN gl_companies com ON com.id = g.carriers_id
                " . $where . "   ORDER BY {$order} DESC";
         $result['list'] = $this->dbh->select_page($sql);
+        if( count($result['list']) ){
+            foreach ($result['list'] as $k => $v) {
+
+                $type = 'area';
+                if( $v['start_provice_id'] == 0 ){
+                    if( $v['start_city_id'] == 0 ){
+                        $type = 'province';
+                    }else{
+                        $type = 'city';
+                    }
+                }
+                $name = "start_{$type}_id";
+                $sql = "SELECT GROUP_CONCAT(cp.`{$type}`) FROM conf_{$type} cp where cp.`{$type}id` = {$v[$name]}";
+                $data = $this->dbh->select_one($sql);
+                $result['list'][$k]['start_name'] = $data ? $data:'';
+
+                $type = 'area';
+                if( $v['end_area_id'] == 0 ){
+                    if( $v['end_city_id'] == 0 ){
+                        $type = 'province';
+                    }else{
+                        $type = 'city';
+                    }
+                }
+                $name = "end_{$type}_id";
+                $sql = "SELECT GROUP_CONCAT(cp.`{$type}`) FROM conf_{$type} cp where cp.`{$type}id` = {$v[$name]}";
+                $data = $this->dbh->select_one($sql);
+                $result['list'][$k]['end_name'] = $data ? $data:'';
+            }
+        }
         return $result;
     }
     /**
