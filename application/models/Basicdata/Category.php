@@ -147,17 +147,17 @@ class Basicdata_CategoryModel
 
 
         //获取三级分类
-        $sql = "SELECT cat.`id`,cat.`title`,cat.`pid`,cat.`grade` FROM td_category_goods cat WHERE cat.`title` = '".trim($name)."' AND cat.`grade`= 3 AND cat.`delete` = 0 AND cat.`showtype` = 1 ";
+        $sql = "SELECT cat.`id`,cat.`title`,cat.`pid`,cat.`grade` FROM td_category_goods cat WHERE cat.`title` = '".trim($name)."' AND cat.`grade`= 3 AND cat.`delete` = 0 AND cat.`showtype` <> 3";
 
         $cateGrade3 = $this->dbh->select_row($sql);
         if(!empty($cateGrade3)){
             //二级类目
-            $sql = "SELECT cat.`id`,cat.`title`,cat.`pid`,cat.`grade` FROM td_category_goods cat WHERE cat.`id` = ".intval($cateGrade3['pid'])." AND cat.`grade`= 2 AND cat.`delete` = 0 AND cat.`showtype` = 1 ";
+            $sql = "SELECT cat.`id`,cat.`title`,cat.`pid`,cat.`grade` FROM td_category_goods cat WHERE cat.`id` = ".intval($cateGrade3['pid'])." AND cat.`grade`= 2";
 
             $cateGrade2 = $this->dbh->select_row($sql);
             if(!empty($cateGrade2)){
                 //一级类目
-                $sql = "SELECT cat.`id`,cat.`title`,cat.`pid`,cat.`grade` FROM td_category_goods cat WHERE cat.`id` = ".intval($cateGrade2['pid'])." AND cat.`grade`= 1 AND cat.`delete` = 0 AND cat.`showtype` = 1 ";
+                $sql = "SELECT cat.`id`,cat.`title`,cat.`pid`,cat.`grade` FROM td_category_goods cat WHERE cat.`id` = ".intval($cateGrade2['pid'])." AND cat.`grade`= 1";
                 $cateGrade1 = $this->dbh->select_row($sql);
             }
 
@@ -172,6 +172,33 @@ class Basicdata_CategoryModel
         return $data;
     }
 
+    /**
+     * 获取所有的三级分类，同时返回所属的一级，二级分类
+     */
+    public function getCategoryProdut(){
+
+        $sql = "SELECT
+                        cat.`id`,
+                        cat.`title`,
+                        cat.`pid`,
+                        cat.`grade`,
+                        cat.`showtype`,
+                        cattwo.`id` as cattwo_id,
+                        cattwo.`pid` as cattwo_pid,
+                        cattwo.`showtype` as cattwo_showtype,
+                        catone.`id` as catone_id,
+                        catone.`pid` as catone_pid,
+                        catone.`showtype` as catone_showtype
+                         FROM td_category_goods cat
+                         LEFT JOIN td_category_goods cattwo ON  cattwo.id=cat.pid
+                         LEFT JOIN td_category_goods catone ON  catone.id=cattwo.pid
+                         WHERE  cat.`grade`= 3 AND cat.`delete` = 0 AND cat.`showtype` <> 3 AND cattwo.`showtype` <> 3 AND catone.`showtype` <> 3";
+
+        $catlist = $this->dbh->select($sql);
+
+        return $catlist?$catlist:[];
+
+    }
 
 
 }

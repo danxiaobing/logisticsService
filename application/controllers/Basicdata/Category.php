@@ -71,5 +71,10 @@ class Basicdata_CategoryController extends Rpc {
         $C = new Basicdata_CategoryModel(Yaf_Registry::get("gy_db"));
         return $C->getGrade($id,$grade);
     }
+    //获取所有的三级分类
+    public function getCategoryProdutFunc(){
+        $C = new Basicdata_CategoryModel(Yaf_Registry::get("gy_db"));
+        return $C->getCategoryProdut();
+    }
 
 }
