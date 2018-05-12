@@ -218,6 +218,12 @@ class Transmanage_DispatchModel
         return $this->dbh->select($sql);
     }
 
+    //获取代办
+    public function getNeedList($id){
+        $sql = "SELECT id,dispatch_number,weights,cars_number,driver_name,supercargo_name,start_time,end_time FROM gl_order_dispatch WHERE status != 6 AND order_id = ".intval($id);
+        return $this->dbh->select($sql);
+    }
+
 
     
 

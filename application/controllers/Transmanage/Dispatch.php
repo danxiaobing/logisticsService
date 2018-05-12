@@ -81,5 +81,11 @@ class Transmanage_DispatchController extends Rpc
     }
 
 
+    public function getNeedListFunc($id){
+         $L = new Transmanage_DispatchModel(Yaf_Registry::get("db"));
+         return $L->getNeedLis($id);       
+    }
+
+
 
 }
