@@ -43,6 +43,9 @@ class Transmanage_DispatchModel
         if (isset($params['status']) && $params['status'] != '') {
             $filter[] = " `status` =".$params['status'];
         }
+        if (isset($params['statusarr']) && $params['statusarr'] != '') {
+            $filter[] = " `status` in (".$params['statusarr'].")";
+        }
 
         if(isset($params['order_id']) && $params['order_id'] != 0){
             $filter[] = " `order_id` =".$params['order_id'];
@@ -56,6 +59,7 @@ class Transmanage_DispatchModel
         }
 
         $sql = "SELECT count(1) FROM gl_order_dispatch  WHERE {$where}";
+        // return $sql;
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
