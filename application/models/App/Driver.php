@@ -21,7 +21,7 @@ class App_DriverModel
 
 
     public function getDriver($mobile){
-        $sql = " SELECT id,name,mobile,sex,cid,type,driver_start,driver_end,practitioners,driver_status,driver_license,certificate_pic,other_pic,company_id,is_use,status FROM `gl_driver` WHERE  `status` = 1 AND `is_use` = 1 AND `isdelete` = 0 AND `mobile`= ".intval($mobile);
+        $sql = " SELECT id,name,mobile,sex,cid,type,driver_start,driver_end,practitioners,driver_status,driver_license,certificate_pic,other_pic,company_id,is_use,status FROM `gl_driver` WHERE  `status` = 1 AND `is_use` = 1 AND `isdelete` = 0 AND `mobile`= ".$mobile;
         return $this->dbh->select_row($sql);
     }
 

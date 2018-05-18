@@ -28,7 +28,7 @@ class App_UsercenterModel
     //查看版本号码
     public function getVersions($type)
     {
-        $sql = "SELECT * FROM td_mobile WHERE `status` = 1 AND `type` = '" . $type . "'  AND `app_type` = 1 ORDER BY id";
+        $sql = "SELECT * FROM td_mobile WHERE `status` = 1 AND `type` = '" . $type . "'  AND `app_type` = 3 ORDER BY id";
         //print_r($sql);die;
         return $this->dbh->select_row($sql);
     }
