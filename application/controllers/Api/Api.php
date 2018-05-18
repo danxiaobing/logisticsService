@@ -31,6 +31,17 @@ class Api_ApiController extends Rpc {
         return $data;
     }
 
+    /**
+     * 匹配运费价格
+     */
+    public function matchingFreightPriceFunc($params){
+
+        $L = new Api_ApiModel(Yaf_Registry::get("db"));
+        $data = $L->matchingFreightPrice($params);
+        return $data;
+
+    }
+
 
 
 }
