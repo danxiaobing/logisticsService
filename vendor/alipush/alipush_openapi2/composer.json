@@ -1,0 +1,19 @@
+{
+  "name" : "alipush/alipush_openapi2",
+  "description" : "阿里云移动推送opapi2.0",
+  "keywords" : ["laravel","php","alipush"],
+  "authors" : [
+    {
+      "name" : "jack",
+      "email" : "1468018323@qq.com",
+      "role" : "Developer"
+    }
+  ],
+  "require" : {
+    "php" : "^5.6.31||^7.0",
+    "laravel/framework":"5.5.*"
+  },
+  "autoload":{
+    "psr-4":{"Loading\\":""}
+  }
+}

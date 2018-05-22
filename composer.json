@@ -8,6 +8,7 @@
      "require": {
           "aliyuncs/oss-sdk-php": "^2.0",
           "predis/predis": "dev-master",
+          "alipush/alipush_openapi2": "dev-master",
           "jenssegers/blade": "^1.0"
      }
 }
