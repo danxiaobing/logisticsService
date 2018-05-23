@@ -289,7 +289,7 @@ class Api_ApiModel{
                     FROM `gl_rule` AS ru
                     LEFT JOIN gl_companies AS com ON com.id = ru.cid
                     LEFT JOIN gl_rule_product AS p ON p.rule_id = ru.id
-                    WHERE {$where}";
+                    WHERE {$where} ORDER BY ru.`price` ASC ";
         return  $this->dbh->select($sql);
 
     }
