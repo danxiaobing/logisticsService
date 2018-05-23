@@ -242,47 +242,43 @@ class Api_ApiModel{
         if(isset($params['start_province_id']) && !empty($params['start_province_id'])){
             $filter[] =  "ru.`start_province_id` = {$params['start_province_id']}";
         }else{
-            return 0;
+            return [];
         }
         if(isset($params['start_city_id']) && !empty($params['start_city_id'])){
             $filter[] =  " ru.`start_city_id` = {$params['start_city_id']}";
         }else{
-            return 0;
+            return [];
         }
         if(isset($params['start_area_id']) && !empty($params['start_area_id'])){
             $filter[] =  " ru.`start_area_id` = {$params['start_area_id']}";
         }else{
-            return 0;
+            return [];
         }
         if(isset($params['end_province_id']) && !empty($params['end_province_id'])){
             $filter[] =  " ru.`end_province_id` = {$params['end_province_id']}";
         }else{
-            return 0;
+            return [];
         }
         if(isset($params['end_city_id']) && !empty($params['end_city_id'])){
             $filter[] =  " ru.`end_city_id` = {$params['end_city_id']}";
         }else{
-            return 0;
+            return [];
         }
         if(isset($params['end_area_id']) && !empty($params['end_area_id'])){
             $filter[] =  " ru.`end_area_id` = {$params['end_area_id']}";
         }else{
-            return 0;
+            return [];
         }
         if(isset($params['category_id_one']) && !empty($params['category_id_one'])){
             $filter[] =  " p.`category_id` = {$params['category_id_one']}";
-        }else{
-            return 0;
         }
         if(isset($params['category_id_two']) && !empty($params['category_id_two'])){
             $filter[] =  " p.`produce_id` = {$params['category_id_two']}";
-        }else{
-            return 0;
         }
         if(isset($params['product_id']) && !empty($params['product_id'])){
             $filter[] = " p.`product_id` = {$params['product_id']}";
         }else{
-            return 0;
+            return [];
         }
         if (1 <= count($filter)) {
             $where .= implode(' AND ', $filter);
