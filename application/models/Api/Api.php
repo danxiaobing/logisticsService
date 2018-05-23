@@ -238,11 +238,7 @@ class Api_ApiModel{
 
         $filter[] = "ru.`is_del` = 0 AND p.`is_del` = 0 AND ru.`price_type` = 2 AND ru.`is_use` = 1";
         $where = "  ";
-        if(isset($params['cid']) && !empty($params['cid'])){
-            $filter[] = " ru.`cid` = {$params['cid']}";
-        }else{
-            return 0;
-        }
+
         if(isset($params['start_province_id']) && !empty($params['start_province_id'])){
             $filter[] =  "ru.`start_province_id` = {$params['start_province_id']}";
         }else{
@@ -293,9 +289,12 @@ class Api_ApiModel{
         }else{
             $where = "";
         }
-        $sql = "SELECT ru.`price` FROM `gl_rule` AS ru LEFT JOIN gl_rule_product AS p ON p.rule_id = ru.id  WHERE {$where}";
-        $result =  $this->dbh->select_row($sql);
-        return $result['price']?$result['price']:0;
+        $sql = "SELECT ru.`cid` as carriers_id,ru.`price`,com.`company_name`
+                    FROM `gl_rule` AS ru
+                    LEFT JOIN gl_companies AS com ON com.id = ru.cid
+                    LEFT JOIN gl_rule_product AS p ON p.rule_id = ru.id
+                    WHERE {$where}";
+        return  $this->dbh->select($sql);
 
     }
 
