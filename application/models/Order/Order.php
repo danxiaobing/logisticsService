@@ -322,11 +322,75 @@ class Order_OrderModel
             return false;
         }
 
-
-
     }
 
 
+    /* 合同信息
+     * 获取单个托运单的详情
+    */
+    public function getOrderInfo($orderid)
+    {
+        //获取托运单基本信息
+        $sql = "SELECT go.id,go.number,go.cargo_id,go.company_id,go.goods_id,go.estimate_freight,go.status,go.fact_freight,gl_in.price as inquiryprice
+          FROM gl_order go
+          LEFT JOIN gl_inquiry gl_in ON  gl_in.order_id=go.id
+          WHERE go.id=" . intval($orderid);
+
+        $orderinfo = $this->dbh->select_row($sql);
+
+        //获取goods基本信息
+        $sql = "SELECT
+                     gd.id,
+                     gd.cid,
+                     gd.start_provice_id,
+                     gd.start_city_id,
+                     gd.start_area_id,
+                     gd.end_provice_id,
+                     gd.end_city_id ,
+                     gd.end_area_id ,
+                     gd.product_id,
+                     gd.weights,
+                     gd.weights_done,
+                     gd.price ,
+                     gd.companies_name ,
+                     gd.off_starttime ,
+                     gd.off_endtime ,
+                     gd.reach_starttime ,
+                     gd.reach_endtime ,
+                     gd.offer_status,
+                     gd.offer_price,
+                     gd.loss,
+                     gd.desc_str ,
+                     gd.off_address ,
+                     gd.off_user ,
+                     gd.off_phone ,
+                     gd.reach_address ,
+                     gd.reach_user ,
+                     gd.reach_phone ,
+                     gd.consign_user ,
+                     gd.consign_phone,
+                     gct.`name`,
+                     gd.created_at,
+                     gd.`status`
+                     FROM gl_goods gd
+                     LEFT JOIN gl_cars_type gct ON  gct.id=gd.cars_type WHERE gd.id =" . $orderinfo['goods_id'];
+        $goodsdata = $this->dbh->select_row($sql);
+        if (!empty($orderinfo)) {
+            #sql语句
+            $sql = 'SELECT
+                  gl_companies.id,
+                  gl_companies.bank_name,
+                  gl_companies.bank_num,
+                  gl_companies.company_name
+                  FROM gl_companies WHERE
+                  gl_companies.id = ' . intval($orderinfo['company_id']);
+            $carrier_data = $this->dbh->select_row($sql);
+        }
+        //获取市的信息
+        $city = $this->dbh->select('SELECT cityid,city FROM conf_city');
+
+        return array('orderinfo' => $orderinfo, 'goodsdata' => $goodsdata, 'carrier_data' => $carrier_data, 'city' => $city);
+    }
 
 
 
