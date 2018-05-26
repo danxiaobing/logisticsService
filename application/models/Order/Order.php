@@ -151,7 +151,8 @@ class Order_OrderModel
         $info = $this->dbh->select_row($sql);
 
         //获取托运单的调度信息
-        $sql = "SELECT
+        if(!empty($info)){
+            $sql = "SELECT
                 god.`id`,
                 god.`cars_number` ,
                 god.`driver_name` ,
@@ -168,7 +169,9 @@ class Order_OrderModel
                 gd.id = god.driver_id
               WHERE
                god.`is_del` = 0 AND  god.`status` NOT IN('6') AND god.`order_id` = ".intval($orderid);
-        $res = $this->dbh->select($sql);
+            $res = $this->dbh->select($sql);
+        }
+
         $Schedule =  $res ? $res:[];
         return array('order_info'=>$info,'schedule'=>$Schedule);
     }

@@ -305,6 +305,11 @@ class Api_ApiModel{
         }else{
             return [];
         }
+        if (isset($params['cid']) && !empty($params['cid'])) {
+            $filter[] = " g.`cid` = '{$params['cid']}'";
+        }else{
+            return [];
+        }
         if (isset($params['status']) && !empty($params['status'])) {
             $filter[] = " i.`status` = '{$params['status']}'";
         }
