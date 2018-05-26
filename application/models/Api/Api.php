@@ -269,12 +269,6 @@ class Api_ApiModel{
         }else{
             return [];
         }
-        if(isset($params['category_id_one']) && !empty($params['category_id_one'])){
-            $filter[] =  " p.`category_id` = {$params['category_id_one']}";
-        }
-        if(isset($params['category_id_two']) && !empty($params['category_id_two'])){
-            $filter[] =  " p.`produce_id` = {$params['category_id_two']}";
-        }
         if(isset($params['product_id']) && !empty($params['product_id'])){
             $filter[] = " p.`product_id` = {$params['product_id']}";
         }else{
@@ -293,6 +287,52 @@ class Api_ApiModel{
         return  $this->dbh->select($sql);
 
     }
+    /**
+     * 货源询价单列表
+     * @param $params
+     * @return mixed
+     */
+    public function getGoodsInquiryList($params)
+    {
+
+        $filter = array();
+
+        $where = 'i.is_del = 0 and g.is_del = 0 ';
+
+
+        if (isset($params['orderno']) && !empty($params['orderno'])) {
+            $filter[] = " g.`orderno` = '{$params['orderno']}'";
+        }else{
+            return [];
+        }
+        if (isset($params['status']) && !empty($params['status'])) {
+            $filter[] = " i.`status` = '{$params['status']}'";
+        }
+
+
+        if (count($filter) > 0) {
+            $where .= ' AND '.implode(" AND ", $filter);
+        }
+
+        $sql = "SELECT i.id,
+                  g.orderno,
+                  g.weights,
+                  g.desc_str,
+                  g.price,
+                  com.company_name,
+                  i.order_id,
+                  i.status,
+                  i.created_at
+                  FROM gl_inquiry i
+                 LEFT JOIN gl_goods g ON   g.id=i.gid
+                 LEFT JOIN gl_companies  com ON com.`id` = i.`cid`
+                 WHERE  {$where}
+                ORDER BY id DESC";
+
+        return $this->dbh->select($sql);
+    }
+
+
 
 
 

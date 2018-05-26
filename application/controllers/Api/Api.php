@@ -42,6 +42,16 @@ class Api_ApiController extends Rpc {
 
     }
 
+    /**
+     * 获取询价单列表
+     */
+    public function getInquiryListByOrdernoFunc($params){
+
+        $L = new Api_ApiModel(Yaf_Registry::get("db"));
+        $data = $L->getGoodsInquiryList($params);
+        return $data;
+    }
+
 
 
 }
