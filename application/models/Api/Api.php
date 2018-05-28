@@ -279,7 +279,7 @@ class Api_ApiModel{
         }else{
             $where = "";
         }
-        $sql = "SELECT ru.`cid` as carriers_id,ru.`price`,com.`company_name`
+        $sql = "SELECT ru.`cid` as carriers_id,ru.`price`,com.`company_name`,com.`company_user`,com.`company_telephone`
                     FROM `gl_rule` AS ru
                     LEFT JOIN gl_companies AS com ON com.id = ru.cid
                     LEFT JOIN gl_rule_product AS p ON p.rule_id = ru.id
