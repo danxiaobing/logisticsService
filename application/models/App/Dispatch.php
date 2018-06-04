@@ -51,27 +51,51 @@ class App_DispatchModel
             $filter[] = " `status` in (".$params['statusarr'].")";
         }
 
-        if(isset($params['order_id']) && $params['order_id'] != 0){
-            $filter[] = " `order_id` =".$params['order_id'];
-        }
-
-        // print_r($filter);die;
         $where = ' 1= 1 ';
 
         if (count($filter) > 0) {
             $where .= ' AND '.implode(" AND ", $filter);
         }
 
-        $sql = "SELECT count(1) FROM gl_order_dispatch  WHERE {$where}";
-        // return $sql;
+        $sql = "SELECT count(1) FROM gl_order_dispatch  as god LEFT JOIN gl_goods as g ON g.id = god.goods_id WHERE {$where}";
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 8);
 
         $sql = "SELECT 
-               *
-                FROM gl_order_dispatch
+                god.id,
+                god.dispatch_number,
+                god.order_number,
+                god.c_name,
+                god.start_provice_id,
+                god.end_provice_id,
+                god.start_city_id,
+                god.end_city_id,
+                god.ctype_name,
+                god.driver_name,
+                god.supercargo_name,
+                god.cars_number,
+                god.end_time,
+                god.start_time,
+                god.weights,
+                god.start_weights,
+                god.end_weights,
+                god.status,
+                g.companies_name,
+                g.product_id,
+                g.loss,
+                g.desc_str,
+                g.off_address,
+                g.off_user,
+                g.off_phone,
+                g.reach_user,
+                g.reach_phone,
+                g.reach_address,
+                g.consign_user,
+                g.consign_phone
+                FROM gl_order_dispatch as god
+                LEFT JOIN gl_goods as g ON g.id = god.goods_id
                 WHERE  {$where}
                 ORDER BY id DESC 
                 ";
@@ -203,9 +227,6 @@ class App_DispatchModel
         }
     }
 
-
-
-
     /**
      * 查询调运单列表
      * @param $id
@@ -232,16 +253,55 @@ class App_DispatchModel
         return $this->dbh->select($sql);
     }
 
-
-    
-
-
-
-    /*待发车调度单*/
+    /*
+     * 调度单详情
+    */
     public function getInfo($dispatch_id){
-        $sql = "SELECT god.id,god.dispatch_number,god.order_number,god.order_id,god.ctype_name,god.driver_name,god.supercargo_name,god.cars_number,god.end_time,god.start_time,god.weights,go.cargo_id,god.cars_id,god.driver_id,god.supercargo_id,god.ctype_id,god.status,god.start_weights,god.end_weights FROM gl_order_dispatch god LEFT JOIN gl_order go ON go.id=god.order_id WHERE god.id=".intval($dispatch_id);
+        $sql = "SELECT
+                god.id,
+                god.dispatch_number,
+                god.order_number,
+                god.c_name,
+                god.start_provice_id,
+                god.end_provice_id,
+                god.start_city_id,
+                god.end_city_id,
+                god.ctype_name,
+                god.driver_name,
+                god.supercargo_name,
+                god.cars_number,
+                god.end_time,
+                god.start_time,
+                god.weights,
+                god.start_weights,
+                god.end_weights,
+                god.cars_id,
+                god.driver_id,
+                god.supercargo_id,
+                god.ctype_id,
+                god.status,
+                g.companies_name,
+                g.product_id,
+                g.loss,
+                g.desc_str,
+                g.off_address,
+                g.off_user,
+                g.off_phone,
+                g.reach_user,
+                g.reach_phone,
+                g.reach_address,
+                g.consign_user,
+                g.consign_phone
+                FROM gl_order_dispatch as god
+                LEFT JOIN gl_goods as g ON g.id = god.goods_id
+                WHERE  god.id=".intval($dispatch_id);
         $data =  $this->dbh->select_row($sql);
-        return $data ? $data : [];
+        //获取城市信息
+        $city = $this->dbh->select('SELECT cityid,city FROM conf_city');
+        //获取省的信息
+        $province = $this->dbh->select('SELECT province,provinceid FROM conf_province');
+
+        return array('info'=>$data,'city'=>$city,'province'=>$province);
 
     }
 

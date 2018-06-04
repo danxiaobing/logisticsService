@@ -59,6 +59,7 @@ class Transmanage_DispatchModel
         }
 
         $sql = "SELECT count(1) FROM gl_order_dispatch  WHERE {$where}";
+
         // return $sql;
         $result['totalRow'] = $this->dbh->select_one($sql);
 
