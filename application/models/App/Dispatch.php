@@ -20,10 +20,14 @@ class App_DispatchModel
 
     public function getList($params){
         $filter = array();
-
         if (isset($params['company_id']) && count($params['company_id']) ) {
             $filter[] = " `c_id` = ".$params['company_id'];
         }
+
+        if (isset($params['user_id']) && $params['user_id'] != '' ) {
+            $filter[] = "( `supercargo_id` = ".$params['user_id'] ." or  `driver_id` = ".$params['user_id']." )";
+        }
+
         if (isset($params['ids']) && count($params['ids']) ) {
             $filter[] = " `id` in ({$params['ids']}) ";
         }
@@ -51,7 +55,7 @@ class App_DispatchModel
             $filter[] = " `order_id` =".$params['order_id'];
         }
 
-
+        // print_r($filter);die;
         $where = ' 1= 1 ';
 
         if (count($filter) > 0) {
