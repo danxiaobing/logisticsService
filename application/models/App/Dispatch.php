@@ -21,34 +21,34 @@ class App_DispatchModel
     public function getList($params){
         $filter = array();
         if (isset($params['company_id']) && count($params['company_id']) ) {
-            $filter[] = " `c_id` = ".$params['company_id'];
+            $filter[] = " god.`c_id` = ".$params['company_id'];
         }
 
         if (isset($params['user_id']) && $params['user_id'] != '' ) {
-            $filter[] = "( `supercargo_id` = ".$params['user_id'] ." or  `driver_id` = ".$params['user_id']." )";
+            $filter[] = "( god.`supercargo_id` = ".$params['user_id'] ." or  god.`driver_id` = ".$params['user_id']." )";
         }
 
         if (isset($params['ids']) && count($params['ids']) ) {
-            $filter[] = " `id` in ({$params['ids']}) ";
+            $filter[] = " god.`id` in ({$params['ids']}) ";
         }
 
         if (isset($params['start_time']) && $params['start_time'] != '') {
-            $filter[] = " `created_at` >= '".$params['start_time']."'";
+            $filter[] = " god.`created_at` >= '".$params['start_time']."'";
         }
 
         if (isset($params['end_time']) && $params['end_time'] != '') {
-            $filter[] = " `created_at` <= '".$params['end_time']."'";
+            $filter[] = " god.`created_at` <= '".$params['end_time']."'";
         }
 
         if (isset($params['keyworks']) && $params['keyworks'] != '') {
-            $filter[] = " ( `dispatch_number` like '%{$params['keyworks']}%' OR `cars_number` like '%{$params['keyworks']}%' OR `driver_name` like '%{$params['keyworks'] }%'  OR `supercargo_name` like '%{$params['keyworks']}%')";
+            $filter[] = " ( god.`dispatch_number` like '%{$params['keyworks']}%' OR god.`cars_number` like '%{$params['keyworks']}%' OR god.`driver_name` like '%{$params['keyworks'] }%'  OR god.`supercargo_name` like '%{$params['keyworks']}%')";
         }
 
         if (isset($params['status']) && $params['status'] != '') {
-            $filter[] = " `status` =".$params['status'];
+            $filter[] = " god.`status` =".$params['status'];
         }
         if (isset($params['statusarr']) && $params['statusarr'] != '') {
-            $filter[] = " `status` in (".$params['statusarr'].")";
+            $filter[] = " god.`status` in (".$params['statusarr'].")";
         }
 
         $where = ' 1= 1 ';
@@ -58,6 +58,7 @@ class App_DispatchModel
         }
 
         $sql = "SELECT count(1) FROM gl_order_dispatch  as god LEFT JOIN gl_goods as g ON g.id = god.goods_id WHERE {$where}";
+        // print_r($sql);die;
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
