@@ -159,8 +159,8 @@ class App_AlipushController extends Rpc
      */
     public function PushNoticeToAllFunc($target='ALL',$targetvalue='ALL',$title='我是通知测试',$body='我是消息内容测试',$badge=1){
 
-        $Iosresponse = $this->PushToIosAction($target,$targetvalue,$title,$body,$badge);
-        $Androidresponse = $this->PushToAndroidAction($target,$targetvalue,$title,$body);
+        $Iosresponse = $this->PushToIosFunc($target,$targetvalue,$title,$body,$badge);
+        $Androidresponse = $this->PushToAndroidFunc($target,$targetvalue,$title,$body);
 
         $response['Iosresponse'] = $Iosresponse;
         $response['Androidresponse'] = $Androidresponse;
