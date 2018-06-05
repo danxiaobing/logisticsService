@@ -18,8 +18,8 @@
  * under the License.
  */
 namespace Push\Request\V20160801;
-
-class PushNoticeToiOSRequest extends \RpcAcsRequest
+use Regions\RpcAcsRequest;
+class PushNoticeToiOSRequest extends RpcAcsRequest
 {
 	function  __construct()
 	{
