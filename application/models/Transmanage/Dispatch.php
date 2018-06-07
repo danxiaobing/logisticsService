@@ -269,12 +269,15 @@ class Transmanage_DispatchModel
             unset($params['weights_all']);
             unset($params['time']);
             if(empty($time)){
-                return false;
+                return array('flag'=>false);
             }
 
             $this->dbh->begin();
             try{
-
+                $msg = array();
+                //获取司机号码
+                $sql = "SELECT mobile FROM gl_driver WHERE id=".intval($params['driver_id']);
+                $mobile = $this->dbh->select_one($sql);
                 #循环插入调度单 根据次数
                 foreach ($time as $key=>$v){
                     if($key == 0){
@@ -288,16 +291,51 @@ class Transmanage_DispatchModel
 
                     $res = $this->dbh->insert('gl_order_dispatch', $params);
                     if(!$res){
+
                         $this->dbh->rollback();
-                        return false;
+                        return array('flag'=>false);
                     }
+
+                    //保存数据ids
+                    // $ids[] = $res;
+                    //插入消息推送表
+                    $sql = "SELECT GROUP_CONCAT(CONCAT(province,city) separator '/') addr from conf_city a left join conf_province b on a.father=b.provinceid  WHERE a.cityid in({$params['start_city_id']},{$params['end_city_id']});";
+                  
+                    $addr = $this->dbh->select_one($sql);
+
+                    $data['driver_id'] =  $params['driver_id'];
+                    $data['company_id'] =  $params['c_id'];
+                    $data['title'] =  $params['dispatch_number'].' 调度单等待执行';
+                    //判断起始地/卸货地是否一样
+                    if(!empty($addr) && strpos($addr,'/') === false){
+                        $data['content'] = '装/卸货地:'.$addr.'/'.$addr;
+                    }else{
+                        $data['content'] = $addr ? '装/卸货地:'.$addr : '装/卸货地:';
+                    }
+                    
+
+                    //保存推送的消息
+                    $msg[$key] = array('title'=>$data['title'],'content'=>$data['content'],'dispatch_number'=>$params['dispatch_number'],'mobile'=>$mobile);
+
+                    $data['dispatch_id'] =  $res;
+                    $data['dispatch_number'] =  $params['dispatch_number'];
+                    $data['type'] =  0;
+                    $data['created_at'] =  '=NOW()';
+
+                    $result = $this->dbh->insert('gl_message',$data);
+                    if(!$result){
+                        $this->dbh->rollback();
+                        return array('flag'=>false);
+                    }
+
+
                 }
 
                 if($weights_done == 0 ){
                     $order = $this->dbh->update('gl_order',['status'=>2],' id ='.intval($params['order_id']));
                     if(!$order){
                         $this->dbh->rollback();
-                        return false;
+                        return array('flag'=>false);
                     }
                 }
 
@@ -306,7 +344,7 @@ class Transmanage_DispatchModel
                 $goods = $this->dbh->update('gl_goods',['weights_done'=>$weights_done],' id ='.$params['goods_id']);
                 if(!$goods){
                     $this->dbh->rollback();
-                    return false;
+                    return array('flag'=>false);
                 }
 
                 #判断总吨数和已调度吨数 （修改状态）
@@ -317,17 +355,19 @@ class Transmanage_DispatchModel
                         $order = $this->dbh->update('gl_order',['status'=>3],' id ='.intval($params['order_id']));
                         if(!$order){
                             $this->dbh->rollback();
-                            return false;
+                            return array('flag'=>false);
                         }
                     }
                 }
 
+ 
+
                 $this->dbh->commit();
-                return true;
+                return array('flag'=>true,'msg'=>$msg);
 
             } catch (Exception $e) {
                 $this->dbh->rollback();
-                return false;
+                return array('flag'=>false);
             }
 
         }
