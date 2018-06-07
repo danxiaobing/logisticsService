@@ -256,8 +256,24 @@ class App_DispatchModel
 
     /*
      * 调度单详情
+     * @params $dispatch_id  调度单id
+     * @params $dispatch_number 调度单号
+     * @return array
     */
-    public function getInfo($dispatch_id){
+    public function getInfo($params){
+
+        if(isset($params['dispatch_id']) && !empty($params['dispatch_id'])){
+            $filter[]  = "god.id=".intval($params['dispatch_id']);
+        }
+        if(isset($params['dispatch_number']) && !empty($params['dispatch_number'])){
+            $filter[]  = 'god.dispatch_number="'.$params['dispatch_number'].'"';
+        }
+        $where = ' 1= 1 ';
+
+        if (count($filter) > 0) {
+            $where .= ' AND '.implode(" AND ", $filter);
+        }
+
         $sql = "SELECT
                 god.id,
                 god.dispatch_number,
@@ -295,12 +311,22 @@ class App_DispatchModel
                 g.consign_phone
                 FROM gl_order_dispatch as god
                 LEFT JOIN gl_goods as g ON g.id = god.goods_id
-                WHERE  god.id=".intval($dispatch_id);
+                WHERE  ".$where;
+
         $data =  $this->dbh->select_row($sql);
-        //获取城市信息
-        $city = $this->dbh->select('SELECT cityid,city FROM conf_city');
-        //获取省的信息
-        $province = $this->dbh->select('SELECT province,provinceid FROM conf_province');
+        if(!empty($data)){
+            //获取城市信息
+            $city = $this->dbh->select('SELECT cityid,city FROM conf_city');
+            //获取省的信息
+            $province = $this->dbh->select('SELECT province,provinceid FROM conf_province');
+            //更新消息通知状态
+            if(isset($params['dispatch_number']) && !empty($params['dispatch_number'])){
+
+                $message['status'] = 1;
+                $this->dbh->update('gl_message', $message,'dispatch_number = "'.$data['dispatch_number'].'"');
+            }
+
+        }
 
         return array('info'=>$data,'city'=>$city,'province'=>$province);
 
