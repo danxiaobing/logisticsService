@@ -39,7 +39,7 @@ class App_AlipushController extends Rpc
      * @param string $title  消息的标题
      * @param string $body  消息的内容
      */
-    public function PushToIosFunc($target='ALL',$targetvalue='ALL',$title='我是通知',$body='我是消息内容',$badge=1){
+    public function PushToIosFunc($target='ALL',$targetvalue='ALL',$title='我是通知',$body='我是消息内容',$badge=1,$dispatch_number=''){
 
         $iClientProfile = DefaultProfile::getProfile("cn-hangzhou", $this->accessKeyId, $this->accessKeySecret);
         $client = new DefaultAcsClient($iClientProfile);
@@ -62,7 +62,7 @@ class App_AlipushController extends Rpc
         $request->setiOSApnsEnv("DEV");//iOS的通知是通过APNs中心来发送的，需要填写对应的环境信息。"DEV" : 表示开发环境 "PRODUCT" : 表示生产环境
         $request->setiOSRemind("false"); // 推送时设备不在线（既与移动推送的服务端的长连接通道不通），则这条推送会做为通知，通过苹果的APNs通道送达一次(发送通知时,Summary为通知的内容,Message不起作用)。注意：离线消息转通知仅适用于生产环境
         $request->setiOSRemindBody("iOSRemindBody");//iOS消息转通知时使用的iOS通知内容，仅当iOSApnsEnv=PRODUCT && iOSRemind为true时有效
-        $request->setiOSExtParameters("{\"k1\":\"ios\",\"k2\":\"v2\"}"); //自定义的kv结构,开发者扩展用 针对iOS设备
+        $request->setiOSExtParameters("{\"dispatch_number\":\"{$dispatch_number}\",\"k2\":\"v2\"}"); //自定义的kv结构,开发者扩展用 针对iOS设备
 
         // 推送控制
         $pushTime = gmdate('Y-m-d\TH:i:s\Z', strtotime('+3 second'));//延迟3秒发送
@@ -84,7 +84,7 @@ class App_AlipushController extends Rpc
      * @param string $title 消息的标题
      * @param string $body 消息的内容
      */
-    public function PushToAndroidFunc($target='ALL',$targetvalue='ALL',$title='我是通知',$body='我是消息内容'){
+    public function PushToAndroidFunc($target='ALL',$targetvalue='ALL',$title='我是通知',$body='我是消息内容',$dispatch_number=''){
 
         $iClientProfile = DefaultProfile::getProfile("cn-hangzhou", $this->accessKeyId, $this->accessKeySecret);
         $client = new DefaultAcsClient($iClientProfile);
@@ -110,7 +110,7 @@ class App_AlipushController extends Rpc
        // $request->setAndroidXiaoMiActivity("com.ali.demo.MiActivity");//设置该参数后启动小米托管弹窗功能, 此处指定通知点击后跳转的Activity（托管弹窗的前提条件：1. 集成小米辅助通道；2. StoreOffline参数设为true
        // $request->setAndroidXiaoMiNotifyTitle("Mi Title");
        // $request->setAndroidXiaoMiNotifyBody("Mi Body");
-        $request->setAndroidExtParameters("{\"k1\":\"android\",\"k2\":\"v2\"}"); // 设定android类型设备通知的扩展属性
+        $request->setAndroidExtParameters("{\"dispatch_number\":\"{$dispatch_number}\",\"k2\":\"v2\"}"); // 设定android类型设备通知的扩展属性
 
         // 推送控制
         $pushTime = gmdate('Y-m-d\TH:i:s\Z', strtotime('+3 second'));//延迟3秒发送
@@ -157,10 +157,11 @@ class App_AlipushController extends Rpc
      * @param string $title 消息的标题
      * @param string $body 消息的内容
      */
-    public function PushNoticeToAllFunc($target='ALL',$targetvalue='ALL',$title='我是通知测试',$body='我是消息内容测试',$badge=1){
+    public function PushNoticeToAllFunc($target='ALL',$targetvalue='ALL',$title='我是通知测试',$body='我是消息内容测试',$badge=1,$dispatch_number){
 
-        $Iosresponse = $this->PushToIosFunc($target,$targetvalue,$title,$body,$badge);
-        $Androidresponse = $this->PushToAndroidFunc($target,$targetvalue,$title,$body);
+
+        // $Iosresponse = $this->PushToIosFunc($target,$targetvalue,$title,$body,$badge,$dispatch_number);
+        $Androidresponse = $this->PushToAndroidFunc($target,$targetvalue,$title,$body,$dispatch_number);
 
         $response['Iosresponse'] = $Iosresponse;
         $response['Androidresponse'] = $Androidresponse;
