@@ -188,6 +188,38 @@ class Transmanage_DispatchModel
                     $this->dbh->rollback();
                     return false;
                 }
+
+                //插入消息推送表
+                $sql = "SELECT GROUP_CONCAT(CONCAT(province,city) separator '/') addr from conf_city a left join conf_province b on a.father=b.provinceid  WHERE a.cityid in({$params['start_city_id']},{$params['end_city_id']});";
+              
+                $addr = $this->dbh->select_one($sql);
+
+                $data['driver_id'] =  $params['driver_id'];
+                $data['company_id'] =  $params['company_id'];
+                $data['dispatch_id'] =  $params['id'];
+                $data['dispatch_number'] =  $params['dispatch_number'];
+                $data['title'] =  $params['dispatch_number'].' 调度单已取消';
+                $data['created_at'] =  '=NOW()';
+                //判断起始地/卸货地是否一样
+                if(!empty($addr) && strpos($addr,'/') === false){
+                    $data['content'] = '装/卸货地:'.$addr.'/'.$addr;
+                }else{
+                    $data['content'] = $addr ? '装/卸货地:'.$addr : '装/卸货地:';
+                }
+
+                //获取司机号码
+                $sql = "SELECT mobile FROM gl_driver WHERE id=".intval($params['driver_id']);
+                $mobile = $this->dbh->select_one($sql);
+
+               //保存推送的消息
+                $msg= array('title'=>$data['title'],'content'=>$data['content'],'dispatch_number'=>$params['dispatch_number'],'mobile'=>$mobile);
+
+                $result = $this->dbh->insert('gl_message',$data);
+                if(!$result){
+                    $this->dbh->rollback();
+                    return array('flag'=>false);
+                }
+
             }
 
 
