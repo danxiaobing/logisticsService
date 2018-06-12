@@ -285,8 +285,8 @@ class Examine_DriverModel
 
     //数据唯一性验证
     public function unique($data){
-        $sql1 = "SELECT DISTINCT count(1) FROM gl_driver WHERE mobile='{$data['mobile']}'";
-        $sql2 = "SELECT DISTINCT count(1) FROM gl_driver WHERE cid='{$data['cid']}'";
+        $sql1 = "SELECT DISTINCT count(1) FROM gl_driver WHERE isdelete=0 AND mobile='{$data['mobile']}'";
+        $sql2 = "SELECT DISTINCT count(1) FROM gl_driver WHERE isdelete=0 AND cid='{$data['cid']}'";
         if(0 != $data['id'] ){
             $str = ' AND id <>'.intval($data['id']);
             $sql1 .= $str;
