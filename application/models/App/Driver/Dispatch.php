@@ -4,7 +4,7 @@
  * 询价单管理
  * User: Jeff
  */
-class Transmanage_DispatchModel
+class App_Driver_DispatchModel
 {
     public $dbh = null;
 
@@ -19,38 +19,38 @@ class Transmanage_DispatchModel
     }
 
     public function getList($params){
-        $filter = array();
 
+        $filter = array();
         if (isset($params['company_id']) && count($params['company_id']) ) {
-            $filter[] = " `c_id` = ".$params['company_id'];
+            $filter[] = " god.`c_id` = ".$params['company_id'];
         }
+
+        if (isset($params['user_id']) && $params['user_id'] != '' ) {
+            $filter[] = "( god.`supercargo_id` = ".$params['user_id'] ." or  god.`driver_id` = ".$params['user_id']." )";
+        }
+
         if (isset($params['ids']) && count($params['ids']) ) {
-            $filter[] = " `id` in ({$params['ids']}) ";
+            $filter[] = " god.`id` in ({$params['ids']}) ";
         }
 
         if (isset($params['start_time']) && $params['start_time'] != '') {
-            $filter[] = " `created_at` >= '".$params['start_time']."'";
+            $filter[] = " god.`created_at` >= '".$params['start_time']."'";
         }
 
         if (isset($params['end_time']) && $params['end_time'] != '') {
-            $filter[] = " `created_at` <= '".$params['end_time']."'";
+            $filter[] = " god.`created_at` <= '".$params['end_time']."'";
         }
 
         if (isset($params['keyworks']) && $params['keyworks'] != '') {
-            $filter[] = " ( `dispatch_number` like '%{$params['keyworks']}%' OR `cars_number` like '%{$params['keyworks']}%' OR `driver_name` like '%{$params['keyworks'] }%'  OR `supercargo_name` like '%{$params['keyworks']}%')";
+            $filter[] = " ( god.`dispatch_number` like '%{$params['keyworks']}%' OR god.`cars_number` like '%{$params['keyworks']}%' OR god.`driver_name` like '%{$params['keyworks'] }%'  OR god.`supercargo_name` like '%{$params['keyworks']}%')";
         }
 
         if (isset($params['status']) && $params['status'] != '') {
-            $filter[] = " `status` =".$params['status'];
+            $filter[] = " god.`status` =".$params['status'];
         }
         if (isset($params['statusarr']) && $params['statusarr'] != '') {
-            $filter[] = " `status` in (".$params['statusarr'].")";
+            $filter[] = " god.`status` in (".$params['statusarr'].")";
         }
-
-        if(isset($params['order_id']) && $params['order_id'] != 0){
-            $filter[] = " `order_id` =".$params['order_id'];
-        }
-
 
         $where = ' 1= 1 ';
 
@@ -58,17 +58,46 @@ class Transmanage_DispatchModel
             $where .= ' AND '.implode(" AND ", $filter);
         }
 
-        $sql = "SELECT count(1) FROM gl_order_dispatch  WHERE {$where}";
-
-        // return $sql;
+        $sql = "SELECT count(1) FROM gl_order_dispatch  as god LEFT JOIN gl_goods as g ON g.id = god.goods_id WHERE {$where}";
+        // print_r($sql);die;
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 8);
 
         $sql = "SELECT 
-               *
-                FROM gl_order_dispatch
+                god.id,
+                god.dispatch_number,
+                god.order_number,
+                god.c_name,
+                god.start_provice_id,
+                god.end_provice_id,
+                god.start_city_id,
+                god.end_city_id,
+                god.ctype_name,
+                god.driver_name,
+                god.supercargo_name,
+                god.cars_number,
+                god.end_time,
+                god.start_time,
+                god.weights,
+                god.start_weights,
+                god.end_weights,
+                god.status,
+                g.companies_name,
+                g.product_id,
+                g.loss,
+                g.desc_str,
+                g.off_address,
+                g.off_user,
+                g.off_phone,
+                g.reach_user,
+                g.reach_phone,
+                g.reach_address,
+                g.consign_user,
+                g.consign_phone
+                FROM gl_order_dispatch as god
+                LEFT JOIN gl_goods as g ON g.id = god.goods_id
                 WHERE  {$where}
                 ORDER BY id DESC 
                 ";
@@ -101,7 +130,7 @@ class Transmanage_DispatchModel
 
 
         if(!$dispatchData){
-            return array('flag'=>false);
+            return false;
         }
 
         #开启事物
@@ -112,14 +141,14 @@ class Transmanage_DispatchModel
 
             if(!$dispatch){
                 $this->dbh->rollback();
-                return array('flag'=>false);
+                return false;
             }
 
             #插入日志表
             $dispatch_log = $this->dbh->insert('gl_order_dispatch_log',['status'=>intval($params['status']),'dispatch_id'=>$params['id'],'created_at'=>'=NOW()','updated_at'=>'=NOW()']);
             if(!$dispatch_log){
                 $this->dbh->rollback();
-                return array('flag'=>false);
+                return false;
             }
 
             if(1 == $params['status']){
@@ -128,7 +157,7 @@ class Transmanage_DispatchModel
                 $order = $this->dbh->update('gl_order',['status'=>$status],' id ='.$dispatchData['order_id']);
                 if(empty($order)){
                     $this->dbh->rollback();
-                    return array('flag'=>false);
+                    return false;
                 }
 
             }
@@ -142,7 +171,7 @@ class Transmanage_DispatchModel
                     $order = $this->dbh->update('gl_order',['status'=>4],' id ='.$dispatchData['order_id']);
                     if(empty($goods) or empty($order)){
                         $this->dbh->rollback();
-                        return array('flag'=>false);
+                        return false;
                     }
                 }
             }
@@ -151,7 +180,7 @@ class Transmanage_DispatchModel
             if(5 == $params['status'] or 3 == $params['status']){
                 if(empty($params['other_file'])){
                     $this->dbh->rollback();
-                    return array('flag'=>false);
+                    return false;
                 }
                 $pic = [];
                 $status = $params['status'] == 3?1:2;
@@ -164,7 +193,7 @@ class Transmanage_DispatchModel
                     $data = $this->dbh->insert('gl_order_dispatch_pic',$v);
                     if(empty($data)){
                         $this->dbh->rollback();
-                        return array('flag'=>false);
+                        return false;
                     }
                 }
             }
@@ -186,54 +215,19 @@ class Transmanage_DispatchModel
                 $order = $this->dbh->update('gl_order',['status'=>$status],' id ='.$dispatchData['order_id']);
                 if(!$goods && !$order){
                     $this->dbh->rollback();
-                    return array('flag'=>false);
+                    return false;
                 }
-
-                //插入消息推送表
-                $sql = "SELECT GROUP_CONCAT(CONCAT(province,city) separator '/') addr from conf_city a left join conf_province b on a.father=b.provinceid  WHERE a.cityid in({$params['start_city_id']},{$params['end_city_id']});";
-              
-                $addr = $this->dbh->select_one($sql);
-
-                $data['driver_id'] =  $params['driver_id'];
-                $data['company_id'] =  $params['company_id'];
-                $data['dispatch_id'] =  $params['id'];
-                $data['dispatch_number'] =  $params['dispatch_number'];
-                $data['title'] =  $params['dispatch_number'].' 调度单已取消';
-                $data['created_at'] =  '=NOW()';
-                //判断起始地/卸货地是否一样
-                if(!empty($addr) && strpos($addr,'/') === false){
-                    $data['content'] = '装/卸货地:'.$addr.'/'.$addr;
-                }else{
-                    $data['content'] = $addr ? '装/卸货地:'.$addr : '装/卸货地:';
-                }
-
-                //获取司机号码
-                $sql = "SELECT mobile FROM gl_driver WHERE id=".intval($params['driver_id']);
-                $mobile = $this->dbh->select_one($sql);
-
-               //保存推送的消息
-                $msg[]= array('title'=>$data['title'],'content'=>$data['content'],'dispatch_number'=>$params['dispatch_number'],'mobile'=>$mobile);
-
-                $result = $this->dbh->insert('gl_message',$data);
-                if(!$result){
-                    $this->dbh->rollback();
-                    return array('flag'=>false);
-                }
-
             }
 
 
             $this->dbh->commit();
-            return array('flag'=>true,'msg'=>$msg);
+            return true;
 
         } catch (Exception $e) {
             $this->dbh->rollback();
-            return array('flag'=>false);
+            return false;
         }
     }
-
-
-
 
     /**
      * 查询调运单列表
@@ -261,16 +255,81 @@ class Transmanage_DispatchModel
         return $this->dbh->select($sql);
     }
 
+    /*
+     * 调度单详情
+     * @params $dispatch_id  调度单id
+     * @params $dispatch_number 调度单号
+     * @return array
+    */
+    public function getInfo($params){
 
-    
+        if(isset($params['dispatch_id']) && !empty($params['dispatch_id'])){
+            $filter[]  = "god.id=".intval($params['dispatch_id']);
+        }
+        if(isset($params['dispatch_number']) && !empty($params['dispatch_number'])){
+            $filter[]  = 'god.dispatch_number="'.$params['dispatch_number'].'"';
+        }
+        $where = ' 1= 1 ';
 
+        if (count($filter) > 0) {
+            $where .= ' AND '.implode(" AND ", $filter);
+        }
 
+        $sql = "SELECT
+                god.id,
+                god.dispatch_number,
+                god.order_number,
+                god.c_name,
+                god.start_provice_id,
+                god.end_provice_id,
+                god.start_city_id,
+                god.end_city_id,
+                god.ctype_name,
+                god.driver_name,
+                god.supercargo_name,
+                god.cars_number,
+                god.end_time,
+                god.start_time,
+                god.weights,
+                god.start_weights,
+                god.end_weights,
+                god.cars_id,
+                god.driver_id,
+                god.supercargo_id,
+                god.ctype_id,
+                god.status,
+                g.companies_name,
+                g.product_id,
+                g.loss,
+                g.desc_str,
+                g.off_address,
+                g.off_user,
+                g.off_phone,
+                g.reach_user,
+                g.reach_phone,
+                g.reach_address,
+                g.consign_user,
+                g.consign_phone
+                FROM gl_order_dispatch as god
+                LEFT JOIN gl_goods as g ON g.id = god.goods_id
+                WHERE  ".$where;
 
-    /*待发车调度单*/
-    public function getInfo($dispatch_id){
-        $sql = "SELECT god.id,god.dispatch_number,god.order_number,god.order_id,god.ctype_name,god.driver_name,god.supercargo_name,god.cars_number,god.end_time,god.start_time,god.weights,go.cargo_id,god.cars_id,god.driver_id,god.supercargo_id,god.ctype_id,god.status,god.start_weights,god.end_weights FROM gl_order_dispatch god LEFT JOIN gl_order go ON go.id=god.order_id WHERE god.id=".intval($dispatch_id);
         $data =  $this->dbh->select_row($sql);
-        return $data ? $data : [];
+        if(!empty($data)){
+            //获取城市信息
+            $city = $this->dbh->select('SELECT cityid,city FROM conf_city');
+            //获取省的信息
+            $province = $this->dbh->select('SELECT province,provinceid FROM conf_province');
+            //更新消息通知状态
+            if(isset($params['dispatch_number']) && !empty($params['dispatch_number'])){
+
+                $message['status'] = 1;
+                $this->dbh->update('gl_message', $message,'dispatch_number = "'.$data['dispatch_number'].'"');
+            }
+
+        }
+
+        return array('info'=>$data,'city'=>$city,'province'=>$province);
 
     }
 
@@ -301,15 +360,12 @@ class Transmanage_DispatchModel
             unset($params['weights_all']);
             unset($params['time']);
             if(empty($time)){
-                return array('flag'=>false);
+                return false;
             }
 
             $this->dbh->begin();
             try{
-                $msg = array();
-                //获取司机号码
-                $sql = "SELECT mobile FROM gl_driver WHERE id=".intval($params['driver_id']);
-                $mobile = $this->dbh->select_one($sql);
+
                 #循环插入调度单 根据次数
                 foreach ($time as $key=>$v){
                     if($key == 0){
@@ -323,51 +379,16 @@ class Transmanage_DispatchModel
 
                     $res = $this->dbh->insert('gl_order_dispatch', $params);
                     if(!$res){
-
                         $this->dbh->rollback();
-                        return array('flag'=>false);
+                        return false;
                     }
-
-                    //保存数据ids
-                    // $ids[] = $res;
-                    //插入消息推送表
-                    $sql = "SELECT GROUP_CONCAT(CONCAT(province,city) separator '/') addr from conf_city a left join conf_province b on a.father=b.provinceid  WHERE a.cityid in({$params['start_city_id']},{$params['end_city_id']});";
-                  
-                    $addr = $this->dbh->select_one($sql);
-
-                    $data['driver_id'] =  $params['driver_id'];
-                    $data['company_id'] =  $params['c_id'];
-                    $data['title'] =  $params['dispatch_number'].' 调度单等待执行';
-                    //判断起始地/卸货地是否一样
-                    if(!empty($addr) && strpos($addr,'/') === false){
-                        $data['content'] = '装/卸货地:'.$addr.'/'.$addr;
-                    }else{
-                        $data['content'] = $addr ? '装/卸货地:'.$addr : '装/卸货地:';
-                    }
-                    
-
-                    //保存推送的消息
-                    $msg[$key] = array('title'=>$data['title'],'content'=>$data['content'],'dispatch_number'=>$params['dispatch_number'],'mobile'=>$mobile);
-
-                    $data['dispatch_id'] =  $res;
-                    $data['dispatch_number'] =  $params['dispatch_number'];
-                    $data['type'] =  0;
-                    $data['created_at'] =  '=NOW()';
-
-                    $result = $this->dbh->insert('gl_message',$data);
-                    if(!$result){
-                        $this->dbh->rollback();
-                        return array('flag'=>false);
-                    }
-
-
                 }
 
                 if($weights_done == 0 ){
                     $order = $this->dbh->update('gl_order',['status'=>2],' id ='.intval($params['order_id']));
                     if(!$order){
                         $this->dbh->rollback();
-                        return array('flag'=>false);
+                        return false;
                     }
                 }
 
@@ -376,7 +397,7 @@ class Transmanage_DispatchModel
                 $goods = $this->dbh->update('gl_goods',['weights_done'=>$weights_done],' id ='.$params['goods_id']);
                 if(!$goods){
                     $this->dbh->rollback();
-                    return array('flag'=>false);
+                    return false;
                 }
 
                 #判断总吨数和已调度吨数 （修改状态）
@@ -387,19 +408,17 @@ class Transmanage_DispatchModel
                         $order = $this->dbh->update('gl_order',['status'=>3],' id ='.intval($params['order_id']));
                         if(!$order){
                             $this->dbh->rollback();
-                            return array('flag'=>false);
+                            return false;
                         }
                     }
                 }
 
- 
-
                 $this->dbh->commit();
-                return array('flag'=>true,'msg'=>$msg);
+                return true;
 
             } catch (Exception $e) {
                 $this->dbh->rollback();
-                return array('flag'=>false);
+                return false;
             }
 
         }
