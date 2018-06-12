@@ -446,13 +446,17 @@ class Transmanage_InquirydelModel
                     return false;
                 }
                 //已生成询价单  同意交易
-                $sql = "SELECT minprice FROM gl_inquiry_info WHERE pid=".intval($inquiryid)." AND type=2  ORDER BY id DESC LIMIT 1";
-                $price  = $this->dbh->select_one($sql);//获取成交价格
+                if(empty($data['price'])){
+                    $sql = "SELECT minprice FROM gl_inquiry_info WHERE pid=".intval($inquiryid)." AND type=2  ORDER BY id DESC LIMIT 1";
+                    $price  = $this->dbh->select_one($sql);//获取成交价格
+                }else {
+                    $price = $data['price'];
+                }
                 $res = $this->dbh->update('gl_inquiry',array('status' => 3,'price'=>$price),'id='.intval($inquiryid));
 
                 if(!$res){
                     $this->dbh->rollback();
-                    return 1111;
+                    return false;
                 }
                 $id = $inquiryid;
 

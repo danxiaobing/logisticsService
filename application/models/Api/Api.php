@@ -1,7 +1,7 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: Administrator
+ * User: daley
  * Date: 2018/4/28
  * Time: 10:01
  */
@@ -229,6 +229,115 @@ class Api_ApiModel{
         return $res?$res['id']:false;
 
     }
+
+    /**
+     * 匹配运费价格
+     * @params Date: 2018/5/17
+     */
+    public function matchingFreightPrice($params){
+
+        $filter[] = "ru.`is_del` = 0 AND p.`is_del` = 0 AND ru.`price_type` = 2 AND ru.`is_use` = 1";
+        $where = "  ";
+
+        if(isset($params['start_province_id']) && !empty($params['start_province_id'])){
+            $filter[] =  "ru.`start_province_id` = {$params['start_province_id']}";
+        }else{
+            return [];
+        }
+        if(isset($params['start_city_id']) && !empty($params['start_city_id'])){
+            $filter[] =  " ru.`start_city_id` = {$params['start_city_id']}";
+        }else{
+            return [];
+        }
+        if(isset($params['start_area_id']) && !empty($params['start_area_id'])){
+            $filter[] =  " ru.`start_area_id` = {$params['start_area_id']}";
+        }else{
+            return [];
+        }
+        if(isset($params['end_province_id']) && !empty($params['end_province_id'])){
+            $filter[] =  " ru.`end_province_id` = {$params['end_province_id']}";
+        }else{
+            return [];
+        }
+        if(isset($params['end_city_id']) && !empty($params['end_city_id'])){
+            $filter[] =  " ru.`end_city_id` = {$params['end_city_id']}";
+        }else{
+            return [];
+        }
+        if(isset($params['end_area_id']) && !empty($params['end_area_id'])){
+            $filter[] =  " ru.`end_area_id` = {$params['end_area_id']}";
+        }else{
+            return [];
+        }
+        if(isset($params['product_id']) && !empty($params['product_id'])){
+            $filter[] = " p.`product_id` = {$params['product_id']}";
+        }else{
+            return [];
+        }
+        if (1 <= count($filter)) {
+            $where .= implode(' AND ', $filter);
+        }else{
+            $where = "";
+        }
+        $sql = "SELECT ru.`cid` as carriers_id,ru.`price`,com.`company_name`,com.`company_user`,com.`company_telephone`
+                    FROM `gl_rule` AS ru
+                    LEFT JOIN gl_companies AS com ON com.id = ru.cid
+                    LEFT JOIN gl_rule_product AS p ON p.rule_id = ru.id
+                    WHERE {$where} ORDER BY ru.`price` ASC ";
+        return  $this->dbh->select($sql);
+
+    }
+    /**
+     * 货源询价单列表
+     * @param $params
+     * @return mixed
+     */
+    public function getGoodsInquiryList($params)
+    {
+
+        $filter = array();
+
+        $where = 'i.is_del = 0 and g.is_del = 0 ';
+
+
+        if (isset($params['orderno']) && !empty($params['orderno'])) {
+            $filter[] = " g.`orderno` = '{$params['orderno']}'";
+        }else{
+            return [];
+        }
+        if (isset($params['cid']) && !empty($params['cid'])) {
+            $filter[] = " g.`cid` = '{$params['cid']}'";
+        }else{
+            return [];
+        }
+        if (isset($params['status']) && !empty($params['status'])) {
+            $filter[] = " i.`status` = '{$params['status']}'";
+        }
+
+
+        if (count($filter) > 0) {
+            $where .= ' AND '.implode(" AND ", $filter);
+        }
+
+        $sql = "SELECT i.id,
+                  g.orderno,
+                  g.weights,
+                  g.desc_str,
+                  g.price,
+                  com.company_name,
+                  i.order_id,
+                  i.status,
+                  i.created_at
+                  FROM gl_inquiry i
+                 LEFT JOIN gl_goods g ON   g.id=i.gid
+                 LEFT JOIN gl_companies  com ON com.`id` = i.`cid`
+                 WHERE  {$where}
+                ORDER BY id DESC";
+
+        return $this->dbh->select($sql);
+    }
+
+
 
 
 
