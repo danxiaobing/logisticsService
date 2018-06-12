@@ -120,16 +120,25 @@ class App_Driver_DispatchModel
             'end_weights'=>$params['end_weights'],
         ];
 
-        $order_id = $params['order_id'] ? $params['order_id']:'';
 
         #过滤空值
         $dispatch_arr = array_filter($dispatch_arr);
 
         #查询调度单
-        $dispatchData = $this->dbh->select_row('SELECT order_id,c_id,weights,goods_id FROM gl_order_dispatch WHERE id = '.$params['id']);
+        $dispatchData = $this->dbh->select_row('SELECT order_id,c_id,status,weights,goods_id FROM gl_order_dispatch WHERE id = '.$params['id']);
 
 
         if(!$dispatchData){
+            return false;
+        }
+        //比较调度状态
+        if($dispatchData['status']+1 != intval($dispatch_arr['status'])){
+            return false;
+        }
+
+        //查询该调度单调度日志是否已调度
+        $dispatch_log = $this->dbh->select_row('SELECT * FROM gl_order_dispatch_log WHERE is_del=0 AND dispatch_id = '.$params['id'] .' AND status ='. $dispatchData['status']);
+        if($dispatch_log){
             return false;
         }
 
@@ -138,6 +147,7 @@ class App_Driver_DispatchModel
         try{
             #修改调度单
             $dispatch = $this->dbh->update('gl_order_dispatch', $dispatch_arr,'id = '.intval($params['id']));
+
 
             if(!$dispatch){
                 $this->dbh->rollback();
