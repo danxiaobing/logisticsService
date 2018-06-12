@@ -137,7 +137,8 @@ class App_Driver_DispatchModel
         }
 
         //查询该调度单调度日志是否已调度
-        $dispatch_log = $this->dbh->select_row('SELECT * FROM gl_order_dispatch_log WHERE is_del=0 AND dispatch_id = '.$params['id'] .' AND status ='. $dispatchData['status']);
+        $dispatch_log = $this->dbh->select_row('SELECT * FROM gl_order_dispatch_log WHERE is_del=0 AND dispatch_id = '.$params['id'] .' AND status ='. $dispatch_arr['status']);
+    
         if($dispatch_log){
             return false;
         }
