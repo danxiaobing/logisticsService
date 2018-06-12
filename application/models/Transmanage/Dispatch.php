@@ -101,7 +101,7 @@ class Transmanage_DispatchModel
 
 
         if(!$dispatchData){
-            return false;
+            return array('flag'=>false);
         }
 
         #开启事物
@@ -112,14 +112,14 @@ class Transmanage_DispatchModel
 
             if(!$dispatch){
                 $this->dbh->rollback();
-                return false;
+                return array('flag'=>false);
             }
 
             #插入日志表
             $dispatch_log = $this->dbh->insert('gl_order_dispatch_log',['status'=>intval($params['status']),'dispatch_id'=>$params['id'],'created_at'=>'=NOW()','updated_at'=>'=NOW()']);
             if(!$dispatch_log){
                 $this->dbh->rollback();
-                return false;
+                return array('flag'=>false);
             }
 
             if(1 == $params['status']){
@@ -128,7 +128,7 @@ class Transmanage_DispatchModel
                 $order = $this->dbh->update('gl_order',['status'=>$status],' id ='.$dispatchData['order_id']);
                 if(empty($order)){
                     $this->dbh->rollback();
-                    return false;
+                    return array('flag'=>false);
                 }
 
             }
@@ -142,7 +142,7 @@ class Transmanage_DispatchModel
                     $order = $this->dbh->update('gl_order',['status'=>4],' id ='.$dispatchData['order_id']);
                     if(empty($goods) or empty($order)){
                         $this->dbh->rollback();
-                        return false;
+                        return array('flag'=>false);
                     }
                 }
             }
@@ -151,7 +151,7 @@ class Transmanage_DispatchModel
             if(5 == $params['status'] or 3 == $params['status']){
                 if(empty($params['other_file'])){
                     $this->dbh->rollback();
-                    return false;
+                    return array('flag'=>false);
                 }
                 $pic = [];
                 $status = $params['status'] == 3?1:2;
@@ -164,7 +164,7 @@ class Transmanage_DispatchModel
                     $data = $this->dbh->insert('gl_order_dispatch_pic',$v);
                     if(empty($data)){
                         $this->dbh->rollback();
-                        return false;
+                        return array('flag'=>false);
                     }
                 }
             }
@@ -186,7 +186,7 @@ class Transmanage_DispatchModel
                 $order = $this->dbh->update('gl_order',['status'=>$status],' id ='.$dispatchData['order_id']);
                 if(!$goods && !$order){
                     $this->dbh->rollback();
-                    return false;
+                    return array('flag'=>false);
                 }
 
                 //插入消息推送表
@@ -212,7 +212,7 @@ class Transmanage_DispatchModel
                 $mobile = $this->dbh->select_one($sql);
 
                //保存推送的消息
-                $msg= array('title'=>$data['title'],'content'=>$data['content'],'dispatch_number'=>$params['dispatch_number'],'mobile'=>$mobile);
+                $msg[]= array('title'=>$data['title'],'content'=>$data['content'],'dispatch_number'=>$params['dispatch_number'],'mobile'=>$mobile);
 
                 $result = $this->dbh->insert('gl_message',$data);
                 if(!$result){
@@ -224,11 +224,11 @@ class Transmanage_DispatchModel
 
 
             $this->dbh->commit();
-            return true;
+            return array('flag'=>true,'msg'=>$msg);
 
         } catch (Exception $e) {
             $this->dbh->rollback();
-            return false;
+            return array('flag'=>false);
         }
     }
 
