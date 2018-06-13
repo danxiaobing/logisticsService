@@ -52,7 +52,7 @@ class App_Driver_PushlistModel
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($rows);
 
-        $sql = "SELECT id as message_id,company_id,title,content,dispatch_id,dispatch_number,type,status FROM gl_message WHERE  {$where} ORDER BY id DESC";
+        $sql = "SELECT id as message_id,company_id,title,content,dispatch_id,dispatch_number,type,status,created_at FROM gl_message WHERE  {$where} ORDER BY id DESC";
 
         $result['list'] = $this->dbh->select_page($sql);
 
