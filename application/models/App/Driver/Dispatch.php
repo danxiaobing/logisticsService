@@ -331,11 +331,9 @@ class App_Driver_DispatchModel
             $city = $this->dbh->select('SELECT cityid,city FROM conf_city');
             //获取省的信息
             $province = $this->dbh->select('SELECT province,provinceid FROM conf_province');
-            //更新消息通知状态
-            if(isset($params['dispatch_number']) && !empty($params['dispatch_number'])){
-
-                $message['status'] = 1;
-                $this->dbh->update('gl_message', $message,'dispatch_number = "'.$data['dispatch_number'].'"');
+            //更新消息通知状态为已读
+            if(isset($params['is_push']) && !empty($params['is_push'])){
+                $this->dbh->update('gl_message', array('status'=>1),'dispatch_id = "'.$data['id'].'"');
             }
 
         }
