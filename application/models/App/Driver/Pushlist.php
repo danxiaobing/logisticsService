@@ -23,7 +23,7 @@ class App_Driver_PushlistModel
     public function getList($driverid,$page,$pagesize){
         $offset = ($page - 1)*$pagesize;
         $offset = $offset > 0 ? $offset : 0;
-        $sql = 'SELECT company_id,title,content,dispatch_id,dispatch_number,type,status FROM gl_message WHERE driver_id='.intval($driverid).' AND is_del=0 Limit '.$offset.','.$pagesize;
+        $sql = 'SELECT count(id) as nums,company_id,title,content,dispatch_id,dispatch_number,type,status FROM gl_message WHERE driver_id='.intval($driverid).' AND is_del=0 Limit '.$offset.','.$pagesize;
         $res = $this->dbh->select($sql);
         return $res ? $res : [];
     }
