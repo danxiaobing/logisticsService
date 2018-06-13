@@ -18,9 +18,9 @@ class App_Driver_PushlistController extends Rpc
      * @param integer $mobile
      * @return array $data
      */
-    public function getListFunc($driverid,$page){
+    public function getListFunc($driverid,$page,$pagesize){
         $L = new App_Driver_PushlistModel(Yaf_Registry::get("db"));
-        $data = $L->getList($driverid,$page);
+        $data = $L->getList($driverid,$page,$pagesize);
         return $data;
     }
 
