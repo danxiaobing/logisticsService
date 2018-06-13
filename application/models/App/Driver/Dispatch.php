@@ -103,12 +103,19 @@ class App_Driver_DispatchModel
                 ";
         $result['list'] = $this->dbh->select_page($sql);
         if(!empty($result['list'])){
+
             $city = array_column($this->dbh->select('SELECT cityid,city FROM conf_city'),'city','cityid');
+            $provice = array_column($this->dbh->select('SELECT provinceid,province FROM conf_province'),'province','provinceid');
+
             foreach($result['list'] as $key=>$value){
+                $result['list'][$key]['start_provice'] = $provice[$value['start_provice_id']];
+                $result['list'][$key]['end_provice'] = $provice[$value['end_provice_id']];
+
                 $result['list'][$key]['start_city'] = $city[$value['start_city_id']];
                 $result['list'][$key]['end_city'] = $city[$value['end_city_id']];
             }
             unset($city);
+            unset($provice);
         }
         return $result;
     }
