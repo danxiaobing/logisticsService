@@ -54,6 +54,11 @@ class App_Driver_DispatchController extends Rpc
         $data = $L->getListByOrderid($id);
         return $data;
     }
+    public function getDispatchInfoByIdFunc($id){
+        $L = new App_Driver_DispatchModel(Yaf_Registry::get("db"));
+        $data = $L->getDispatchInfoById($id);
+        return $data;
+    }
 
     /**
      * 待发车调度单
