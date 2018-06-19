@@ -57,7 +57,7 @@ class App_Driver_PushlistModel
         $sql = "SELECT id as message_id,company_id,title,content,dispatch_id,dispatch_number,type,status,created_at FROM gl_message WHERE  {$where} ORDER BY id DESC";
 
         $result['list'] = $this->dbh->select_page($sql);
-        $result['list']['unreadnums'] = $unreadnums;
+        $result['unreadnums'] = $unreadnums;
         return $result;
     }
 
