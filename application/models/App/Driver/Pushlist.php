@@ -44,6 +44,8 @@ class App_Driver_PushlistModel
         }
 
         $sql = "SELECT count(1) FROM gl_message WHERE {$where}";
+        $sql1 = 'SELECT count(1) FROM gl_message WHERE  status = 0 AND `driver_id` = '.intval($params['driver_id']);
+        $unreadnums = $this->dbh->select_one($sql1);
         $rows = $params['rows'] ? $params['rows'] : 8;
 
         $result['totalRow'] = $this->dbh->select_one($sql);
@@ -55,7 +57,7 @@ class App_Driver_PushlistModel
         $sql = "SELECT id as message_id,company_id,title,content,dispatch_id,dispatch_number,type,status,created_at FROM gl_message WHERE  {$where} ORDER BY id DESC";
 
         $result['list'] = $this->dbh->select_page($sql);
-
+        $result['list']['unreadnums'] = $unreadnums;
         return $result;
     }
 
