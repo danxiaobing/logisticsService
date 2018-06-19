@@ -44,6 +44,8 @@ class App_Driver_PushlistModel
         }
 
         $sql = "SELECT count(1) FROM gl_message WHERE {$where}";
+        $sql1 = 'SELECT count(1) FROM gl_message WHERE  status = 0 AND `driver_id` = '.intval($params['driver_id']);
+        $unreadnums = $this->dbh->select_one($sql1);
         $rows = $params['rows'] ? $params['rows'] : 8;
 
         $result['totalRow'] = $this->dbh->select_one($sql);
@@ -55,7 +57,7 @@ class App_Driver_PushlistModel
         $sql = "SELECT id as message_id,company_id,title,content,dispatch_id,dispatch_number,type,status,created_at FROM gl_message WHERE  {$where} ORDER BY id DESC";
 
         $result['list'] = $this->dbh->select_page($sql);
-
+        $result['list']['unreadnums'] = $unreadnums;
         return $result;
     }
 
@@ -76,6 +78,47 @@ class App_Driver_PushlistModel
         return true;
 
     }
+
+
+    /**
+     * 未读消息列表
+     * @param $params
+     * @return mixed
+     */
+    public function unreadlist($params){
+
+        $where = ' 1= 1 AND is_del= 0 AND status=0 ';
+        $filter = array();
+
+        if (isset($params['driver_id']) && !empty($params['driver_id']) ) {
+            $filter[] = " `driver_id` = ".intval($params['driver_id']);
+        }else{
+            $result['totalRow'] = 0;
+            $result['totalPage'] = 0;
+            $result['list'] = [];
+            return $result;
+        }
+
+        if (count($filter) > 0) {
+            $where .= ' AND '.implode(" AND ", $filter);
+        }
+
+        $sql = "SELECT count(1) FROM gl_message WHERE {$where}";
+        $rows = $params['rows'] ? $params['rows'] : 8;
+
+        $result['totalRow'] = $this->dbh->select_one($sql);
+        $result['totalPage'] = (string)ceil($result['totalRow']/$rows);
+
+        $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
+        $this->dbh->set_page_rows($rows);
+
+        $sql = "SELECT id as message_id,company_id,title,content,dispatch_id,dispatch_number,type,status,created_at FROM gl_message WHERE  {$where} ORDER BY id DESC";
+        $result['list'] = $this->dbh->select_page($sql);
+
+        return $result;
+    }
+
+
 
 
 }
