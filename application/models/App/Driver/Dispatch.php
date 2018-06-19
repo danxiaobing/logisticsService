@@ -120,6 +120,22 @@ class App_Driver_DispatchModel
         return $result;
     }
 
+    /**
+     * 获取调度单信息
+     */
+    public function getDispatchInfoById($id){
+        if(intval($id)!=0){
+            $dispatchData = $this->dbh->select_row('SELECT order_id,c_id,status,weights,start_weights,end_weights,goods_id FROM gl_order_dispatch WHERE id = '.intval($id));
+            return $dispatchData;
+        }
+        return false;
+    }
+
+    /**
+     * 更新调度单信息
+     * @param $params
+     * @return bool
+     */
     public function dispatchProcedure($params){
         $dispatch_arr  = [
             'status' =>$params['status'],
@@ -127,21 +143,8 @@ class App_Driver_DispatchModel
             'end_weights'=>$params['end_weights'],
         ];
 
-
         #过滤空值
         $dispatch_arr = array_filter($dispatch_arr);
-
-        #查询调度单
-        $dispatchData = $this->dbh->select_row('SELECT order_id,c_id,status,weights,goods_id FROM gl_order_dispatch WHERE id = '.$params['id']);
-
-
-        if(!$dispatchData){
-            return false;
-        }
-        //比较调度状态
-        if($dispatchData['status']+1 != intval($dispatch_arr['status'])){
-            return false;
-        }
 
         //查询该调度单调度日志是否已调度
         $dispatch_log = $this->dbh->select_row('SELECT * FROM gl_order_dispatch_log WHERE is_del=0 AND dispatch_id = '.$params['id'] .' AND status ='. $dispatch_arr['status']);
