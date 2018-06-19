@@ -146,6 +146,8 @@ class App_Driver_DispatchModel
         #过滤空值
         $dispatch_arr = array_filter($dispatch_arr);
 
+        $dispatchData = $this->dbh->select_row('SELECT order_id,c_id,status,weights,start_weights,end_weights,goods_id FROM gl_order_dispatch WHERE id = '.intval($params['id']));
+
         //查询该调度单调度日志是否已调度
         $dispatch_log = $this->dbh->select_row('SELECT * FROM gl_order_dispatch_log WHERE is_del=0 AND dispatch_id = '.$params['id'] .' AND status ='. $dispatch_arr['status']);
     
