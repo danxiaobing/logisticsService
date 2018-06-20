@@ -71,7 +71,7 @@ class Examine_CarrierModel
                   gl_companies.company_address,
                   gl_companies.company_user,
                   gl_companies.company_telephone,
-                  gl_companies.code,
+                  gl_companies.social_code,
                   gl_companies.status,
                   conf_area.area,
                   conf_province.province,
@@ -128,7 +128,7 @@ class Examine_CarrierModel
         $sql = "SELECT 
                   gl_companies.id,
                   gl_companies.company_code,
-                  gl_companies.code,
+                  gl_companies.social_code,
                   gl_companies.province_id,
                   gl_companies.company_name,
                   gl_companies.city_id,
@@ -172,7 +172,7 @@ class Examine_CarrierModel
             'company_user'      =>$params['company_user'],
             'company_telephone' =>$params['company_telephone'],
             'status'            =>$params['status'],
-            'code'              =>$params['code'],
+            'social_code'        =>$params['social_code'],
             'business'          =>$params['business'],
             'created_at'        => '=NOW()',
             'updated_at'        => '=NOW()',
@@ -244,7 +244,74 @@ class Examine_CarrierModel
      * @return array $data
      */
     public function examineCarrier($status,$where){
-        return $this->dbh->update('gl_companies', $status, $where );
+
+        //审核通过后
+        if($status['status'] = 2){
+            #开启事物
+            $this->dbh->begin();
+            try{
+                #更新公司审核状态
+                $companies_res =  $this->dbh->update('gl_companies', $status, $where );
+
+                if(empty($companies_res)) {
+                    $this->dbh->rollback();
+                    return false;
+                }
+
+                $sql = "SELECT * FROM gl_companies  WHERE ".$where;
+                $companiesdata =  $this->dbh->select_row($sql);
+
+                //如果申请开通支付功能
+                if($companiesdata['privilege_pay']==1){
+
+                    $bankApply = [
+                        'companies_id' => $companiesdata['id'],
+                        'companyname' => $companiesdata['company_name'],
+                        'legalpersonname' => '',
+                        'certtype' => $companiesdata['type'],
+                        'certno'   => $companiesdata['social_code'],
+                        'commaddress' => $companiesdata['company_address'],
+                        'contactname' => $companiesdata['company_user'],
+                        'contactphone' => $companiesdata['company_telephone'],
+                        'mailaddress'  => $companiesdata['company_mail'],
+                        'auditstatus' => 1,
+                        'created_at' => '=NOW()',
+                        'updated_at' => '=NOW()'
+                    ];
+
+                    //插入资金账户申请
+                    $account_apply_res = $this->dbh->insert('gl_companies_account_apply',$bankApply);
+                    if(empty($account_apply_res)) {
+                        $this->dbh->rollback();
+                        return false;
+                    }
+                }
+
+
+                $caApply = [
+                    'companies_id' => $companiesdata['id'],
+                    'apply_status' =>  1,
+                    'created_at' => '=NOW()',
+                    'updated_at' => '=NOW()'
+                ];
+                $contract_apply_res = $this->dbh->insert('gl_companies_contract_apply',$caApply);
+                if(empty($contract_apply_res)) {
+                    $this->dbh->rollback();
+                    return false;
+                }
+                $this->dbh->commit();
+                return true;
+
+            } catch (Exception $e) {
+                $this->dbh->rollback();
+                return false;
+            }
+
+        }else{
+            return $this->dbh->update('gl_companies', $status, $where );
+        }
+
+
     }
 
 
