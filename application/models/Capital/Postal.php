@@ -26,8 +26,7 @@ class Capital_PostalModel
         if (isset($params['orders']) && $params['orders'] != '') {
             $ord = explode(",", $params['orders']);
             $ord_str = "pay_takemoney." . implode(",pay_takemoney.", $ord);
-            $ord_str = str_replace("pay_takemoney.company_name", "td_companies.company_name", $ord_str);
-            $ord_str = str_replace("pay_takemoney.user_name", "td_user_info.user_name", $ord_str);
+            $ord_str = str_replace("pay_takemoney.company_name", "gl_companies.company_name", $ord_str);
             $orders = "ORDER BY " . $ord_str;
         } else {
             $orders = "ORDER BY pay_takemoney.updated_at DESC,pay_takemoney.status DESC";
@@ -62,26 +61,26 @@ class Capital_PostalModel
         }
 
         $sql = "SELECT COUNT(*) FROM `pay_takemoney`
-                LEFT JOIN `td_companies` ON td_companies.`id`=pay_takemoney.`companies_id`
-                LEFT JOIN `td_user_info` ON td_user_info.`id`=pay_takemoney.`info_id`{$where}";
+                LEFT JOIN `gl_companies` ON gl_companies.`id`=pay_takemoney.`companies_id`
+               {$where}";
 //        error_log($where, 3, 'sql_print.txt');
         $result['totalRow'] = $this->dbh->select_one($sql);
         if ($result['totalRow']) {
             if (isset($params['page']) && $params['page'] == false) {
-                $sql = "SELECT pay_takemoney.*,td_companies.company_name,td_user_info.user_name
+                $sql = "SELECT pay_takemoney.*,gl_companies.company_name
                         FROM `pay_takemoney`
-                        LEFT JOIN `td_companies` ON td_companies.`id`=pay_takemoney.`companies_id`
-                        LEFT JOIN `td_user_info` ON td_user_info.`id`=pay_takemoney.`info_id`{$where} {$orders}";
+                        LEFT JOIN `gl_companies` ON gl_companies.`id`=pay_takemoney.`companies_id`
+                        {$where} {$orders}";
 //                error_log($sql, 3, 'sql_print.txt');
                 $result['list'] = $this->dbh->select($sql);
             } else {
                 $result['totalPage'] = ceil($result['totalRow'] / $params['pageSize']);
                 $this->dbh->set_page_num($params['pageCurrent']);
                 $this->dbh->set_page_rows($params['pageSize']);
-                $sql = "SELECT pay_takemoney.*,td_companies.company_name,td_user_info.user_name
+                $sql = "SELECT pay_takemoney.*,gl_companies.company_name
                         FROM `pay_takemoney`
-                        LEFT JOIN `td_companies` ON td_companies.`id`=pay_takemoney.`companies_id`
-                        LEFT JOIN `td_user_info` ON td_user_info.`id`=pay_takemoney.`info_id`{$where} {$orders}";
+                        LEFT JOIN `gl_companies` ON gl_companies.`id`=pay_takemoney.`companies_id`
+                        {$where} {$orders}";
 //                error_log($sql, 3, 'sql_print.txt');
                 $result['list'] = $this->dbh->select_page($sql);
             }
@@ -93,10 +92,10 @@ class Capital_PostalModel
 
     public function getPostalInfo($id)
     {
-        $sql = "SELECT pay_takemoney.*,td_companies.company_name,td_user_info.user_name
+        $sql = "SELECT pay_takemoney.*,gl_companies.company_name
                 FROM `pay_takemoney`
-                LEFT JOIN `td_companies` ON td_companies.`id`=pay_takemoney.`companies_id`
-                LEFT JOIN `td_user_info` ON td_user_info.`id`=pay_takemoney.`info_id` WHERE pay_takemoney.`id`={$id}";
+                LEFT JOIN `gl_companies` ON gl_companies.`id`=pay_takemoney.`companies_id`
+                WHERE pay_takemoney.`id`={$id}";
         $result = $this->dbh->select_row($sql);
         return $result;
     }
