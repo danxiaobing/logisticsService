@@ -91,10 +91,11 @@ class Capital_CiticauditModel
     public function getInfoById($id)
     {
         $sql = "SELECT gl_companies.id as c_id,gl_companies.company_name,tcaa.auditmemo,
-                tcaa.id,tcaa.info_id,tcaa.auditname,tcaa.auditstatus,tcaa.created_at,tcaa.updated_at,tcaa.contactphone,tcaa.contactname,tcaa.mailaddress,tcaa.commaddress,tcaa.legalpersonname,tcaa.companyname,gl_companies.organization_code,tcaa.certno as social_code
+                tcaa.id,tcaa.info_id,tcaa.auditname,tcaa.auditstatus,tcaa.created_at,tcaa.updated_at,tcaa.contactphone,tcaa.contactname,tcaa.mailaddress,tcaa.commaddress,tcaa.legalpersonname,tcaa.companyname,tcaa.certno as social_code
                 FROM `gl_companies_account_apply` AS tcaa
                 JOIN `gl_companies` ON gl_companies.`id`=tcaa.`companies_id`
-                LEFT JOIN `gl_user_info` ON gl_user_info.`id`=tcaa.`info_id` WHERE tcaa.`id`={$id}";
+                WHERE tcaa.`id`={$id}";
+
         $result = $this->dbh->select_row($sql);
         $c_id = $result['c_id'];
         $sql_filed = "SELECT * FROM gl_companies_account WHERE companies_id={$c_id}";
