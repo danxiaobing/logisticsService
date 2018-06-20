@@ -176,6 +176,7 @@ class Examine_CarrierModel
             'business'          =>$params['business'],
             'created_at'        => '=NOW()',
             'updated_at'        => '=NOW()',
+            'company_mail'      =>$params['company_mail'],
             'products'          => $params['products']
 
         );
@@ -198,10 +199,15 @@ class Examine_CarrierModel
 
             $pic = array(
                 0=>['path'=>$params['danger_file'],'type'=>2,'cid'=>$id,'created_at'=>'=NOW()','updated_at'=>'=NOW()'],
-                1=>['path'=>$params['business_license'],'type'=>1,'cid'=>$id,'created_at'=>'=NOW()','updated_at'=>'=NOW()']
+                1=>['path'=>$params['business_license'],'type'=>1,'cid'=>$id,'created_at'=>'=NOW()','updated_at'=>'=NOW()'],
+                2=>['path'=>$params['corporation_card'],'type'=>4,'cid'=>$id,'created_at'=>'=NOW()','updated_at'=>'=NOW()'],
+                3=>['path'=>$params['ca_warrant'],'type'=>5,'cid'=>$id,'created_at'=>'=NOW()','updated_at'=>'=NOW()'],
+                4=>['path'=>$params['ca_application'],'type'=>6,'cid'=>$id,'created_at'=>'=NOW()','updated_at'=>'=NOW()'],
+                5=>['path'=>$params['admin_warrant'],'type'=>7,'cid'=>$id,'created_at'=>'=NOW()','updated_at'=>'=NOW()']
+
             ) ;
 
-            $n = 2;
+            $n = 6;
             if(1 <= count($params['other_file'])){
                 foreach ($params['other_file'] as $v){
                     $pic[$n] = ['path'=>$v,'type'=>3,'cid'=>$id,'created_at'=>'=NOW()','updated_at'=>'=NOW()'];
@@ -209,8 +215,8 @@ class Examine_CarrierModel
                 }
             }
 
-            $data = '';
             foreach ($pic as $v){
+                $data = '';
                 $data = $this->dbh->insert('gl_companies_pic',$v);
                 if(empty($data)){
                     $this->dbh->rollback();
