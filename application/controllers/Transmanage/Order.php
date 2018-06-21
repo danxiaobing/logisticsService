@@ -88,4 +88,10 @@ class Transmanage_OrderController extends Rpc
         return $L->retreatOrder($id,$param);
     }
 
+
+    public  function createpayFunc($params){
+        $L = new Transmanage_OrderModel(Yaf_Registry::get("db"),null,Yaf_Registry::get("gy_db"));
+        return $L->createpay($params);        
+    }
+
 }

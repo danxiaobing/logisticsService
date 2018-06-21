@@ -141,7 +141,7 @@ class Transmanage_OrderModel
     /*获取单个托运单的详情*/
     public function getOrderInfo($orderid){
       //获取托运单基本信息
-      $sql = "SELECT go.id,go.number,go.cargo_id,go.goods_id,go.estimate_freight,go.status,go.fact_freight FROM gl_order go WHERE go.id=".intval($orderid);
+      $sql = "SELECT go.id,go.number,go.cargo_id,go.company_id,go.goods_id,go.estimate_freight,go.status,go.fact_freight FROM gl_order go WHERE go.id=".intval($orderid);
       $info = $this->dbh->select_row($sql);
       //获取goods基本信息
       $sql = "SELECT
@@ -176,7 +176,8 @@ class Transmanage_OrderModel
                      gd.consign_phone,
                      gct.`name`,
                      gd.created_at,
-                     gd.`status`
+                     gd.`status`,
+                     gd.pay_type
                      FROM gl_goods gd
                      LEFT JOIN gl_cars_type gct ON  gct.id=gd.cars_type WHERE gd.id =".$info['goods_id'];
       $data = $this->dbh->select_row($sql);
@@ -511,6 +512,46 @@ class Transmanage_OrderModel
         }
 
     }
+
+
+
+
+    public function createpay($param){
+        $param['paymentno'] = $this->get_random($len=4);
+        //事务
+        $this->dbh->begin();
+        try{
+            $res = $this->dbh->insert('payment_order',$param);
+            if(!$res){
+             $this->dbh->rollback();
+             return false; 
+            }
+            $this->dbh->commit();
+            return $res;
+            
+        }catch(Exception $e){
+             $this->dbh->rollback();
+            return false;           
+        }
+    }
+
+
+    private static function get_random($len=3){  
+          //range 是将10到99列成一个数组   
+          $numbers = range (10,99);  
+          //shuffle 将数组顺序随即打乱   
+          shuffle ($numbers);   
+          //取值起始位置随机  
+          $start = mt_rand(1,10);  
+          //取从指定定位置开始的若干数  
+          $result = array_slice($numbers,$start,$len);   
+          $random = "";  
+          for ($i=0;$i<$len;$i++){   
+             $random = $random.$result[$i];  
+           }   
+           $str = date('mdHi');
+          return $str.$random;  
+     }
 
 
 }
