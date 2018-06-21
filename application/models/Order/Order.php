@@ -364,6 +364,7 @@ class Order_OrderModel
                      gd.offer_price,
                      gd.loss,
                      gd.pay_type,
+                     gd.qq,
                      gd.desc_str ,
                      gd.off_address,
                      gd.off_user ,
