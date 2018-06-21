@@ -177,7 +177,11 @@ class Examine_UsersModel
                 gl_companies.company_name,
                 gl_companies.company_telephone,
                 gl_companies.company_user,
-                gl_companies.status  
+                gl_companies.privilege_sign,
+                gl_companies.privilege_ca,
+                gl_companies.privilege_pay,
+                gl_companies.privilege_basic,
+                gl_companies.status
                 FROM gl_user_info
                 LEFT JOIN gl_companies ON gl_companies.id = gl_user_info.cid WHERE 
                 ".$where;

@@ -123,7 +123,7 @@ class Cargo_GoodsModel
     {
         $sql = "SELECT
                g.id,g.start_provice_id,g.start_city_id,g.start_area_id,g.end_provice_id,g.end_city_id,g.end_area_id,g.cate_id,g.cate_id_two,g.product_id,g.weights,g.price,g.companies_name,g.off_starttime,g.off_endtime,g.reach_starttime,
-               g.reach_endtime,g.cars_type,g.loss,g.offer_status,g.carriers_id,g.offer_price,g.off_address,g.off_user,g.off_phone,g.reach_address,g.reach_user,g.reach_phone,g.consign_user,g.consign_phone,g.desc_str,g.status,
+               g.reach_endtime,g.cars_type,g.pay_type,g.loss,g.offer_status,g.carriers_id,g.offer_price,g.off_address,g.off_user,g.off_phone,g.reach_address,g.reach_user,g.reach_phone,g.consign_user,g.consign_phone,g.desc_str,g.status,
                gl_cars_type.name AS cars_type_name,
                start_city.`city` as start_city,
                start_area.`area` as start_area,
@@ -548,6 +548,7 @@ class Cargo_GoodsModel
                g.reach_starttime,
                g.reach_endtime,
                g.cars_type,
+               g.pay_type,
                g.loss,
                g.off_address,
                g.off_user,
