@@ -573,23 +573,22 @@ class Order_PayModel
      */
     private function _getZhongxinAmount($bankaccountno)
     {
-      //  if(!$bankaccountno){
-       //     $params = array('total_amount'=>'暂时无法查询','frozen_amount'=>'暂时无法查询','active_amount'=>'暂时无法查询');
-        //    throw new Yaf_Exception(json_encode($params));
-       // }
+        if(!$bankaccountno){
+            $params = array('total_amount'=>'暂时无法查询','frozen_amount'=>'暂时无法查询','active_amount'=>'暂时无法查询');
+            throw new Yaf_Exception(json_encode($params));
+        }
         $arr['banktype'] = 'ZhongXinApi';
         $arr['method'] = 'UserBalance';
         $arr['data']=array(
             'subAccNo'=>$bankaccountno
         );
 
-
-        //try{
+        try{
             $amount=$this->pay->paymentFunc($arr);
-      //  }catch (Exception $exception){
-       //     $params = array('total_amount'=>'暂时无法查询','frozen_amount'=>'暂时无法查询','active_amount'=>'暂时无法查询');
-         //   throw new Yaf_Exception(json_encode($params));
-       // }
+        }catch (Exception $exception){
+            $params = array('total_amount'=>'暂时无法查询','frozen_amount'=>'暂时无法查询','active_amount'=>'暂时无法查询');
+            throw new Yaf_Exception(json_encode($params));
+        }
         if($amount['code'] == '0000' && $amount['data']['status'] == 'AAAAAAA'){
             $params = array();
             $params['total_amount'] = $amount['data']['list']['row']['SJAMT'];   //账户金额
@@ -600,9 +599,8 @@ class Order_PayModel
             $params['active_amount'] = $params['active_amount']>0?$params['active_amount']:"0.00";
         }else{
             $params = array('total_amount'=>'暂时无法查询','frozen_amount'=>'暂时无法查询','active_amount'=>'暂时无法查询');
-          //  throw new Yaf_Exception(json_encode($params));
+            throw new Yaf_Exception(json_encode($params));
         }
-       echo '--银行卡号'.$bankaccountno+'中信银行返回状态'.$amount['data']['status'].'中信银行返回code'.$amount['code'];die;
         return $params;
 
     }
