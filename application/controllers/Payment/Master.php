@@ -11,7 +11,7 @@ class Payment_MasterController extends Rpc
     }
 
 
-    public function getListFunc($params){
+    public function getPaymentListFunc($params){
         $L = new Payment_MasterModel(Yaf_Registry::get("db"));
         $data = $L->getList($params);
         return $data;
@@ -24,4 +24,5 @@ class Payment_MasterController extends Rpc
         $data = $L->getInfo($id);
         return $data;
     }
+
 }

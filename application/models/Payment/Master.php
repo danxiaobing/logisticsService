@@ -25,8 +25,8 @@ class Payment_MasterModel
 
         $where = ' g.isdel = 0 ';
 
-        if (isset($params['cid']) && !empty($params['cid'])) {
-            $filter[] = " g.`company_id` =".$params['cid'];
+        if (isset($params['carrier_id']) && !empty($params['carrier_id'])) {
+            $filter[] = " g.`receive_companyno` =".$params['carrier_id'];
         }
 
 
@@ -48,8 +48,8 @@ class Payment_MasterModel
 
 
         $sql = "SELECT count(1) FROM payment_master g  WHERE {$where}";
+
         $result['totalRow'] = $this->dbh->select_one($sql);
-        // print_r($filter);die;
 
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
@@ -59,9 +59,9 @@ class Payment_MasterModel
                 WHERE  {$where}
                 ORDER BY g.id DESC";
         $result['list']  = $this->dbh->select_page($sql);
+
         return $result;
     }
-
 
 
     /**
