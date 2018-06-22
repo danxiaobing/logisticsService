@@ -82,7 +82,7 @@ class Payment_OrderModel
         //         FROM gl_inquiry_info WHERE is_del = 0 AND pid=".$id." ORDER BY id ASC";
         // $result['inquiry_info'] = $this->dbh->select($sql);
     }
-    
+
     /**
      * @param array $params 收付款单-付款单关联订单表
      * @return mixed
@@ -144,17 +144,6 @@ class Payment_OrderModel
 
         $sql = 'SELECT gy.`id`,gy.`c_id`,gy.`cargo_id`,gy.`order_id`,gy.`goods_id`,gy.`paymentno`,gy.`number`,gy.`freightamount`,gy.`estimate_freight`,gy.`start_weights`,gy.`end_weights`,gy.`cost_weights`,gy.`cname`,gy.`bankname`,gy.`bankcode`,gy.`status`,gy.`pay_type`,gy.`created_at`,gy.`dealno` FROM payment_order gy WHERE c_id='.intval($params['c_id']);
         $result['list'] = $this->dbh->select_page($sql);
->>>>>>> 4d11f069220fc56cfbc8af5af7ff52577d757301
         return $result;
-     }
-
-  
-
-
-
-
-
-
-
-
+    }
 }
