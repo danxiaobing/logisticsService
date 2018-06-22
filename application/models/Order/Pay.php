@@ -22,6 +22,18 @@ class Order_PayModel
      */
     public function __construct($dbh, $mch = null)
     {
+        $this->tranType=array(
+            11=> '普通转账',
+            12=> '资金初始化',
+            13=> '利息分配',
+            14=> '手续费分配',
+            15=> '交易转账',
+            16=> '调账',
+            21=> '公共利息收费账户转账',
+            22=> '公共调账账户外部转账',
+            23=> '出入金',
+        );
+        $this->loanFlag = array('C'=>'入','D'=>'出');
         $this->dbh = $dbh;
         $this->pay = Hprose\Client::create("http://172.19.0.25:8003/api",false);
        // $this->pay =  rpcClient('service-pay/api');
@@ -603,6 +615,86 @@ class Order_PayModel
         }
         return $params;
 
+    }
+
+    /**
+     * 获取中信账户交易详情
+     * @param int $companyNo 企业编号
+     * @return array
+     * @throws Yaf_Exception
+     * 通过企业编号查询企业账户金额
+     */
+    public function getZhongxinAmountDetail($companyNo,$params){
+        if ($companyNo == null){
+            throw new Yaf_Exception(StatusCode::CLIENT_EMPTY_PARAMETER_STRING,StatusCode::CLIENT_EMPTY_PARAMETER_CODE);
+        }
+        //通过公司编号查询是否支持线上支付
+        $sql = "select bankaccountno from gl_companies_account WHERE companies_id = $companyNo and status = 1";
+
+        if (Yaf_Registry:: get("db") instanceof MySQL) {
+            $bankaccountno = $this->dbh->select_one($sql);
+
+            if ($bankaccountno){
+                return $this->_getZhongxinAmountDetail($bankaccountno,$params);
+            }else{
+                throw new Yaf_Exception(StatusCode::CLIENT_DATA_NOT_EXISTS_STRING,StatusCode::CLIENT_DATA_NOT_EXISTS_CODE);
+            }
+        } else {
+            throw new Yaf_Exception("db配置不对",StatusCode::CLIENT_DATA_NOT_EXISTS_CODE);
+        }
+    }
+   /**
+     * @param $bankaccountno
+     * @return array
+     * @throws Yaf_Exception
+     * 通过银行卡号获取中信账户交易详情
+     */
+    private function _getZhongxinAmountDetail($bankaccountno,$params)
+    {
+        if(!$bankaccountno){
+            throw new Yaf_Exception(StatusCode::CLIENT_DATA_NOT_EXISTS_STRING,StatusCode::CLIENT_DATA_NOT_EXISTS_CODE);
+        }
+
+        //开始时间
+        $startDate = $params['startDate']? date('Ymd',strtotime($params['startDate'])):date("Ymd",time()-7*24*3600);
+        //结束时间
+        $endDate = $params['endDate']? date('Ymd',strtotime($params['endDate'])):date("Ymd",time());
+        //分页
+        $page = $params['page']? $params['page']:1;
+
+        $arr['banktype'] = 'ZhongXinApi';
+        $arr['method'] = 'NologPrint';
+        $arr['data']=array(
+            'subAccNo'      => $bankaccountno,
+            // 'queryType'     => '',
+            // 'tranType'      => $tranType,
+            'startDate'     => $startDate,
+            'endDate'       => $endDate,
+            'startRecord'   => ($page-1)*5+1,
+            'pageNumber'    => 5
+        );
+
+        try{
+            $zhongxin=$this->pay->paymentFunc($arr);
+            if($zhongxin['code'] == '0001'){//接口验证数据不成功
+                $params['code'] = 500;
+            }else if($zhongxin['data']['status'] != 'AAAAAAA'){
+                $params['code'] = 404;
+            }else{
+                $detail = $zhongxin['data']['list']['row'];
+                $params['code'] = 200;
+                foreach ($detail as $k => $v) {
+                    $detail[$k]['tranType'] = $this->tranType[$v['tranType']];
+                    $detail[$k]['loanFlag'] = $this->loanFlag[$v['loanFlag']];
+                    $detail[$k]['tranDate'] = date('Y-m-d',strtotime($v['tranDate']));
+                }
+            }
+            $params['detail'] = $detail;
+
+        }catch (Exception $exception){
+            throw new Yaf_Exception(StatusCode::CLIENT_DATA_NOT_EXISTS_STRING,StatusCode::CLIENT_DATA_NOT_EXISTS_CODE);
+        }
+        return $params;
     }
 
     /**

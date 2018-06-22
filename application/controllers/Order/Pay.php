@@ -28,6 +28,20 @@ class Order_payController extends Rpc
             return ReturnResult::failed($yaf_Exception->getCode(),$yaf_Exception->getMessage())->toArray();
         }
     }
+    /**
+     * @param $companyNo
+     * @return string
+     * 通过企业编号查询企业账户交易详情
+     */
+    public function getZhongxinAmountDetailFunc($companyNo,$params){
+        try{
+            $Order_Pay = new Order_PayModel(Yaf_Registry::get("db"));
+            $result = $Order_Pay->getZhongxinAmountDetail($companyNo,$params);
+            return ReturnResult::success($result)->toArray();
+        }catch (Yaf_Exception $yaf_Exception){
+            return ReturnResult::failed($yaf_Exception->getCode(),$yaf_Exception->getMessage())->toArray();
+        }
+    }
 
     /**
      * @param string $paymentNo    收付款单编号
