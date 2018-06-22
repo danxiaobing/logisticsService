@@ -146,4 +146,24 @@ class Payment_OrderModel
         $result['list'] = $this->dbh->select_page($sql);
         return $result;
     }
+
+
+    public function getpayinfo($payid){
+        $sql  = 'SELECT gy.`id`,gy.`c_id`,gy.`cargo_id`,gy.`order_id`,gy.`goods_id`,gy.`paymentno`,gy.`number`,gy.`freightamount`,gy.`estimate_freight`,gy.`start_weights`,gy.`end_weights`,gy.`cost_weights`,gy.`cname`,gy.`bankname`,gy.`bankcode`,gy.`status`,gy.`pay_type`,gy.`created_at`,gy.`dealno` FROM payment_order gy WHERE id='.intval($payid);
+        $data = $this->dbh->select_row($sql);
+
+        return $data ? $data : array() ;
+    }
+
+    //更新结算单
+    public function updatepay($params){
+        $id = $params['id'];
+        unset($params['id']);
+        $res = $this->dbh->update('payment_order',$params,'id='.intval($id));
+        return $res ? true : false;
+    }
+
+
+
+
 }
