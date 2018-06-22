@@ -81,7 +81,80 @@ class Payment_OrderModel
         // $sql = "SELECT id,minprice,maxprice,cid,type,updated_at,created_at
         //         FROM gl_inquiry_info WHERE is_del = 0 AND pid=".$id." ORDER BY id ASC";
         // $result['inquiry_info'] = $this->dbh->select($sql);
-        return $result;
     }
+    
+    /**
+     * @param array $params 收付款单-付款单关联订单表
+     * @return mixed
+     */
+    public function addPaymentOrder($params)
+    {
+        $param['dealno'] = $this->get_random($len=4);
+        $param['created_at'] = '=NOW()';
+        //事务
+        $this->dbh->begin();
+        try{
+            $res = $this->dbh->insert('payment_order',$params);
+            if(!$res){
+             $this->dbh->rollback();
+             return array('code'=>'300','msg'=>'生成结算单失败'); 
+            }
+
+            //更新托运单状态
+            $result = $this->dbh->update('gl_order',array('status'=>'9'),'id='.intval($params['order_id']));
+            $this->dbh->commit();
+            return array('code'=>'200','msg'=>'生成结算单成功');
+            
+        }catch(Exception $e){
+             $this->dbh->rollback();
+            return array('code'=>'300','msg'=>'生成结算单失败');           
+        }
+    }
+
+    private static function get_random($len=3){  
+          //range 是将10到99列成一个数组   
+          $numbers = range (10,99);  
+          //shuffle 将数组顺序随即打乱   
+          shuffle ($numbers);   
+          //取值起始位置随机  
+          $start = mt_rand(1,10);  
+          //取从指定定位置开始的若干数  
+          $result = array_slice($numbers,$start,$len);   
+          $random = "";  
+          for ($i=0;$i<$len;$i++){   
+             $random = $random.$result[$i];  
+           }   
+           $str = date('mdHi');
+          return $str.$random;  
+     }
+
+
+
+
+     //list结算单
+     public function getpaylist($params){
+        //计算总数
+        $sql = 'SELECT count(1) FROM payment_order WHERE c_id='.intval($params['c_id']);
+        $data = $this->dbh->select_one($sql);
+
+        $result['totalRow'] = $data ? $data:[];
+
+        $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
+        $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 8);
+
+        $sql = 'SELECT gy.`id`,gy.`c_id`,gy.`cargo_id`,gy.`order_id`,gy.`goods_id`,gy.`paymentno`,gy.`number`,gy.`freightamount`,gy.`estimate_freight`,gy.`start_weights`,gy.`end_weights`,gy.`cost_weights`,gy.`cname`,gy.`bankname`,gy.`bankcode`,gy.`status`,gy.`pay_type`,gy.`created_at`,gy.`dealno` FROM payment_order gy WHERE c_id='.intval($params['c_id']);
+        $result['list'] = $this->dbh->select_page($sql);
+>>>>>>> 4d11f069220fc56cfbc8af5af7ff52577d757301
+        return $result;
+     }
+
+  
+
+
+
+
+
+
+
 
 }

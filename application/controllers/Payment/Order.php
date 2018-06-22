@@ -28,4 +28,21 @@ class Payment_OrderController extends Rpc
         $data = $L->getInfo($id);
         return $data;
     }
+
+
+    //创建结算单
+    public function createpayFunc($params){
+        try{
+            $order = Payment_OrderModel::getInstance()->addPaymentOrder($params);
+            return ReturnResult::success($order)->toJson();
+        }catch (Exception $exception){
+            return ReturnResult::failed($exception->getCode(),$exception->getMessage())->toJson();
+        }        
+    }
+
+
+    //list结算单
+    public function getpaylistFunc($params){
+           return  Payment_OrderModel::getInstance()->getpaylist($params);
+    }
 }
