@@ -176,13 +176,16 @@ class Examine_CarrierModel
             'status'            =>$params['status'],
             'social_code'        =>$params['social_code'],
             'business'          =>$params['business'],
+            'privilege_pay'     =>$params['privilege_pay'],
+            'privilege_ca'     =>$params['privilege_ca'],
+            'privilege_sign'     =>$params['privilege_sign'],
             'created_at'        => '=NOW()',
             'updated_at'        => '=NOW()',
             'company_mail'      =>$params['company_mail'],
-            'products'          => $params['products']
+            'products'          => $params['products'],
+            'qq'                => $params['qq']
 
         );
-
         #开启事物
         $this->dbh->begin();
         try{
