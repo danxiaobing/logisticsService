@@ -1,7 +1,6 @@
 <?php
 /**
  * 订单 pay model.
- * tableName = 'payment_master';
  * Auther: josy
  * Date: 17/7/11
  * Time: 上午9:59
@@ -24,14 +23,9 @@ class Order_PayModel
     public function __construct($dbh, $mch = null)
     {
         $this->dbh = $dbh;
-        $this->pay = Hprose\Client::create("http://172.19.0.25:8003//api",false);
+        $this->pay = Hprose\Client::create("http://http://172.19.0.25:8003//api",false);
        // $this->pay =  rpcClient('service-pay/api');
     }
-    /*protected function __construct() {
-        self::$tableName = 'payment_master';
-       //$this->pay = Hprose\Client::create("http://192.168.18.211:8003/api",false);
-        $this->pay =  rpcClient('service-pay/api');
-    }*/
 
     //担保交易，需冻结在卖家，可以同时绑定多个订单
     public function  guarantePay($payno)
@@ -551,23 +545,23 @@ class Order_PayModel
      * @throws Yaf_Exception
      * 通过企业编号查询企业账户金额
      */
-    public function getZhongxinAmount($companyNo){
+    public function getZhongxinAmount($companyNo){;
         if ($companyNo == null){
             throw new Yaf_Exception(StatusCode::CLIENT_EMPTY_PARAMETER_STRING,StatusCode::CLIENT_EMPTY_PARAMETER_CODE);
         }
         //通过公司编号查询是否支持线上支付
-        $sql = "select bankaccountno from td_companies_account WHERE companies_id = $companyNo and status = 1";
+        $sql = "select bankaccountno from gl_companies_account WHERE companies_id = $companyNo and status = 1";
 
-        if (Yaf_Registry:: get("guoyie_db") instanceof MySQL) {
-            $this->dbh = Yaf_Registry:: get("guoyie_db");
+        if (Yaf_Registry:: get("db") instanceof MySQL) {
             $bankaccountno = $this->dbh->select_one($sql);
+
             if ($bankaccountno){
                 return $this->_getZhongxinAmount($bankaccountno);
             }else{
                 throw new Yaf_Exception(StatusCode::CLIENT_DATA_NOT_EXISTS_STRING,StatusCode::CLIENT_DATA_NOT_EXISTS_CODE);
             }
         } else {
-            throw new Yaf_Exception("guoyie_db配置不对",StatusCode::CLIENT_DATA_NOT_EXISTS_CODE);
+            throw new Yaf_Exception("db配置不对",StatusCode::CLIENT_DATA_NOT_EXISTS_CODE);
         }
     }
 
@@ -579,12 +573,8 @@ class Order_PayModel
      */
     private function _getZhongxinAmount($bankaccountno)
     {
-//        $params = array('total_amount'=>'正在查询','frozen_amount'=>'正在查询','active_amount'=>'正在查询');
-
-
         if(!$bankaccountno){
             $params = array('total_amount'=>'暂时无法查询','frozen_amount'=>'暂时无法查询','active_amount'=>'暂时无法查询');
-//            return $params;
             throw new Yaf_Exception(json_encode($params));
         }
         $arr['banktype'] = 'ZhongXinApi';
