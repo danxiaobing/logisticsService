@@ -165,5 +165,14 @@ class Payment_OrderModel
 
 
 
+    public function infoByorderid($orderid){
+        $sql = 'SELECT gy.`id`,gy.`c_id`,gy.`cargo_id`,gy.`order_id`,gy.`goods_id`,gy.`paymentno`,gy.`number`,gy.`freightamount`,gy.`estimate_freight`,gy.`start_weights`,gy.`end_weights`,gy.`cost_weights`,gy.`cname`,gy.`bankname`,gy.`bankcode`,gy.`status`,gy.`pay_type`,gy.`created_at`,gy.`dealno` FROM payment_order gy WHERE order_id='.intval($orderid).' order by id asc limit 1';
+        $data = $this->dbh->select_row($sql);
+
+        return $data ? $data : array() ;        
+    }
+
+
+
 
 }
