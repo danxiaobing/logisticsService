@@ -65,27 +65,6 @@ class Payment_MasterModel
 
 
     /**
-     * 获取货源询价单详情
-     * @param $id
-     * @return mixed
-     */
-    public function getInfo($id){
-
-        //查询询价单信息
-        $sql = "SELECT *
-               FROM payment_master i
-               WHERE i.isdel = 0 AND i.id=".$id." ORDER BY id DESC";
-        $result['inquiry'] = $this->dbh->select_row($sql);
-
-       //询价单记录信息
-        // $sql = "SELECT id,minprice,maxprice,cid,type,updated_at,created_at
-        //         FROM gl_inquiry_info WHERE is_del = 0 AND pid=".$id." ORDER BY id ASC";
-        // $result['inquiry_info'] = $this->dbh->select($sql);
-        return $result;
-    }
-
-
-    /**
      * @param string $paymentNo 收付款单编号
      * @param bool $isOther 是否获得当前收付款单下的所有订单和附件文件
      * @return mixed

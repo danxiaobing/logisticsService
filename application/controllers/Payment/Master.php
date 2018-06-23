@@ -19,9 +19,9 @@ class Payment_MasterController extends Rpc
 
 
 
-    public function getInfoFunc($id){
+    public function getPaymentInfoFunc($paymentNo,$isOther){
         $L = new Payment_MasterModel(Yaf_Registry::get("db"));
-        $data = $L->getInfo($id);
+        $data = $L->getPaymentInfo($paymentNo,$isOther);
         return $data;
     }
 
