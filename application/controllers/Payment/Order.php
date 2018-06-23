@@ -33,7 +33,7 @@ class Payment_OrderController extends Rpc
     //创建结算单
     public function createpayFunc($params){
         $L = new Payment_OrderModel(Yaf_Registry::get("db"));
-        return $L->createpay($params);
+        return $L->addPaymentOrder($params);
     }
 
 
