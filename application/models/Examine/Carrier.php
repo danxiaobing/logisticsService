@@ -138,6 +138,7 @@ class Examine_CarrierModel
                   gl_companies.company_telephone,
                   gl_companies.company_telephone,
                   gl_companies.company_mail,
+                  gl_companies.status,
                   gl_companies.qq,
                   conf_area.area,
                   conf_province.province,
