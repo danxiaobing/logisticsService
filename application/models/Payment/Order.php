@@ -96,6 +96,7 @@ class Payment_OrderModel
     {
         $params['dealno'] = $this->get_random($len=4);
         $params['created_at'] = '=NOW()';
+        $params['status'] = 3;
         //事务
         $this->dbh->begin();
         try{
@@ -187,6 +188,7 @@ class Payment_OrderModel
         $id = $params['id'];
         unset($params['id']);
         $params['updated_at'] = '=NOW()';
+        $params['status'] = 3;
         $res = $this->dbh->update('payment_order',$params,'id='.intval($id));
         return $res ? true : false;
     }
