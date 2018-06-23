@@ -184,4 +184,13 @@ class Payment_MasterModel
         // echo 1;die;
         return $this->dbh->insert('payment_master',$data);
     }
+
+    //详情 
+    public function getInfo($id){
+
+        //查询询价单信息
+        $sql = "SELECT * FROM payment_master i WHERE i.isdel = 0 AND i.id=".$id." ORDER BY id DESC";
+        $result = $this->dbh->select_row($sql);
+        return $result;
+    }
 }
