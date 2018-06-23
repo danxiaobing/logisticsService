@@ -145,5 +145,35 @@ class Payment_MasterModel
         $data['updatedat'] = '=NOW()';
         return $this->dbh->update('payment_master', $data, "paymentno = '" . $paymentno."'");
     }
+    /**
+     * @param string $paymentNo 收付款单编号
+     * @param string $companyName    收付款单企业人
+     * @return mixed
+     * @throws Yaf_Exception
+     * 查询一个收付款单
+     */
+    public function findMaster($paymentNo,$companyName){
+        if ($paymentNo == null || $companyName == null){
+            throw new Yaf_Exception('收付款单号不能为空！');
+        }
+        //判断这个收付款单是否属于这个企业所有
+        $sql="SELECT * from payment_master where paymentno = '$paymentNo' and (pay_companyname = '$companyName' or receive_companyname = '$companyName')";
+        $info = $this->dbh->select_one($sql);
+        if($info == null){
+            throw new Yaf_Exception('该收付款单不属于您！');
+        }
+
+        $sql = "SELECT * from payment_master where paymentno = '$paymentNo' and isdel = 0";
+        $masterInfo = $this->dbh->select_row($sql);
+        $sql = " SELECT payment_order.*,order_master.fact_freight
+            FROM  payment_order as payment_order
+            LEFT JOIN gl_order as order_master ON payment_order.order_id = order_master.id
+            WHERE payment_order.paymentno = '" . $paymentNo. " '";
+        $masterInfo['orderList'] = $this->dbh->select($sql);
+        $sql = "SELECT * from payment_files where paymentno = '$paymentNo'";
+        $masterInfo['filesList'] = $this->dbh->select($sql);
+        return $masterInfo;
+
+    }
 
 }
