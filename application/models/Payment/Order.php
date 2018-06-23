@@ -137,7 +137,7 @@ class Payment_OrderModel
         $sql = 'SELECT count(1) FROM payment_order WHERE c_id='.intval($params['c_id']);
         $data = $this->dbh->select_one($sql);
 
-        $result['totalRow'] = $data ? $data:[];
+        $result['totalRow'] = $data ? $data:0;
 
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 8);
