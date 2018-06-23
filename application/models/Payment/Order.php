@@ -133,8 +133,30 @@ class Payment_OrderModel
 
      //list结算单
      public function getpaylist($params){
+
+        //搜索条件
+        $where = '';
+
+        if(isset($params['number']) && $params['number'] != ''){
+            $filter[] = 'number = "'.$params['number'].'"';
+        }
+
+        if(isset($params['status']) && $params['status'] != -100){
+            $filter[] = 'status = '.intval($params['status']);
+        }
+
+        if(isset($params['c_id']) && $params['c_id'] != 0){
+            $filter[] = 'c_id = '.intval($params['c_id']);
+        }
+
+        if(count($filter)){
+            $str = implode(' AND ', $filter);
+            $where .= $str;
+        }
+
         //计算总数
-        $sql = 'SELECT count(1) FROM payment_order WHERE c_id='.intval($params['c_id']);
+        $sql = "SELECT count(1) FROM payment_order WHERE {$where}";
+
         $data = $this->dbh->select_one($sql);
 
         $result['totalRow'] = $data ? $data:0;
@@ -142,7 +164,8 @@ class Payment_OrderModel
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 8);
 
-        $sql = 'SELECT gy.`id`,gy.`c_id`,gy.`cargo_id`,gy.`order_id`,gy.`goods_id`,gy.`paymentno`,gy.`number`,gy.`freightamount`,gy.`estimate_freight`,gy.`start_weights`,gy.`end_weights`,gy.`cost_weights`,gy.`cname`,gy.`bankname`,gy.`bankcode`,gy.`status`,gy.`pay_type`,gy.`created_at`,gy.`dealno` FROM payment_order gy WHERE c_id='.intval($params['c_id']);
+        $sql = "SELECT gy.`id`,gy.`c_id`,gy.`cargo_id`,gy.`order_id`,gy.`goods_id`,gy.`paymentno`,gy.`number`,gy.`freightamount`,gy.`estimate_freight`,gy.`start_weights`,gy.`end_weights`,gy.`cost_weights`,gy.`cname`,gy.`bankname`,gy.`bankcode`,gy.`status`,gy.`pay_type`,gy.`created_at`,gy.`dealno` FROM payment_order gy WHERE {$where}";
+    // var_dump($sql);die;
         $result['list'] = $this->dbh->select_page($sql);
         return $result;
     }
