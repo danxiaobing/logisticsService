@@ -89,8 +89,8 @@ class Payment_OrderModel
      */
     public function addPaymentOrder($params)
     {
-        $param['dealno'] = $this->get_random($len=4);
-        $param['created_at'] = '=NOW()';
+        $params['dealno'] = $this->get_random($len=4);
+        $params['created_at'] = '=NOW()';
         //事务
         $this->dbh->begin();
         try{
@@ -159,6 +159,7 @@ class Payment_OrderModel
     public function updatepay($params){
         $id = $params['id'];
         unset($params['id']);
+        $params['updated_at'] = '=NOW()';
         $res = $this->dbh->update('payment_order',$params,'id='.intval($id));
         return $res ? true : false;
     }
