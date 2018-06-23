@@ -176,4 +176,12 @@ class Payment_MasterModel
 
     }
 
+
+    //新增
+    public function affirm($data)
+    {
+        // print_r($data);die;
+        // echo 1;die;
+        return $this->dbh->insert('payment_master',$data);
+    }
 }

@@ -6,15 +6,17 @@
 class Payment_OrderModel
 {
     public $dbh = null;
+    public $gy_db = null;
 
     /**
      * Constructor
      * @param   object $dbh
      * @return  void
      */
-    public function __construct($dbh, $mch = null)
+    public function __construct($dbh, $gy_db = null)
     {
         $this->dbh = $dbh;
+        $this->gy_db = $gy_db;
     }
 
     /**
@@ -75,12 +77,15 @@ class Payment_OrderModel
         $sql = "SELECT *
                FROM payment_order i
                WHERE i.isdel = 0 AND i.id=".$id." ORDER BY id DESC";
-        $result['inquiry'] = $this->dbh->select_row($sql);
+               // print_r($sql);die;
+        $result = $this->dbh->select_row($sql);
 
        //询价单记录信息
         // $sql = "SELECT id,minprice,maxprice,cid,type,updated_at,created_at
         //         FROM gl_inquiry_info WHERE is_del = 0 AND pid=".$id." ORDER BY id ASC";
         // $result['inquiry_info'] = $this->dbh->select($sql);
+
+        return $result;
     }
 
     /**
@@ -174,7 +179,6 @@ class Payment_OrderModel
     public function getpayinfo($payid){
         $sql  = 'SELECT gy.`id`,gy.`c_id`,gy.`cargo_id`,gy.`order_id`,gy.`goods_id`,gy.`paymentno`,gy.`number`,gy.`freightamount`,gy.`estimate_freight`,gy.`start_weights`,gy.`end_weights`,gy.`cost_weights`,gy.`cname`,gy.`bankname`,gy.`bankcode`,gy.`status`,gy.`pay_type`,gy.`created_at`,gy.`dealno` FROM payment_order gy WHERE id='.intval($payid);
         $data = $this->dbh->select_row($sql);
-
         return $data ? $data : array() ;
     }
 
@@ -187,6 +191,10 @@ class Payment_OrderModel
         return $res ? true : false;
     }
 
+    public function getbankinfo($id){
+        $sql = "select * from td_companies_account WHERE companies_id = {$id} and status = 1";
+        return $this->gy_db->select_row($sql);
+    }
 
 
     public function infoByorderid($orderid){

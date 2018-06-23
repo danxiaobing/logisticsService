@@ -25,6 +25,7 @@ class Payment_MasterController extends Rpc
         return $data;
     }
 
+
     /**
      * @param string $paymentNo    收付款单编号
      * @param string $companyName    收付款单企业人
@@ -40,5 +41,12 @@ class Payment_MasterController extends Rpc
             return ReturnResult::failed(StatusCode::CLIENT_DATA_NOT_EXISTS_CODE,StatusCode::CLIENT_DATA_NOT_EXISTS_STRING.',查找失败,'.$exception->getMessage())->toArray();
         }
 
+    }
+
+
+    public function affirmFunc($params){
+        $L = new Payment_MasterModel(Yaf_Registry::get("db"));
+        $data = $L->affirm($params);
+        return $data;
     }
 }
