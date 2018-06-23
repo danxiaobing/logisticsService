@@ -25,13 +25,17 @@ class Payment_MasterModel
 
         $where = ' g.isdel = 0 ';
 
+
         if (isset($params['carrier_id']) && !empty($params['carrier_id'])) {
             $filter[] = " g.`receive_companyno` =".$params['carrier_id'];
         }
 
+        if (isset($params['paystatus']) && !empty($params['paystatus'])) {
+            $filter[] = " g.`paystatus` = '{$params['paystatus']}'";
+        }
 
-        if (isset($params['status']) && !empty($params['status'])) {
-            $filter[] = " g.`status` = '{$params['status']}'";
+        if (isset($params['pay_companyname']) && !empty($params['pay_companyname'])) {
+            $filter[] = " g.`pay_companyname` = '%{$params['pay_companyname']}%'";
         }
 
         if (isset($params['starttime']) && $params['starttime'] != '') {
@@ -192,5 +196,57 @@ class Payment_MasterModel
         $sql = "SELECT * FROM payment_master i WHERE i.isdel = 0 AND i.id=".$id." ORDER BY id DESC";
         $result = $this->dbh->select_row($sql);
         return $result;
+    }
+
+
+    /**
+     * 修改付款单
+     * @param string $paymentno
+     * @param int $paystatus
+     * @return bool
+     */
+    public function updatePaymentStatus($paymentno,$paystatus){
+        if ($paymentno == null || $paystatus == null){
+            throw new Yaf_Exception('收付款单号信息不能为空！');
+        }
+
+        $orderSql = "SELECT order_id from payment_order where paymentno = '$paymentno'";
+        $info = $this->dbh->select_one($orderSql);
+
+        if($info == null){
+            throw new Yaf_Exception('该收付款单不存在！');
+        }
+
+        #事务
+        $this->dbh->begin();
+        try{
+
+            #修改付款单
+            $masterResult =  $this->dbh->update('payment_master',$paystatus,"paymentno = '" . $paymentno."'");
+            if(!$masterResult){
+                $this->dbh->rollback();
+                throw new Yaf_Exception('修改失败！');
+            }
+
+            #修改结算单
+            $orderResult = $this->dbh->update('payment_order',['status'=>1],"paymentno = '" . $paymentno."'");
+            if(!$orderResult){
+                $this->dbh->rollback();
+                throw new Yaf_Exception('修改失败！');
+            }
+
+            #修改托运单
+            $consignResult = $this->dbh->update('gl_order',['status'=>5],"id = '" . $info['order_id']."'");
+            if($consignResult){
+                $this->dbh->commit();
+                return true;
+            }else{
+                $this->dbh->rollback();
+                throw new Yaf_Exception('修改失败！');
+            }
+
+        }catch (Exception $exception){
+            throw new Yaf_Exception('修改失败！');
+        }
     }
 }
