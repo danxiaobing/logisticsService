@@ -55,4 +55,20 @@ class Payment_MasterController extends Rpc
         $data = $L->affirm($params);
         return $data;
     }
+
+    /**
+     * 修改收款单账户
+     * @param string $paymentno
+     * @param int $paystatus
+     * @return array
+     */
+    public function updatePaymentStatusFunc($paymentno,$paystatus){
+        try{
+            $master = new Payment_MasterModel(Yaf_Registry::get("db"));
+            $result = $master->updatePaymentStatus($paymentno,$paystatus);
+            return ReturnResult::success($result)->toArray();
+        }catch (Exception $exception){
+            return ReturnResult::failed(StatusCode::CLIENT_DATA_NOT_EXISTS_CODE,StatusCode::CLIENT_DATA_NOT_EXISTS_STRING.',查找失败,'.$exception->getMessage())->toArray();
+        }
+    }
 }
