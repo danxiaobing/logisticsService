@@ -83,7 +83,84 @@ class Transmanage_DispatchModel
         }
         return $result;
     }
+    public function getListForApp($params){
+        $filter = array();
 
+        if (isset($params['company_id']) && $params['company_id'] ) {
+            $filter[] = " `c_id` = ".$params['company_id'];
+        }
+        if (isset($params['ids']) && count($params['ids']) ) {
+            $filter[] = " `id` in ({$params['ids']}) ";
+        }
+
+        if (isset($params['start_time']) && $params['start_time'] != '') {
+            $filter[] = " `created_at` >= '".$params['start_time']."'";
+        }
+
+        if (isset($params['end_time']) && $params['end_time'] != '') {
+            $filter[] = " `created_at` <= '".$params['end_time']."'";
+        }
+
+        if (isset($params['keyworks']) && $params['keyworks'] != '') {
+            $filter[] = " ( `dispatch_number` like '%{$params['keyworks']}%' OR `cars_number` like '%{$params['keyworks']}%' OR `driver_name` like '%{$params['keyworks'] }%'  OR `supercargo_name` like '%{$params['keyworks']}%')";
+        }
+
+        if (isset($params['status']) && $params['status'] != '') {
+            $filter[] = " `status` =".$params['status'];
+        }
+        if (isset($params['statusarr']) && $params['statusarr'] != '') {
+            $filter[] = " `status` in (".$params['statusarr'].")";
+        }
+
+        if(isset($params['order_id']) && $params['order_id'] != 0){
+            $filter[] = " `order_id` =".$params['order_id'];
+        }
+
+
+        $where = ' 1= 1 ';
+
+        if (count($filter) > 0) {
+            $where .= ' AND '.implode(" AND ", $filter);
+        }
+
+        $sql = "SELECT count(1) FROM gl_order_dispatch  WHERE {$where}";
+
+        // return $sql;
+        $result['totalRow'] = $this->dbh->select_one($sql);
+
+        $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
+        $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 8);
+
+        $sql = "SELECT 
+               d.*,dr.mobile as driver_mobile,goods.off_address,goods.reach_address 
+                FROM gl_order_dispatch d LEFT JOIN gl_driver dr on d.driver_id = dr.id 
+                LEFT JOIN gl_goods goods on goods.id=d.goods_id
+                WHERE  {$where}
+                ORDER BY d.id DESC 
+                ";
+        $result['list'] = $this->dbh->select_page($sql);
+        if(!empty($result['list'])){
+            $pro = array_column($this->dbh->select('SELECT provinceid,province FROM conf_province'),'province','provinceid');
+            foreach($result['list'] as $key=>$value){
+                $result['list'][$key]['start_province'] = $pro[$value['start_provice_id']];
+                $result['list'][$key]['end_province'] = $pro[$value['end_provice_id']];
+            }
+            unset($pro);
+            $city = array_column($this->dbh->select('SELECT cityid,city FROM conf_city'),'city','cityid');
+            foreach($result['list'] as $key=>$value){
+                $result['list'][$key]['start_city'] = $city[$value['start_city_id']];
+                $result['list'][$key]['end_city'] = $city[$value['end_city_id']];
+            }
+            unset($city);
+            $area = array_column($this->dbh->select('SELECT areaid,area FROM conf_area'),'area','areaid');
+            foreach($result['list'] as $key=>$value){
+                $result['list'][$key]['start_area'] = $area[$value['start_area_id']];
+                $result['list'][$key]['end_area'] = $area[$value['end_area_id']];
+            }
+            unset($area);
+        }
+        return $result;
+    }
     public function dispatchProcedure($params){
         $dispatch_arr  = [
             'status' =>$params['status'],
@@ -273,7 +350,15 @@ class Transmanage_DispatchModel
         return $data ? $data : [];
 
     }
-
+    public function getInfoForApp($dispatch_id)
+    {
+        $sql = "SELECT d.mobile as driver_mobile,god.id,god.dispatch_number,god.order_number,god.order_id,god.ctype_name,god.driver_name,god.supercargo_name,god.cars_number,god.end_time,god.start_time,god.weights,go.cargo_id,god.cars_id,god.driver_id,god.supercargo_id,god.ctype_id,god.status,god.start_weights,god.end_weights 
+              FROM gl_order_dispatch god 
+              LEFT JOIN gl_driver d  on d.id=god.driver_id 
+              LEFT JOIN gl_order go ON go.id=god.order_id WHERE god.id=".intval($dispatch_id);
+        $data =  $this->dbh->select_row($sql);
+        return $data ? $data : [];
+    }
     /**
      * 编辑和新增
      * @param  array $params
@@ -430,6 +515,25 @@ class Transmanage_DispatchModel
         return $pic;
     }
 
+    /**
+     * 待调度
+     * @param $company_id
+     * @return mixed
+     */
+    public function getWaitOrderNum($company_id)
+    {
+        $sql = "SELECT COUNT(1) FROM  gl_order where status=1 and is_del=0 and company_id=".intval($company_id);
+        return $this->dbh->select_one($sql);
+    }
 
-
+    /**
+     * 运输中
+     * @param $company_id
+     * @return mixed
+     */
+    public function getTransitNum($company_id)
+    {
+        $sql = "SELECT COUNT(1) FROM  gl_order_dispatch where status in (0,1,2,3,4) and is_del=0 and c_id=".intval($company_id);
+        return $this->dbh->select_one($sql);
+    }
 }
