@@ -357,7 +357,7 @@ class Order_PayModel
 
                 //更新结算单信息
                 $payUpdate = [
-                    'status' => 3, //已支付
+                    'status' => 2, //已支付
                     'updated_at' => '=NOW()',
                     'serialno' => $clmeno,
                     'pay_type' => 2
@@ -367,7 +367,7 @@ class Order_PayModel
             //更新付款单信息
             $payMasterUpdate = [
                 'pay_type' => '2', //支付完成
-                'paystatus' => '2', //支付完成
+                'paystatus' => '2', //待审核
                 'paystatustime' => '=NOW()',
                 'updatedat' => '=NOW()'
             ];
