@@ -1,57 +1,92 @@
 <?php
 
 /**
- * Entry Name: ec_service_order
- * LastModified: 2018/3/6 11:12
- * Author: Wang HuiHui <wanghuihui@chinayie.com>
  * 收付款单-付款单关联订单表
  */
 class Payment_OrderModel
 {
-    /**
-     * @var string  默认的表名
-     */
-    public static $tableName = 'payment_order';
-    /**
-     * @var MySQL
-     */
     public $dbh = null;
+    public $gy_db = null;
 
-    //静态变量保存全局实例
     /**
-     * @var null
+     * Constructor
+     * @param   object $dbh
+     * @return  void
      */
-    private static $_instance = null;
-
-    //私有构造函数，防止外界实例化对象
-    private function __construct()
+    public function __construct($dbh, $gy_db = null)
     {
-    }
-
-    //私有克隆函数，防止外办克隆对象
-    private function __clone()
-    {
+        $this->dbh = $dbh;
+        $this->gy_db = $gy_db;
     }
 
     /**
-     * @return null|Payment_OrderModel
-     * @throws Yaf_Exception
-     * 静态方法，单例统一访问入口
+     * 获得订单的所有信息
      */
-    static public function getInstance()
-    {
-        if (is_null(self::$_instance) || isset (self::$_instance)) {
-            self::$_instance = new self ();
-            if (Yaf_Registry:: get("db") instanceof MySQL) {
-                self::$_instance->dbh = Yaf_Registry:: get("db");
-            } else {
-                throw new Yaf_Exception("db配置不对");
-            }
+    public function getList($params){
+        $filter = array();
+
+        $where = ' g.isdel = 0 ';
+
+        if (isset($params['cid']) && !empty($params['cid'])) {
+            $filter[] = " g.`c_id` =".$params['cid'];
         }
 
-        return self::$_instance;
+
+        if (isset($params['status']) && !empty($params['status'])) {
+            $filter[] = " g.`status` = '{$params['status']}'";
+        }
+
+        if (isset($params['starttime']) && $params['starttime'] != '') {
+            $filter[] = " unix_timestamp(g.`created_at`) >= unix_timestamp('{$params['starttime']} 00:00:00')";
+        }
+
+        if (isset($params['endtime']) && $params['endtime'] != '') {
+            $filter[] = " unix_timestamp(g.`created_at`) <= unix_timestamp('{$params['endtime']} 23:59:59')";
+        }
+
+        if (count($filter) > 0) {
+            $where .= ' AND '.implode(" AND ", $filter);
+        }
+
+
+        $sql = "SELECT count(1) FROM payment_order g  WHERE {$where}";
+        $result['totalRow'] = $this->dbh->select_one($sql);
+        // print_r($filter);die;
+
+        $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
+        $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
+
+        $sql = "SELECT g.*
+                FROM payment_order g
+                WHERE  {$where}
+                ORDER BY g.id DESC";
+        $result['list']  = $this->dbh->select_page($sql);
+        return $result;
     }
 
+
+
+    /**
+     * 获取货源询价单详情
+     * @param $id
+     * @return mixed
+     */
+    public function getInfo($id){
+
+        //查询询价单信息
+        $sql = "SELECT *
+               FROM payment_order i
+               WHERE i.isdel = 0 AND i.id=".$id." ORDER BY id DESC";
+               // print_r($sql);die;
+        $result = $this->dbh->select_row($sql);
+
+       //询价单记录信息
+        // $sql = "SELECT id,minprice,maxprice,cid,type,updated_at,created_at
+        //         FROM gl_inquiry_info WHERE is_del = 0 AND pid=".$id." ORDER BY id ASC";
+        // $result['inquiry_info'] = $this->dbh->select($sql);
+
+        return $result;
+    }
 
     /**
      * @param array $params 收付款单-付款单关联订单表
@@ -59,102 +94,119 @@ class Payment_OrderModel
      */
     public function addPaymentOrder($params)
     {
-        $params['linktime'] = '=NOW()';
-        return $this->dbh->insert(self::$tableName, $params);
-    }
-
-    /**
-     * @param array $params  订单列表数据
-     *  例子：$params['paymentno'=>111,'orderList'=>[[],[],[]]]
-     * @return bool
-     * @throws Yaf_Exception
-     * 收付款单-付款单关联订单列表表
-     */
-    public function addPaymentListOrder($params){
-        $paymentno = isset($params['paymentno'])?$params['paymentno']:null;
-        if($paymentno == null){
-            throw new Yaf_Exception('添加收付款单文件时，收付款单号不能为空');
-        }
-        $orderList = isset($params['orderList'])?$params['orderList']:null;
-        if($orderList == null || !is_array($orderList)){
-            throw new Yaf_Exception('添加收付款单文件时，没有找到订单列表');
-        }
-
-        foreach ($orderList as $key=>$order){
-            $order['paymentno'] = $paymentno;
-            try{
-                $this->addPaymentOrder($order);
-            }catch (Exception $exception){
-                throw new Yaf_Exception($exception->getMessage());
+        $params['dealno'] = $this->get_random($len=4);
+        $params['created_at'] = '=NOW()';
+        $params['status'] = 3;
+        //事务
+        $this->dbh->begin();
+        try{
+            $res = $this->dbh->insert('payment_order',$params);
+            if(!$res){
+             $this->dbh->rollback();
+             return array('code'=>'300','msg'=>'生成结算单失败'); 
             }
+
+            //更新托运单状态
+            $result = $this->dbh->update('gl_order',array('status'=>'9'),'id='.intval($params['order_id']));
+            $this->dbh->commit();
+            return array('code'=>'200','msg'=>'生成结算单成功');
+            
+        }catch(Exception $e){
+             $this->dbh->rollback();
+            return array('code'=>'300','msg'=>'生成结算单失败');           
         }
-        return true;
     }
 
-    /**
-     * @param $paymentno
-     * @param $data
-     * @return bool
-     * 更新收付款单-付款单关联订单表
-     */
-    public function updatePaymentOrder($paymentno, $data)
-    {
-//        $data['linktime'] = '=NOW()';
-        return $this->dbh->update(self::$tableName, $data, "paymentno = '" . $paymentno."'");
-    }
+    private static function get_random($len=3){  
+          //range 是将10到99列成一个数组   
+          $numbers = range (10,99);  
+          //shuffle 将数组顺序随即打乱   
+          shuffle ($numbers);   
+          //取值起始位置随机  
+          $start = mt_rand(1,10);  
+          //取从指定定位置开始的若干数  
+          $result = array_slice($numbers,$start,$len);   
+          $random = "";  
+          for ($i=0;$i<$len;$i++){   
+             $random = $random.$result[$i];  
+           }   
+           $str = date('mdHi');
+          return $str.$random;  
+     }
 
-    /**
-     * 根据订单号查询订单的已支付运费
-     * @params string $orderno  订单编号
-     * @return int
-     */
-    public function getOrderPayFreightamount($orderno){
-        $sql  = "SELECT SUM(freightamount) as sum_freight FROM `payment_order` WHERE orderno='".$orderno."' AND status in (1,2)";
-        $data = $this->dbh->select_row($sql);
-        return $data;
-    }
 
-    /**
-     * @param string $orderNo 订单编号
-     * @param bool $isOther 是否获得当前收付款单下的所有订单和附件文件
-     * @return mixed
-     * @throws Yaf_Exception
-     * 获得订单的所有信息
-     */
-    public function getOrderPayList($orderNo,$isOther = true){
-        if ($orderNo == null){
-            throw  new Yaf_Exception(StatusCode::CLIENT_EMPTY_PARAMETER_STRING."，订单的编号不能为空！",StatusCode::CLIENT_EMPTY_PARAMETER_CODE);
+
+
+     //list结算单
+     public function getpaylist($params){
+
+        //搜索条件
+        $where = '';
+
+        if(isset($params['number']) && $params['number'] != ''){
+            $filter[] = 'number = "'.$params['number'].'"';
         }
 
-        //判断订单号是否真实存在
-        $sql = "select * from order_master where orderno='".$orderNo."' and isdel = 0";
-        $orderInfo = $this->dbh->select_row($sql);
-        if ($orderInfo == null){
-            throw  new Yaf_Exception(StatusCode::CLIENT_ILLEGAL_PARAMETER_STRING."，订单的编号错误！",StatusCode::CLIENT_ILLEGAL_PARAMETER_CODE);
+        if(isset($params['status']) && $params['status'] != -100){
+            $filter[] = 'status = '.intval($params['status']);
         }
 
-        //获得所有的payment_order的数据
-        $sql = "select * from ".self::$tableName." where orderno = '".$orderNo."'";
-        $paymentOrderList = $this->dbh->select($sql);
-        if ($paymentOrderList == null){
-            $result['orderInfo'] = $orderInfo;
-            $result['paymentOrderList'] = [];
-            return $result;
+        if(isset($params['c_id']) && $params['c_id'] != 0){
+            $filter[] = 'c_id = '.intval($params['c_id']);
         }
 
-
-
-        foreach ($paymentOrderList as $key=>$paymentOrder){
-            $paymentOrderList[$key]['paymentList'] = Payment_MasterModel::getInstance()->getPaymentInfo($paymentOrder['paymentno'],$isOther);
-            if (!isset($paymentOrderList[$key]['paymentList']['isdel']) || $paymentOrderList[$key]['paymentList']['isdel'] == 1){
-                $paymentOrderList[$key]['paymentList'] = null;
-                unset($paymentOrderList[$key]);
-            }
+        if(count($filter)){
+            $str = implode(' AND ', $filter);
+            $where .= $str;
         }
 
-        $result['orderInfo'] = $orderInfo;
-        $result['paymentOrderList'] = $paymentOrderList;
+        //计算总数
+        $sql = "SELECT count(1) FROM payment_order WHERE {$where}";
+
+        $data = $this->dbh->select_one($sql);
+
+        $result['totalRow'] = $data ? $data:0;
+
+        $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
+        $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 8);
+
+        $sql = "SELECT gy.`id`,gy.`c_id`,gy.`cargo_id`,gy.`order_id`,gy.`goods_id`,gy.`paymentno`,gy.`number`,gy.`freightamount`,gy.`estimate_freight`,gy.`start_weights`,gy.`end_weights`,gy.`cost_weights`,gy.`cname`,gy.`bankname`,gy.`bankcode`,gy.`status`,gy.`pay_type`,gy.`created_at`,gy.`dealno` FROM payment_order gy WHERE {$where}";
+    // var_dump($sql);die;
+        $result['list'] = $this->dbh->select_page($sql);
         return $result;
     }
+
+
+    public function getpayinfo($payid){
+        $sql  = 'SELECT gy.`id`,gy.`c_id`,gy.`cargo_id`,gy.`order_id`,gy.`goods_id`,gy.`paymentno`,gy.`number`,gy.`freightamount`,gy.`estimate_freight`,gy.`start_weights`,gy.`end_weights`,gy.`cost_weights`,gy.`cname`,gy.`bankname`,gy.`bankcode`,gy.`status`,gy.`pay_type`,gy.`created_at`,gy.`dealno` FROM payment_order gy WHERE id='.intval($payid);
+        $data = $this->dbh->select_row($sql);
+        return $data ? $data : array() ;
+    }
+
+    //更新结算单
+    public function updatepay($params){
+        $id = $params['id'];
+        unset($params['id']);
+        $params['updated_at'] = '=NOW()';
+        $params['status'] = 3;
+        $res = $this->dbh->update('payment_order',$params,'id='.intval($id));
+        return $res ? true : false;
+    }
+
+    public function getbankinfo($id){
+        $sql = "select * from td_companies_account WHERE companies_id = {$id} and status = 1";
+        return $this->gy_db->select_row($sql);
+    }
+
+
+    public function infoByorderid($orderid){
+        $sql = 'SELECT gy.`id`,gy.`c_id`,gy.`cargo_id`,gy.`order_id`,gy.`goods_id`,gy.`paymentno`,gy.`number`,gy.`freightamount`,gy.`estimate_freight`,gy.`start_weights`,gy.`end_weights`,gy.`cost_weights`,gy.`cname`,gy.`bankname`,gy.`bankcode`,gy.`status`,gy.`pay_type`,gy.`created_at`,gy.`dealno` FROM payment_order gy WHERE order_id='.intval($orderid).' order by id asc limit 1';
+        $data = $this->dbh->select_row($sql);
+
+        return $data ? $data : array() ;        
+    }
+
+
+
 
 }

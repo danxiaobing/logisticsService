@@ -1,9 +1,6 @@
 <?php
 
 /**
- * Entry Name: ec_service_order
- * LastModified: 2018/3/8 14:22
- * Author: Wang HuiHui <wanghuihui@chinayie.com>
  * 付款单的订单
  */
 class Payment_OrderController extends Rpc
@@ -19,12 +16,58 @@ class Payment_OrderController extends Rpc
      * @return string
      * 获得订单的所有信息
      */
-    public function getOrderPayListFunc($orderNo,$isOther = true){
-        try{
-            $order = Payment_OrderModel::getInstance()->getOrderPayList($orderNo,$isOther);
-            return ReturnResult::success($order)->toJson();
-        }catch (Exception $exception){
-            return ReturnResult::failed($exception->getCode(),$exception->getMessage())->toJson();
-        }
+    public function getListFunc($params){
+        $L = new Payment_OrderModel(Yaf_Registry::get("db"));
+        $data = $L->getList($params);
+        return $data;
     }
+
+
+    public function getInfoFunc($id){
+        $L = new Payment_OrderModel(Yaf_Registry::get("db"));
+        $data = $L->getInfo($id);
+        return $data;
+    }
+
+
+    //创建结算单
+    public function createpayFunc($params){
+        $L = new Payment_OrderModel(Yaf_Registry::get("db"));
+        return $L->addPaymentOrder($params);
+    }
+
+
+    //list结算单
+    public function getpaylistFunc($params){
+           $L =   new Payment_OrderModel(Yaf_Registry::get("db"));
+           return $L->getpaylist($params);
+    }
+
+    //获取单个信息
+    public  function getpayinfoFunc($payid){
+        $L = new Payment_OrderModel(Yaf_Registry::get("db"));
+        return $L->getpayinfo($payid);   
+    }
+
+
+    public function updatepayFunc($params){
+        $L = new Payment_OrderModel(Yaf_Registry::get("db"));
+        return $L->updatepay($params);         
+    }
+
+
+
+    //获取结算单byorderid
+    public function infoByorderidFunc($orderid){
+        $L = new Payment_OrderModel(Yaf_Registry::get("db"));
+        return $L->infoByorderid($orderid);          
+    }
+
+
+
+    public function getbankinfoFunc($params){
+        $L = new Payment_OrderModel(Yaf_Registry::get("db"),Yaf_Registry::get("gy_db"));
+        return $L->getbankinfo($params);         
+    }
+
 }

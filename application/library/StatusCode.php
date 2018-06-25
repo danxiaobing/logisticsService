@@ -128,10 +128,10 @@ class StatusCode
     const PAY_NODETAIL_ERROR_STRING  = '缺少制单详情';
 
     const PAY_OVERLIMIT_ERROR_CODE = 80001005;
-    const PAY_OVERLIMIT_ERROR_STRING  = '制单金额超过匹配订单剩余金额';
+    const PAY_OVERLIMIT_ERROR_STRING  = '结算单金额超过匹配订单剩余金额';
 
     const PAY_NOMATCH_ERROR_CODE = 80001006;
-    const PAY_NOMATCH_ERROR_STRING  = '详情金额与制单金额不匹配';
+    const PAY_NOMATCH_ERROR_STRING  = '支付金额与结算单金额不匹配';
 
     const PAY_BANK_ERROR_CODE = 80001007;
     const PAY_BANK_ERROR_STRING  = '银行接口返回错误';

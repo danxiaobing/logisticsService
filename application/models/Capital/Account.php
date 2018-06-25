@@ -29,7 +29,7 @@ class Capital_AccountModel
      * @return [array]                 
      */
     public function getCompanyAccount($company_id){        
-        $sql = "SELECT bankaccountno,bankaccountname,date(created_at) as created_date FROM gl_companies_account WHERE companies_id='{$company_id}' limit 1";
+        $sql = "SELECT bankname,bankaccountno,bankaccountname,date(created_at) as created_date FROM gl_companies_account WHERE companies_id='{$company_id}' limit 1";
         return $this->dbh->select_row($sql);  
     }
 

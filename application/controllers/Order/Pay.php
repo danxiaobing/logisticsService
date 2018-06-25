@@ -3,7 +3,7 @@
 /**
  * Entry Name: ec_service_order
  * LastModified: 2018/3/8 14:22
- * Author: Wang HuiHui <wanghuihui@chinayie.com>
+ * Author: daley <wanghuihui@chinayie.com>
  * 付款单
  */
 class Order_payController extends Rpc
@@ -52,29 +52,19 @@ class Order_payController extends Rpc
      */
     public function onLinePayFunc($paymentNo,$masterParams,$logParams){
         try{
-            //判断是否是担保交易，需冻结在卖家，可以同时绑定多个订单
-            $payment = Payment_MasterModel::getInstance()->getPaymentInfo($paymentNo);
-            if (count($payment['paymentOrderList']) == 1 ){
-                $order = new Order_CurdModel();
-                $data = $order->getInfo( $payment['paymentOrderList'][0]['orderno']);
-                if ($data != null && $data['isassure'] == 2){  //是否是担保交易
-                    $result = Order_PayModel::getInstance()->guarantePay($paymentNo);
-                }else{
-                    //直接交易，直接支付给卖家。代码里可以同时绑定多个订单，逻辑层不应该允许
-                    $result = Order_PayModel::getInstance()->directPay($paymentNo);
-                }
-            }else{
-                //直接交易，直接支付给卖家。代码里可以同时绑定多个订单，逻辑层不应该允许
-                $result = Order_PayModel::getInstance()->directPay($paymentNo);
-            }
 
-            $paymentInfo = Payment_MasterModel::getInstance()->getPaymentInfo($paymentNo,false);
+            $Order_Pay = new Order_PayModel(Yaf_Registry::get("db"));
+            //直接交易，直接支付给卖家。代码里可以同时绑定多个订单，逻辑层不应该允许
+            $result = $Order_Pay->directPay($paymentNo);
+
+            $Payment_Master = new Payment_MasterModel(Yaf_Registry::get("db"));
+            $paymentInfo = $Payment_Master->getPaymentInfo($paymentNo,false);
             if (isset($paymentInfo['paystatus']) && $paymentInfo['paystatus'] == 1){
                 unset($masterParams['validator']);
                 unset($masterParams['validatortime']);
             }
             //首付款编号
-            Payment_MasterModel::getInstance()->updatedMasterAndLog($paymentNo,$masterParams,$logParams);
+            $Payment_Master->updatedMasterAndLog($paymentNo,$masterParams,$logParams);
             return $result;
         }catch (Exception $yaf_Exception){
             return ReturnResult::failed($yaf_Exception->getCode(),$yaf_Exception->getMessage().',添加失败')->toJson();
@@ -90,14 +80,16 @@ class Order_payController extends Rpc
      */
     public function linePayFunc($paymentNo,$masterParams,$logParams){
         try{
-            $result = Order_PayModel::getInstance()->linePay($paymentNo);
-            $paymentInfo = Payment_MasterModel::getInstance()->getPaymentInfo($paymentNo,false);
+            $Order_Pay = new Order_PayModel(Yaf_Registry::get("db"));
+            $result = $Order_Pay->linePay($paymentNo);
+            $Payment_Master = new Payment_MasterModel(Yaf_Registry::get("db"));
+            $paymentInfo = $Payment_Master->getPaymentInfo($paymentNo,false);
             if (isset($paymentInfo['paystatus']) && $paymentInfo['paystatus'] == 1){
                 unset($masterParams['validator']);
                 unset($masterParams['validatortime']);
             }
             //首付款编号
-            Payment_MasterModel::getInstance()->updatedMasterAndLog($paymentNo,$masterParams,$logParams);
+            $Payment_Master->updatedMasterAndLog($paymentNo,$masterParams,$logParams);
             return $result;
         }catch (Exception $yaf_Exception){
             return ReturnResult::failed($yaf_Exception->getCode(),$yaf_Exception->getMessage().'，添加失败')->toJson();
