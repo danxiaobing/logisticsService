@@ -66,6 +66,12 @@ class Payment_MasterController extends Rpc
         return $data;
     }
 
+    public function backPaymentMasterStatusFunc($params){
+        $L = new Payment_MasterModel(Yaf_Registry::get("db"));
+        $data = $L->backPaymentMasterStatus($params);
+        return $data;
+    }
+
     /**
      * 修改收款单账户
      * @param string $paymentno
