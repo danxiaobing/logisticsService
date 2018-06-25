@@ -141,6 +141,7 @@ class Examine_CarrierModel
                   gl_companies.status,
                   gl_companies.privilege_ca,
                   gl_companies.company_mail,
+                  gl_companies.privilege_pay,
                   gl_companies.status,
                   gl_companies.qq,
                   conf_area.area,
@@ -152,13 +153,20 @@ class Examine_CarrierModel
                   FROM gl_companies 
                 LEFT JOIN conf_area ON conf_area.areaid = gl_companies.area_id
                 LEFT JOIN conf_province ON conf_province.provinceid = gl_companies.province_id
-                LEFT JOIN gl_companies_contract_apply ON gl_companies_contract_apply.companies_id = gl_companies.id
                 LEFT JOIN conf_city ON conf_city.cityid = gl_companies.city_id WHERE  
                ".$where;
 
-        var_dump($sql);die;
 
         $data =  $this->dbh->select_row($sql);
+        if($data['privilege_ca'] == 1){
+            $contractSql = "SELECT apply_status FROM gl_companies_contract_apply WHERE companies_id = ".intval($data['id']);
+            $data['apply_status'] = $this->dbh->select_one($contractSql);
+        }
+
+        if($data['privilege_pay'] == 1){
+            $accountSql = "SELECT apply_status FROM gl_companies_account_apply WHERE companies_id = ".intval($data['id']);
+            $data['privilege_pay_data'] = $this->dbh->select_row($accountSql);
+        }
         $res = $this->showfile($data['id']);
         $data = array_merge($data, $res);
         return $data;
@@ -353,6 +361,8 @@ class Examine_CarrierModel
                     $data['other_file'][$key] = $value['path'];
                 }
             }
+        }else{
+            $data = array();
         }
 
         return $data;
