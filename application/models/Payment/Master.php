@@ -206,7 +206,6 @@ class Payment_MasterModel
         return $result;
     }
 
-
     /**
      * 修改付款单
      * @param string $paymentno
@@ -219,6 +218,7 @@ class Payment_MasterModel
         }
 
         $orderSql = "SELECT order_id from payment_order where paymentno = '$paymentno'";
+
         $info = $this->dbh->select_one($orderSql);
 
         if($info == null){
@@ -236,22 +236,25 @@ class Payment_MasterModel
                 throw new Yaf_Exception('修改失败！');
             }
 
-            #修改结算单
-            $orderResult = $this->dbh->update('payment_order',['status'=>1],"paymentno = '" . $paymentno."'");
-            if(!$orderResult){
-                $this->dbh->rollback();
-                throw new Yaf_Exception('修改失败！');
+
+            if($paystatus == 3){
+                #修改结算单
+                $orderResult = $this->dbh->update('payment_order',['status'=>1,'updated_at'=>'=NOW()'],"paymentno = '" . $paymentno."'");
+                if(!$orderResult){
+                    $this->dbh->rollback();
+                    throw new Yaf_Exception('修改失败！');
+                }
+
+                #修改托运单
+                $consignResult = $this->dbh->update('gl_order',['status'=>5,'updated_at'=>'=NOW()'],"id = '". $info."'");
+                if(!$consignResult){
+                    $this->dbh->rollback();
+                    throw new Yaf_Exception('修改失败！');
+                }
             }
 
-            #修改托运单
-            $consignResult = $this->dbh->update('gl_order',['status'=>5],"id = '" . $info['order_id']."'");
-            if($consignResult){
-                $this->dbh->commit();
-                return true;
-            }else{
-                $this->dbh->rollback();
-                throw new Yaf_Exception('修改失败！');
-            }
+            $this->dbh->commit();
+            return true;
 
         }catch (Exception $exception){
             throw new Yaf_Exception('修改失败！');

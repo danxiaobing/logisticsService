@@ -68,7 +68,7 @@ class Payment_MasterController extends Rpc
             $result = $master->updatePaymentStatus($paymentno,$paystatus);
             return ReturnResult::success($result)->toArray();
         }catch (Exception $exception){
-            return ReturnResult::failed(StatusCode::CLIENT_DATA_NOT_EXISTS_CODE,StatusCode::CLIENT_DATA_NOT_EXISTS_STRING.',查找失败,'.$exception->getMessage())->toArray();
+            return ReturnResult::failed(StatusCode::CLIENT_DATA_NOT_EXISTS_CODE,$exception->getMessage())->toArray();
         }
     }
 }
