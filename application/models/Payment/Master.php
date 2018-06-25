@@ -137,6 +137,12 @@ class Payment_MasterModel
         }
     }
 
+    //保存上传文件
+    public function addfile($data)
+    {
+        return $this->dbh->insert('payment_files', $data);
+    }
+
     /**
      * @param $paymentno
      * @param $data
