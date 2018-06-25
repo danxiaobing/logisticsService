@@ -163,7 +163,7 @@ class Examine_CarrierModel
         }
 
         if($data['privilege_pay'] == 1){
-            $accountSql = "SELECT apply_status FROM gl_companies_account_apply WHERE companies_id = ".intval($data['id']);
+            $accountSql = "SELECT * FROM gl_companies_account_apply WHERE companies_id = ".intval($data['id']);
             $data['privilege_pay_data'] = $this->dbh->select_row($accountSql);
         }
         $res = $this->showfile($data['id']);
