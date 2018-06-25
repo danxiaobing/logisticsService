@@ -23,6 +23,12 @@ class Payment_MasterController extends Rpc
         return $data;
     }
 
+    public function getFileFunc($no){
+        $L = new Payment_MasterModel(Yaf_Registry::get("db"));
+        $data = $L->getFile($no);
+        return $data;
+    }
+
     public function addfileFunc($data){
         $L = new Payment_MasterModel(Yaf_Registry::get("db"));
         $data = $L->addfile($data);

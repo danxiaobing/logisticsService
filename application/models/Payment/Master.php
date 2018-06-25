@@ -67,6 +67,12 @@ class Payment_MasterModel
         return $result;
     }
 
+    //获取附件
+    public function getFile($paymentNo){
+        $sql = "SELECT * from payment_files where paymentno = '$paymentNo'";
+        return $this->dbh->select($sql);;
+    }
+
 
     /**
      * @param string $paymentNo 收付款单编号
