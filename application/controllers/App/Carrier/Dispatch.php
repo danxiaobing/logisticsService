@@ -86,6 +86,24 @@ class App_Carrier_DispatchController extends Rpc
          return $L->getNeedLis($id);       
     }
 
+    /**
+     * 待调度 数量
+     * @param int $company_id
+     * @return mixed
+     */
+    public function getWaitOrderNumFunc($company_id=0){
+        $T = new Transmanage_DispatchModel(Yaf_Registry::get("db"));
+        return $T->getWaitOrderNum($company_id);
+    }
 
-
+    /**
+     * 运输中 数量
+     * @param int $company_id
+     * @return mixed
+     */
+    public function getTransitNumFunc($company_id=0)
+    {
+        $T = new Transmanage_DispatchModel(Yaf_Registry::get("db"));
+        return $T->getTransitNum($company_id);
+    }
 }

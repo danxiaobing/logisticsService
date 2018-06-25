@@ -515,6 +515,25 @@ class Transmanage_DispatchModel
         return $pic;
     }
 
+    /**
+     * 待调度
+     * @param $company_id
+     * @return mixed
+     */
+    public function getWaitOrderNum($company_id)
+    {
+        $sql = "SELECT COUNT(1) FROM  gl_order where status=1 and is_del=0 and company_id=".intval($company_id);
+        return $this->dbh->select_one($sql);
+    }
 
-
+    /**
+     * 运输中
+     * @param $company_id
+     * @return mixed
+     */
+    public function getTransitNum($company_id)
+    {
+        $sql = "SELECT COUNT(1) FROM  gl_order_dispatch where status in (0,1,2,3,4) and is_del=0 and c_id=".intval($company_id);
+        return $this->dbh->select_one($sql);
+    }
 }
