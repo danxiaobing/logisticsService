@@ -55,6 +55,11 @@ class Payment_OrderController extends Rpc
         return $L->updatepay($params);         
     }
 
+    public function updateFunc($params){
+        $L = new Payment_OrderModel(Yaf_Registry::get("db"));
+        return $L->update($params);         
+    }
+
 
 
     //获取结算单byorderid

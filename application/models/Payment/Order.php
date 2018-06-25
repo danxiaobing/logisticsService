@@ -193,6 +193,15 @@ class Payment_OrderModel
         return $res ? true : false;
     }
 
+    //更新
+    public function update($params){
+        $id = $params['id'];
+        unset($params['id']);
+        $params['updated_at'] = '=NOW()';
+        $res = $this->dbh->update('payment_order',$params,'id='.intval($id));
+        return $res ? true : false;
+    }
+    
     public function getbankinfo($id){
         $sql = "select * from td_companies_account WHERE companies_id = {$id} and status = 1";
         return $this->gy_db->select_row($sql);
