@@ -139,6 +139,10 @@ class Examine_CarrierModel
                   gl_companies.company_telephone,
                   gl_companies.company_mail,
                   gl_companies.status,
+                  gl_companies.privilege_ca,
+                  gl_companies.company_mail,
+                  gl_companies.privilege_pay,
+                  gl_companies.status,
                   gl_companies.qq,
                   conf_area.area,
                   conf_province.province,
@@ -151,9 +155,21 @@ class Examine_CarrierModel
                 LEFT JOIN conf_city ON conf_city.cityid = gl_companies.city_id WHERE  
                ".$where;
 
+
         $data =  $this->dbh->select_row($sql);
+        if($data['privilege_ca'] == 1){
+            $contractSql = "SELECT apply_status FROM gl_companies_contract_apply WHERE companies_id = ".intval($data['id']);
+            $data['apply_status'] = $this->dbh->select_one($contractSql);
+        }
+
+        if($data['privilege_pay'] == 1){
+            $accountSql = "SELECT apply_status FROM gl_companies_account_apply WHERE companies_id = ".intval($data['id']);
+            $data['privilege_pay_data'] = $this->dbh->select_row($accountSql);
+        }
         $res = $this->showfile($data['id']);
-        $data = array_merge($data, $res);
+        if(!empty($res)){
+            $data = array_merge($data, $res);
+        }
         return $data;
     }
 
@@ -332,12 +348,22 @@ class Examine_CarrierModel
             foreach ($res as $key=>$value){
                 if( 1 == intval($value['type'])){
                     $data['business_license'] = $value['path'];
-                }else if( 2 == intval($value['type'])){
+                }else if( 2 == intval($value['type'])) {
                     $data['danger_file'] = $value['path'];
+                }else if(4  == intval($value['type'])){
+                    $data['corporation_card'] = $value['path'];
+                }else if(5  == intval($value['type'])){
+                    $data['ca_warrant'] = $value['path'];
+                }else if(6  == intval($value['type'])){
+                    $data['ca_application'] = $value['path'];
+                }else if(7  == intval($value['type'])){
+                    $data['admin_warrant'] = $value['path'];
                 }else{
                     $data['other_file'][$key] = $value['path'];
                 }
             }
+        }else{
+            $data = array();
         }
 
         return $data;

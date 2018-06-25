@@ -183,7 +183,8 @@ class Transmanage_InquirydelModel
                          gd.consign_phone,
                          gct.`name`,
                          gd.created_at,
-                         gd.`status`
+                         gd.`status`,
+                         gd.`qq`
                          FROM gl_goods gd
                          LEFT JOIN gl_cars_type gct ON  gct.id=gd.cars_type WHERE gd.id =".intval($id);
         $res = $this->dbh->select_row($sql);

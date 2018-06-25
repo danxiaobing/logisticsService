@@ -190,9 +190,40 @@ class Payment_MasterModel
     //新增
     public function affirm($data)
     {
+
         // print_r($data);die;
-        // echo 1;die;
-        return $this->dbh->insert('payment_master',$data);
+         #事务
+        $this->dbh->begin();
+        try{
+
+            $id = $data['id'];
+
+            #修改结算单
+            unset($data['id']);
+            $res1 = $this->dbh->insert('payment_master',$data);
+            if(!$res1){
+                $this->dbh->rollback();
+                throw new Yaf_Exception('修改失败！');
+            }
+
+            #修改付款单
+            $masterResult =  $this->dbh->update('payment_order',array('status'=>0,'paymentno'=>$data['paymentno'] ),"id = '".$id."'");
+            if(!$masterResult){
+                $this->dbh->rollback();
+                throw new Yaf_Exception('修改失败！');
+            }
+
+
+
+            $this->dbh->commit();
+            return true;
+
+        }catch (Exception $exception){
+            throw new Yaf_Exception('修改失败！');
+        }
+
+
+
     }
 
 
@@ -211,6 +242,49 @@ class Payment_MasterModel
         }
         return $result;
     }
+
+    /**
+     * 驳回
+     */
+    public function backPaymentMasterStatus($paymentno){
+        if ($paymentno == null ){
+            throw new Yaf_Exception('单号信息不能为空！');
+        }
+
+        $orderSql = "SELECT paymentno from payment_master where paymentno = '$paymentno'";
+        $info = $this->dbh->select_one($orderSql);
+
+        if($info == null){
+            throw new Yaf_Exception('该收付款单不存在！');
+        }
+
+        #事务
+        $this->dbh->begin();
+        try{
+
+            #修改付款单
+            $masterResult =  $this->dbh->update('payment_master',array('paystatus'=>4),"paymentno = '" . $paymentno."'");
+            if(!$masterResult){
+                $this->dbh->rollback();
+                throw new Yaf_Exception('修改失败！');
+            }
+
+            #修改结算单
+            $orderResult = $this->dbh->update('payment_order',['status'=>1,'updated_at'=>'=NOW()'],"paymentno = '" . $paymentno."'");
+            if(!$orderResult){
+                $this->dbh->rollback();
+                throw new Yaf_Exception('修改失败！');
+            }
+
+
+            $this->dbh->commit();
+            return true;
+
+        }catch (Exception $exception){
+            throw new Yaf_Exception('修改失败！');
+        }
+    }
+
 
     /**
      * 修改付款单
