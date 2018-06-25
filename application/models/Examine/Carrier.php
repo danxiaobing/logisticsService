@@ -147,7 +147,6 @@ class Examine_CarrierModel
                   conf_area.area,
                   conf_province.province,
                   conf_city.city,
-                  gl_companies_contract_apply.apply_status,
                   gl_companies.business,
                   gl_companies.products  
                   FROM gl_companies 
