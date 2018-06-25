@@ -167,7 +167,9 @@ class Examine_CarrierModel
             $data['privilege_pay_data'] = $this->dbh->select_row($accountSql);
         }
         $res = $this->showfile($data['id']);
-        $data = array_merge($data, $res);
+        if(!empty($res)){
+            $data = array_merge($data, $res);
+        }
         return $data;
     }
 
