@@ -177,7 +177,8 @@ class Transmanage_OrderModel
                      gct.`name`,
                      gd.created_at,
                      gd.`status`,
-                     gd.pay_type
+                     gd.pay_type,
+                     gd.`qq`
                      FROM gl_goods gd
                      LEFT JOIN gl_cars_type gct ON  gct.id=gd.cars_type WHERE gd.id =".$info['goods_id'];
       $data = $this->dbh->select_row($sql);
