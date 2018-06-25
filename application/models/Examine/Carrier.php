@@ -139,17 +139,24 @@ class Examine_CarrierModel
                   gl_companies.company_telephone,
                   gl_companies.company_mail,
                   gl_companies.status,
+                  gl_companies.privilege_ca,
+                  gl_companies.company_mail,
+                  gl_companies.status,
                   gl_companies.qq,
                   conf_area.area,
                   conf_province.province,
                   conf_city.city,
+                  gl_companies_contract_apply.apply_status,
                   gl_companies.business,
                   gl_companies.products  
                   FROM gl_companies 
                 LEFT JOIN conf_area ON conf_area.areaid = gl_companies.area_id
                 LEFT JOIN conf_province ON conf_province.provinceid = gl_companies.province_id
+                LEFT JOIN gl_companies_contract_apply ON gl_companies_contract_apply.companies_id = gl_companies.id
                 LEFT JOIN conf_city ON conf_city.cityid = gl_companies.city_id WHERE  
                ".$where;
+
+        var_dump($sql);die;
 
         $data =  $this->dbh->select_row($sql);
         $res = $this->showfile($data['id']);
@@ -332,8 +339,16 @@ class Examine_CarrierModel
             foreach ($res as $key=>$value){
                 if( 1 == intval($value['type'])){
                     $data['business_license'] = $value['path'];
-                }else if( 2 == intval($value['type'])){
+                }else if( 2 == intval($value['type'])) {
                     $data['danger_file'] = $value['path'];
+                }else if(4  == intval($value['type'])){
+                    $data['corporation_card'] = $value['path'];
+                }else if(5  == intval($value['type'])){
+                    $data['ca_warrant'] = $value['path'];
+                }else if(6  == intval($value['type'])){
+                    $data['ca_application'] = $value['path'];
+                }else if(7  == intval($value['type'])){
+                    $data['admin_warrant'] = $value['path'];
                 }else{
                     $data['other_file'][$key] = $value['path'];
                 }
