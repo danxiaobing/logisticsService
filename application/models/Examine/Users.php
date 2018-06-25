@@ -173,6 +173,7 @@ class Examine_UsersModel
                 gl_user_info.mobile,
                 gl_user_info.email,
                 gl_companies.company_code,
+                gl_companies.social_code,
                 gl_companies.id as cid,
                 gl_companies.company_name,
                 gl_companies.company_telephone,
