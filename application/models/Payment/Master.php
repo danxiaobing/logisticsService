@@ -26,8 +26,8 @@ class Payment_MasterModel
         $where = ' g.isdel = 0 ';
 
 
-        if (isset($params['carrier_id']) && !empty($params['carrier_id'])) {
-            $filter[] = " g.`receive_companyno` =".$params['carrier_id'];
+        if (isset($params['cid']) && !empty($params['cid'])) {
+            $filter[] = " g.`pay_companyno` =".$params['cid'];
         }
 
         if (isset($params['paystatus']) && !empty($params['paystatus'])) {

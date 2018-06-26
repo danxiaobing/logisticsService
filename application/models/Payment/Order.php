@@ -28,7 +28,7 @@ class Payment_OrderModel
         $where = ' g.isdel = 0 ';
 
         if (isset($params['cid']) && !empty($params['cid'])) {
-            $filter[] = " g.`c_id` =".$params['cid'];
+            $filter[] = " g.`cargo_id` =".$params['cid'];
         }
 
 
@@ -51,7 +51,7 @@ class Payment_OrderModel
 
         $sql = "SELECT count(1) FROM payment_order g  WHERE {$where}";
         $result['totalRow'] = $this->dbh->select_one($sql);
-        // print_r($filter);die;
+        
 
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
@@ -60,6 +60,7 @@ class Payment_OrderModel
                 FROM payment_order g
                 WHERE  {$where}
                 ORDER BY g.id DESC";
+        // print_r($sql);die;
         $result['list']  = $this->dbh->select_page($sql);
         return $result;
     }
