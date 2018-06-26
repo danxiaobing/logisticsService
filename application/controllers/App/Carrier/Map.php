@@ -32,11 +32,16 @@ class App_Carrier_MapController extends Rpc
     public function getLocusFunc($parms){
 
         $map = new App_Carrier_MapModel(Yaf_Registry::get("db"));
-        $res = $map->getLocus($parms); 
+        $res = $map->getLocus($parms);   
+        if (!$res){
+            return [];
+        }
         $data = [
             "name"=>$res[0]['driver_name'],//司机姓名
             "dispatch_number"=>$res[0]['dispatch_number'],//调度单号
             "mobile"=>$res[0]['mobile'],//手机
+            "off_address"=>$res[0]['off_address'],//发货地址
+            "reach_address"=>$res[0]['reach_address'],//卸货地址
         ];
         foreach ($res as $key => $val){
             $data['locations'][] = [
@@ -46,7 +51,7 @@ class App_Carrier_MapController extends Rpc
             ];
         }      
         
-        return $data;
+        return $data?$data:[];
     }
 
 
