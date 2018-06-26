@@ -136,7 +136,7 @@ class Examine_CarrierModel
                   gl_companies.company_address,
                   gl_companies.company_user,
                   gl_companies.company_telephone,
-                  gl_companies.company_telephone,
+                  gl_companies.seal_customer_id,
                   gl_companies.company_mail,
                   gl_companies.status,
                   gl_companies.privilege_ca,
@@ -171,6 +171,31 @@ class Examine_CarrierModel
             $data = array_merge($data, $res);
         }
         return $data;
+    }
+
+    /**
+     * 修改承运商基础信息
+     * @param array $params
+     * @param integer $id
+     * @return bool
+     */
+    public function updateCarrierBase($params,$id){
+
+        $carrier_arr = array(
+            'company_name'      =>$params['company_name'],
+            'company_user'      =>$params['company_user'],
+            'company_telephone' =>$params['company_telephone'],
+            'social_code'        =>$params['social_code'],
+            'seal_customer_id'     =>$params['seal_customer_id'],
+            'privilege_pay'     =>$params['privilege_pay'],
+            'privilege_ca'     =>$params['privilege_ca'],
+            'privilege_sign'     =>$params['privilege_sign'],
+            'company_mail'      =>$params['company_mail'],
+            'status'            =>$params['status'],
+            'updated_at'        => '=NOW()'
+        );
+        $carrier = $this->dbh->update('gl_companies', $carrier_arr,'id='.$id);
+        return $carrier;
     }
 
 
