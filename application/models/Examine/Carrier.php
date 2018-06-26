@@ -136,7 +136,7 @@ class Examine_CarrierModel
                   gl_companies.company_address,
                   gl_companies.company_user,
                   gl_companies.company_telephone,
-                  gl_companies.company_telephone,
+                  gl_companies.seal_customer_id,
                   gl_companies.company_mail,
                   gl_companies.status,
                   gl_companies.privilege_ca,
