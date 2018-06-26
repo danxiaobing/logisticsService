@@ -40,13 +40,11 @@ class App_Carrier_OrderModel
                 o.number as order_number,
                 o.status,
                 o.created_at,
-                p.zh_name as product_name,
                 car.name as cars_type_name,
                 god.dispatch_number as cars_type_name
                 FROM gl_order o
                 LEFT JOIN gl_goods g ON o.goods_id = g.id
                 LEFT JOIN gl_companies com ON com.id = o.company_id
-                LEFT JOIN gl_products p ON g.product_id = p.id
                 LEFT JOIN gl_cars_type car ON car.id = g.cars_type
                 LEFT JOIN gl_order_dispatch god ON o.id = god.order_id
                 WHERE  {$where}
@@ -54,6 +52,9 @@ class App_Carrier_OrderModel
         $result['list']  = $this->dbh->select_page($sql);
         foreach ($result['list'] as $k => &$v) {
             $v['unit'] = '吨';
+            $sql = "SELECT title FROM td_category_goods WHERE td_category_goods.id=".$v['product_id'];
+            $product_name = $this->dbh2->select_one($sql);
+            $v['product_name'] = $product_name;
         }
         return $result;
     }
