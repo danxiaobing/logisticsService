@@ -47,7 +47,7 @@ class App_Carrier_OrderModel
                 LEFT JOIN gl_goods g ON o.goods_id = g.id
                 LEFT JOIN gl_companies com ON com.id = o.company_id
                 LEFT JOIN gl_products p ON g.product_id = p.id
-                LEFT JOIN gl_cars_type car ON o.car_id = car.id
+                LEFT JOIN gl_cars_type car ON car.id = g.cars_type
                 LEFT JOIN gl_order_dispatch god ON o.id = god.order_id
                 WHERE  {$where}
                 ORDER BY order_id DESC";
