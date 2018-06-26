@@ -74,6 +74,11 @@ class Examine_CarrierController extends Rpc {
         $data = $Carrier->updateCarrier($params,$id);
         return $data;
     }
+    public function updateCarrierBaseFunc($params,$id){
+        $Carrier = new Examine_CarrierModel(Yaf_Registry::get("db"));
+        $data = $Carrier->updateCarrierBase($params,$id);
+        return $data;
+    }
 
     public function delFileFunc($status,$where){
         $Carrier = new Examine_CarrierModel(Yaf_Registry::get("db"));
