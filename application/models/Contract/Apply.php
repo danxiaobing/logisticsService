@@ -95,11 +95,10 @@ class Contract_ApplyModel
 
      public function getContractApplyInfoById($id)
     {
-        $sql = "SELECT gl_companies.id as c_id,gl_companies.*,gl_user_info.mobile,
+        $sql = "SELECT gl_companies.id as c_id,gl_companies.*,
                 tcca.id,tcca.apply_status,tcca.created_at,tcca.updated_at,tcca.deal_time
                 FROM `gl_companies_contract_apply` AS tcca
                 JOIN `gl_companies` ON gl_companies.`id`=tcca.`companies_id`
-                JOIN `gl_user_info` ON gl_companies.`id`=gl_user_info.`cid`
                 WHERE tcca.`id`={$id}";
                 // echo $sql;die;
         $result = $this->dbh->select_row($sql);
