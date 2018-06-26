@@ -41,7 +41,6 @@ class App_Carrier_OrderModel
                 o.status,
                 o.created_at,
                 p.zh_name as product_name,
-                p.unit,
                 car.name as cars_type_name,
                 god.dispatch_number as cars_type_name
                 FROM gl_order o
@@ -53,6 +52,9 @@ class App_Carrier_OrderModel
                 WHERE  {$where}
                 ORDER BY order_id DESC";
         $result['list']  = $this->dbh->select_page($sql);
+        foreach ($result['list'] as $k => &$v) {
+            $v['unit'] = '吨';
+        }
         return $result;
     }
 
@@ -76,7 +78,6 @@ class App_Carrier_OrderModel
                         od.start_time,
                         od.end_time,
                         p.zh_name as product_name,
-                        p.unit,
                         cp1.province as start_provice,
                         cp2.province as end_provice,
                         cc1.city as start_city,
@@ -96,6 +97,7 @@ class App_Carrier_OrderModel
                         WHERE
                         o.id = ".intval($orderid);
         $res = $this->dbh->select_row($sql);
+        $res['unit'] = '吨';
         $sql = "SELECT IFNULL(company_name,'') name  FROM td_companies WHERE id=".$res['cargo_id'];
         $name = $this->dbh2->select_one($sql);
         $res['cargoname'] = $name;
