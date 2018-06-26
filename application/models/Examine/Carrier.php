@@ -164,8 +164,8 @@ class Examine_CarrierModel
 
         $data =  $this->dbh->select_row($sql);
         if($data['privilege_ca'] == 1){
-            $contractSql = "SELECT updated_at FROM gl_companies_contract_apply WHERE companies_id = ".intval($data['id']);
-            $data['privilege_ca'] = $this->dbh->select_one($contractSql);
+            $contractSql = "SELECT apply_status,apply_msg,updated_at FROM gl_companies_contract_apply WHERE companies_id = ".intval($data['id']);
+            $data['privilege_ca'] = $this->dbh->select_row($contractSql);
         }
 
         if($data['privilege_pay'] == 1){
