@@ -38,7 +38,6 @@ class App_Carrier_DriverModel
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['page_size'] ? $params['page_size'] : 8);
         $sql = "SELECT * FROM gl_driver WHERE ".$where."ORDER BY created_at DESC";
-        var_dump($sql);die();
         $result = $this->dbh->select_page($sql);
         if ($result){
             return $result;
