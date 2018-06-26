@@ -59,10 +59,11 @@ class App_Carrier_MapModel
         if($dispatch_id && is_numeric($dispatch_id)){
             $where .= ' AND god.`id` = '.$dispatch_id;
         }
-        $sql = "SELECT god.driver_name,god.driver_id,god.dispatch_number,gd.mobile,gml.lng,gml.lat,gml.created_at
+        $sql = "SELECT god.driver_name,god.driver_id,god.dispatch_number,gd.mobile,gml.lng,gml.lat,gml.created_at,gg.off_address,gg.reach_address
                 FROM gl_order_dispatch god 
                 LEFT JOIN gl_map_location gml ON god.id = gml.dispatch_id
                 LEFT JOIN gl_driver gd ON gd.id = god.driver_id
+                LEFT JOIN gl_goods gg ON gg.id = god.goods_id
                 WHERE ".$where;  
         $sql .= ' order by gml.created_at desc';
         $data =  $this->dbh->select($sql);
