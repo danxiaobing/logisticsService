@@ -7,16 +7,17 @@
  */
 class App_Carrier_OrderModel
 {
-    public $dbh = null;
-
+    public $dbh  = null;
+    public $dbh2 = null;
     /**
      * Constructor
      * @param   object $dbh
      * @return  void
      */
-    public function __construct($dbh, $mch = null)
+    public function __construct($dbh, $mch = null, $dbh2)
     {
         $this->dbh = $dbh;
+        $this->dbh2 = $dbh2;
     }
 
     public function getList($params)
@@ -61,6 +62,7 @@ class App_Carrier_OrderModel
                         o.goods_id,
                         o.cargo_id,                       
                         o.number as order_number,          
+                        o.cargo_id,          
                         g.weights,
                         g.off_address,   
                         g.reach_address,   
@@ -93,7 +95,11 @@ class App_Carrier_OrderModel
                         LEFT JOIN conf_area ca2 ON ca2.areaid = g.end_area_id
                         WHERE
                         o.id = ".intval($orderid);
-        return $this->dbh->select_row($sql);
+        $res = $this->dbh->select_row($sql);
+        $sql = "SELECT IFNULL(company_name,'') name  FROM td_companies WHERE id=".$res['cargo_id'];
+        $name = $this->dbh2->select_one($sql);
+        $res['cargoname'] = $name;
+        return $res;
     }
 
 }
