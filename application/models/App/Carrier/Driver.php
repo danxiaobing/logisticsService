@@ -24,6 +24,9 @@ class App_Carrier_DriverModel
         if (isset($params['keyword']) && $params['keyword']){
             $filter[] = " ( `name` like '%{$params['keyword']}%' OR `mobile` like '%{$params['keyword']}%')";
         }
+        if (isset($params['company_id']) && $params['company_id']){
+            $filter[] = "`company_id` = {$params['company_id']} ";
+        }
         $where = ' status = 1 AND is_use = 1 AND isdelete = 0 ';
         if (count($filter) > 0) {
             $where .= ' AND '.implode(" AND ", $filter);
