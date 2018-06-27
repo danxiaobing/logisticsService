@@ -30,12 +30,16 @@ class Payment_MasterModel
             $filter[] = " g.`pay_companyno` =".$params['cid'];
         }
 
+        if (isset($params['carrier_id']) && !empty($params['carrier_id'])) {
+            $filter[] = " g.`receive_companyno` =".$params['carrier_id'];
+        }
+
         if (isset($params['paystatus']) && !empty($params['paystatus'])) {
             $filter[] = " g.`paystatus` = '{$params['paystatus']}'";
         }
 
         if (isset($params['pay_companyname']) && !empty($params['pay_companyname'])) {
-            $filter[] = " g.`pay_companyname` = '%{$params['pay_companyname']}%'";
+            $filter[] = " g.`pay_companyname` LIKE '%{$params['pay_companyname']}%'";
         }
 
         if (isset($params['starttime']) && $params['starttime'] != '') {
@@ -52,7 +56,7 @@ class Payment_MasterModel
 
 
         $sql = "SELECT count(1) FROM payment_master g  WHERE {$where}";
-        //print_r($sql);die;
+
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
