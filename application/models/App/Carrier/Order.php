@@ -22,9 +22,19 @@ class App_Carrier_OrderModel
 
     public function getList($params)
     {
+        $filter = array();
         $where = 'o.is_del = 0 and g.is_del = 0 ';
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
+        if ($params['type'] == 2) {
+            $filter[] = " o.`status` = 1";
+        }
+        if (isset($params['company_id']) && !empty($params['company_id'])) {
+            $filter[] = " g.`cid` =".$params['company_id'];
+        }
+        if (count($filter) > 0) {
+            $where .= ' AND '.implode(" AND ", $filter);
+        }
         $sql = "SELECT
                 o.id as order_id,
                 g.start_provice_id,
@@ -67,6 +77,7 @@ class App_Carrier_OrderModel
                         o.number as order_number,          
                         o.cargo_id,          
                         g.weights,
+                        o.status,
                         g.off_address,   
                         g.reach_address,   
                         g.loss,   
