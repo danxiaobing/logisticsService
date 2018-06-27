@@ -298,8 +298,8 @@ class Payment_MasterModel
      * @param int $paystatus
      * @return bool
      */
-    public function updatePaymentStatus($paymentno,$paystatus){
-        if ($paymentno == null || $paystatus == null){
+    public function updatePaymentStatus($paymentno,$params){
+        if ($paymentno == null || $params == null){
             throw new Yaf_Exception('收付款单号信息不能为空！');
         }
 
@@ -316,14 +316,14 @@ class Payment_MasterModel
         try{
 
             #修改付款单
-            $masterResult =  $this->dbh->update('payment_master',$paystatus,"paymentno = '" . $paymentno."'");
+            $masterResult =  $this->dbh->update('payment_master',$params,"paymentno = '" . $paymentno."'");
             if(!$masterResult){
                 $this->dbh->rollback();
                 throw new Yaf_Exception('修改失败！');
             }
 
 
-            if($paystatus == 3){
+            if($params['paystatus'] == 3){
                 #修改结算单
                 $orderResult = $this->dbh->update('payment_order',['status'=>2,'updated_at'=>'=NOW()'],"paymentno = '" . $paymentno."'");
                 if(!$orderResult){
