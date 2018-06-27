@@ -29,12 +29,13 @@ class Transmanage_DispatchModel
         }
 
         if (isset($params['start_time']) && $params['start_time'] != '') {
-            $filter[] = " `created_at` >= '".$params['start_time']."'";
+            $filter[] = " `created_at` >= '{$params['start_time']} 00:00:00'";
         }
 
         if (isset($params['end_time']) && $params['end_time'] != '') {
-            $filter[] = " `created_at` <= '".$params['end_time']."'";
+            $filter[] = " `created_at` <= '{$params['end_time']} 23:59:59'";
         }
+
 
         if (isset($params['keyworks']) && $params['keyworks'] != '') {
             $filter[] = " ( `dispatch_number` like '%{$params['keyworks']}%' OR `cars_number` like '%{$params['keyworks']}%' OR `driver_name` like '%{$params['keyworks'] }%'  OR `supercargo_name` like '%{$params['keyworks']}%')";
