@@ -39,11 +39,11 @@ class Payment_MasterModel
         }
 
         if (isset($params['starttime']) && $params['starttime'] != '') {
-            $filter[] = " unix_timestamp(g.`created_at`) >= unix_timestamp('{$params['starttime']} 00:00:00')";
+            $filter[] = " unix_timestamp(g.`createdat`) >= unix_timestamp('{$params['starttime']} 00:00:00')";
         }
 
         if (isset($params['endtime']) && $params['endtime'] != '') {
-            $filter[] = " unix_timestamp(g.`created_at`) <= unix_timestamp('{$params['endtime']} 23:59:59')";
+            $filter[] = " unix_timestamp(g.`createdat`) <= unix_timestamp('{$params['endtime']} 23:59:59')";
         }
 
         if (count($filter) > 0) {
@@ -52,7 +52,7 @@ class Payment_MasterModel
 
 
         $sql = "SELECT count(1) FROM payment_master g  WHERE {$where}";
-
+        //print_r($sql);die;
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);

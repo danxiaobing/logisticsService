@@ -32,7 +32,7 @@ class Payment_OrderModel
         }
 
 
-        if (isset($params['status']) && !empty($params['status'])) {
+        if (isset($params['status']) && $params['status'] != '') {
             $filter[] = " g.`status` = '{$params['status']}'";
         }
 
@@ -48,7 +48,7 @@ class Payment_OrderModel
             $where .= ' AND '.implode(" AND ", $filter);
         }
 
-
+        //print_r($filter);die;
         $sql = "SELECT count(1) FROM payment_order g  WHERE {$where}";
         $result['totalRow'] = $this->dbh->select_one($sql);
         
