@@ -37,9 +37,13 @@ class App_Carrier_OrderModel
         }
         $sql = "SELECT
                 o.id as order_id,
-                g.start_provice_id,
-                g.end_provice_id,
                 g.product_id,
+                g.start_provice_id,
+                g.start_city_id,
+                g.start_area_id,
+                g.end_provice_id,
+                g.end_city_id,
+                g.end_area_id,
                 g.weights,
                 g.off_address,
                 g.reach_address,
@@ -50,8 +54,7 @@ class App_Carrier_OrderModel
                 o.number as order_number,
                 o.status,
                 o.created_at,
-                car.name as cars_type_name,
-                god.dispatch_number as cars_type_name
+                car.name as cars_type_name
                 FROM gl_order o
                 LEFT JOIN gl_goods g ON o.goods_id = g.id
                 LEFT JOIN gl_companies com ON com.id = o.company_id
@@ -60,6 +63,28 @@ class App_Carrier_OrderModel
                 WHERE  {$where}
                 ORDER BY order_id DESC";
         $result['list']  = $this->dbh->select_page($sql);
+        if(!empty($result['list'])){
+            $pro = array_column($this->dbh->select('SELECT provinceid,province FROM conf_province'),'province','provinceid');
+            foreach($result['list'] as $key=>$value){
+                $result['list'][$key]['start_province'] = $pro[$value['start_provice_id']];
+                $result['list'][$key]['end_province'] = $pro[$value['end_provice_id']];
+            }
+            unset($pro);
+            $city = array_column($this->dbh->select('SELECT cityid,city FROM conf_city'),'city','cityid');
+            foreach($result['list'] as $key=>$value){
+                $result['list'][$key]['start_city'] = $city[$value['start_city_id']];
+                $result['list'][$key]['end_city'] = $city[$value['end_city_id']];
+            }
+            unset($city);
+            $area = array_column($this->dbh->select('SELECT areaid,area FROM conf_area'),'area','areaid');
+            foreach($result['list'] as $key=>$value){
+                $result['list'][$key]['start_area'] = $area[$value['start_area_id']];
+                $result['list'][$key]['end_area'] = $area[$value['end_area_id']];
+            }
+            unset($area);
+        }
+
+
         foreach ($result['list'] as $k => &$v) {
             $v['unit'] = '吨';
             $sql = "SELECT title FROM td_category_goods WHERE td_category_goods.id=".$v['product_id'];
