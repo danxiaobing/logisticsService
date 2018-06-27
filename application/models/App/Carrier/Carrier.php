@@ -62,9 +62,9 @@ class App_Carrier_CarrierModel
             } else {
                 return false;
             }
+        }else{
+            return false;
         }
-
-        return $data;
 
     }
 
