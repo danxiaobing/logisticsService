@@ -89,6 +89,9 @@ class Transmanage_DispatchModel
         if (isset($params['company_id']) && $params['company_id'] ) {
             $filter[] = " `c_id` = ".$params['company_id'];
         }
+        if (isset($params['dispatch_number']) && $params['dispatch_number'] ) {
+            $filter[] = " `dispatch_number` = '".$params['dispatch_number']."'";
+        }
         if (isset($params['ids']) && count($params['ids']) ) {
             $filter[] = " `id` in ({$params['ids']}) ";
         }
@@ -106,16 +109,15 @@ class Transmanage_DispatchModel
         }
 
         if (isset($params['status']) && $params['status'] != '') {
-            $filter[] = " `status` =".$params['status'];
+            $filter[] = " d.`status` =".$params['status'];
         }
         if (isset($params['statusarr']) && $params['statusarr'] != '') {
-            $filter[] = " `status` in (".$params['statusarr'].")";
+            $filter[] = " d.`status` in (".$params['statusarr'].")";
         }
 
         if(isset($params['order_id']) && $params['order_id'] != 0){
             $filter[] = " `order_id` =".$params['order_id'];
         }
-
 
         $where = ' 1= 1 ';
 
@@ -123,7 +125,7 @@ class Transmanage_DispatchModel
             $where .= ' AND '.implode(" AND ", $filter);
         }
 
-        $sql = "SELECT count(1) FROM gl_order_dispatch  WHERE {$where}";
+        $sql = "SELECT count(1) FROM gl_order_dispatch d  WHERE {$where}";
 
         // return $sql;
         $result['totalRow'] = $this->dbh->select_one($sql);
