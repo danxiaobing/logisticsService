@@ -58,6 +58,8 @@ class App_Carrier_MapModel
 
         if($dispatch_id && is_numeric($dispatch_id)){
             $where .= ' AND god.`id` = '.$dispatch_id;
+        }else{
+            return [];
         }
         $sql = "SELECT god.driver_name,god.driver_id,god.dispatch_number,gd.mobile,gml.lng,gml.lat,gml.created_at,gg.off_address,gg.reach_address
                 FROM gl_order_dispatch god 
