@@ -341,6 +341,14 @@ class Payment_MasterModel
                     $this->dbh->rollback();
                     throw new Yaf_Exception('修改失败！');
                 }
+            }elseif($params['paystatus'] == 4){
+
+                #修改结算单
+                $orderResult = $this->dbh->update('payment_order',['status'=>0,'updated_at'=>'=NOW()'],"paymentno = '" . $paymentno."'");
+                if(!$orderResult){
+                    $this->dbh->rollback();
+                    throw new Yaf_Exception('修改失败！');
+                }
             }
 
             $this->dbh->commit();
