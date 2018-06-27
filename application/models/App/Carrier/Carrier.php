@@ -53,8 +53,7 @@ class App_Carrier_CarrierModel
                 ".$where;
 
         $data =  $this->dbh->select_row($sql);
-
-        if(!empty($password)) {
+        if(!empty($userpwd)) {
             $hash = $data['password'];
             if (password_verify($userpwd, $hash)) {
                 unset($data['password']);
@@ -65,7 +64,6 @@ class App_Carrier_CarrierModel
         }else{
             return false;
         }
-
     }
 
 
