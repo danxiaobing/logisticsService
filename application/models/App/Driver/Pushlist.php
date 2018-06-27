@@ -79,6 +79,16 @@ class App_Driver_PushlistModel
 
     }
 
+    /**
+     * 未读消息数量
+     */
+    public function unReadCount($driver_id){
+
+        $sql = 'SELECT count(1) FROM gl_message WHERE  status = 0 AND `driver_id` = '.intval($driver_id);
+        $unreadnums = $this->dbh->select_one($sql);
+        return $unreadnums;
+
+    }
 
     /**
      * 未读消息列表

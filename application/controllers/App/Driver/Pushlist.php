@@ -40,6 +40,16 @@ class App_Driver_PushlistController extends Rpc
      * @param $params
      * @return mixed
      */
+    public function unReadCountFunc($driver_id){
+        $L = new App_Driver_PushlistModel(Yaf_Registry::get("db"));
+        $data = $L->unReadCount($driver_id);
+        return $data;
+    }
+    /**
+     * 获取未读消息推送列表
+     * @param $params
+     * @return mixed
+     */
     public function unreadlistFunc($params){
         $L = new App_Driver_PushlistModel(Yaf_Registry::get("db"));
         $data = $L->unreadlist($params);
