@@ -44,24 +44,17 @@ class Order_PayModel
      * @throws Yaf_Exception
      * 通过企业编号查询企业账户金额
      */
-    public function getZhongxinAmount($companyNo){
-        if ($companyNo == null){
+    public function getZhongxinAmount($bankaccountno){
+
+        if ($bankaccountno == null){
             throw new Yaf_Exception(StatusCode::CLIENT_EMPTY_PARAMETER_STRING,StatusCode::CLIENT_EMPTY_PARAMETER_CODE);
         }
-        //通过公司编号查询是否支持线上支付
-        $sql = "select bankaccountno from gl_companies_account WHERE companies_id = $companyNo and status = 1";
-
-        if (Yaf_Registry:: get("db") instanceof MySQL) {
-            $bankaccountno = $this->dbh->select_one($sql);
-
-            if ($bankaccountno){
-                return $this->_getZhongxinAmount($bankaccountno);
-            }else{
-                throw new Yaf_Exception(StatusCode::CLIENT_DATA_NOT_EXISTS_STRING,StatusCode::CLIENT_DATA_NOT_EXISTS_CODE);
-            }
-        } else {
-            throw new Yaf_Exception("db配置不对",StatusCode::CLIENT_DATA_NOT_EXISTS_CODE);
+        if ($bankaccountno){
+            return $this->_getZhongxinAmount($bankaccountno);
+        }else{
+            throw new Yaf_Exception(StatusCode::CLIENT_DATA_NOT_EXISTS_STRING,StatusCode::CLIENT_DATA_NOT_EXISTS_CODE);
         }
+
     }
 
     /**
