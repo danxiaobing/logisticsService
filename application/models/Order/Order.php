@@ -334,7 +334,7 @@ class Order_OrderModel
     public function getOrderInfo($orderid)
     {
         //获取托运单基本信息
-        $sql = "SELECT go.id,go.number,go.cargo_id,go.company_id,go.goods_id,go.estimate_freight,go.status,go.fact_freight,gl_in.price as inquiryprice
+        $sql = "SELECT go.id,go.number,go.cargo_id,go.company_id,go.goods_id,go.estimate_freight,go.status,go.fact_freight,go.pdf_url,gl_in.price as inquiryprice
           FROM gl_order go
           LEFT JOIN gl_inquiry gl_in ON  gl_in.order_id=go.id
           WHERE go.id=" . intval($orderid);
