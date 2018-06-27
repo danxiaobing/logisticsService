@@ -74,11 +74,11 @@ class App_Carrier_OrderModel
                         g.off_phone,   
                         g.reach_user,   
                         g.reach_phone,   
+                        g.product_id,   
                         od.dispatch_number,
                         od.cars_number,
                         od.start_time,
                         od.end_time,
-                        p.zh_name as product_name,
                         cp1.province as start_provice,
                         cp2.province as end_provice,
                         cc1.city as start_city,
@@ -87,7 +87,6 @@ class App_Carrier_OrderModel
                         ca2.area as end_area
                         FROM gl_order o
                         LEFT JOIN gl_goods g ON o.goods_id = g.id
-                        LEFT JOIN gl_products p ON g.product_id = p.id
                         LEFT JOIN gl_order_dispatch od ON o.id = od.order_id
                         LEFT JOIN conf_province cp1 ON cp1.provinceid = g.start_provice_id
                         LEFT JOIN conf_province cp2 ON cp2.provinceid = g.end_provice_id
@@ -101,6 +100,9 @@ class App_Carrier_OrderModel
         $res['unit'] = '吨';
         $sql = "SELECT IFNULL(company_name,'') name  FROM td_companies WHERE id=".$res['cargo_id'];
         $name = $this->dbh2->select_one($sql);
+        $sql = "SELECT title FROM td_category_goods WHERE td_category_goods.id=".$res['product_id'];
+        $product_name = $this->dbh2->select_one($sql);
+        $res['product_name'] = $product_name;
         $res['cargoname'] = $name;
         return $res;
     }
