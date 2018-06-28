@@ -30,7 +30,7 @@ class App_Carrier_OrderModel
             $filter[] = " o.`status` = 1";
         }
         if (isset($params['company_id']) && !empty($params['company_id'])) {
-            $filter[] = " g.`cid` =".$params['company_id'];
+            $filter[] = " o.`company_id` =".$params['company_id'];
         }
         if (count($filter) > 0) {
             $where .= ' AND '.implode(" AND ", $filter);
