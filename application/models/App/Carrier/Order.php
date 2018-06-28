@@ -51,6 +51,8 @@ class App_Carrier_OrderModel
                 com.company_name,
                 g.price,
                 g.desc_str,
+                g.off_starttime as start_time,   
+                g.reach_starttime as end_time,   
                 o.number as order_number,
                 o.status,
                 o.created_at,
