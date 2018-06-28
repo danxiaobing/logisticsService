@@ -341,8 +341,9 @@ class Order_OrderModel
 
         $orderinfo = $this->dbh->select_row($sql);
 
-        //获取goods基本信息
-        $sql = "SELECT
+        if(!empty($orderinfo)){
+            //获取goods基本信息
+            $sql = "SELECT
                      gd.id,
                      gd.cid,
                      gd.start_provice_id,
@@ -379,18 +380,20 @@ class Order_OrderModel
                      gd.`status`
                      FROM gl_goods gd
                      LEFT JOIN gl_cars_type gct ON  gct.id=gd.cars_type WHERE gd.id =" . $orderinfo['goods_id'];
-        $goodsdata = $this->dbh->select_row($sql);
-        if (!empty($orderinfo)) {
-            #sql语句
-            $sql = 'SELECT
+            $goodsdata = $this->dbh->select_row($sql);
+            if (!empty($orderinfo)) {
+                #sql语句
+                $sql = 'SELECT
                   gl_companies.id,
                   gl_companies.company_user,
                   gl_companies.company_telephone,
                   gl_companies.company_name
                   FROM gl_companies WHERE
                   gl_companies.id = ' . intval($orderinfo['company_id']);
-            $carrier_data = $this->dbh->select_row($sql);
+                $carrier_data = $this->dbh->select_row($sql);
+            }
         }
+
         //获取市的信息
         $city = $this->dbh->select('SELECT cityid,city FROM conf_city');
 
