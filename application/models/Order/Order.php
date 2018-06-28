@@ -384,8 +384,8 @@ class Order_OrderModel
             #sql语句
             $sql = 'SELECT
                   gl_companies.id,
-                  gl_companies.bank_name,
-                  gl_companies.bank_num,
+                  gl_companies.company_user,
+                  gl_companies.company_telephone,
                   gl_companies.company_name
                   FROM gl_companies WHERE
                   gl_companies.id = ' . intval($orderinfo['company_id']);
@@ -397,6 +397,77 @@ class Order_OrderModel
         return array('orderinfo' => $orderinfo, 'goodsdata' => $goodsdata, 'carrier_data' => $carrier_data, 'city' => $city);
     }
 
+    /**
+     * 获取预览合同数据
+     */
+    /* 合同信息
+    * 获取单个托运单的详情
+   */
+    public function getContractInfo($params)
+    {
+
+        if(!$params['goods_id']){
+            return [];
+        }
+
+        //获取goods基本信息
+        $sql = "SELECT
+                     gd.id,
+                     gd.cid,
+                     gd.start_provice_id,
+                     gd.start_city_id,
+                     gd.start_area_id,
+                     gd.end_provice_id,
+                     gd.end_city_id ,
+                     gd.end_area_id ,
+                     gd.product_id,
+                     gd.weights,
+                     gd.weights_done,
+                     gd.price ,
+                     gd.companies_name ,
+                     gd.off_starttime ,
+                     gd.off_endtime ,
+                     gd.reach_starttime ,
+                     gd.reach_endtime ,
+                     gd.offer_status,
+                     gd.offer_price,
+                     gd.loss,
+                     gd.pay_type,
+                     gd.qq,
+                     gd.desc_str ,
+                     gd.off_address,
+                     gd.off_user ,
+                     gd.off_phone ,
+                     gd.reach_address ,
+                     gd.reach_user ,
+                     gd.reach_phone ,
+                     gd.consign_user ,
+                     gd.consign_phone,
+                     gct.`name`,
+                     gd.created_at,
+                     gd.`status`
+                     FROM gl_goods gd
+                     LEFT JOIN gl_cars_type gct ON  gct.id=gd.cars_type WHERE gd.id =" . intval($params['goods_id']);
+        $goodsdata = $this->dbh->select_row($sql);
+        if (!empty($goodsdata)) {
+            #sql语句
+            $sql = 'SELECT
+                  gl_companies.id,
+                  gl_companies.company_user,
+                  gl_companies.company_telephone,
+                  gl_companies.company_name
+                  FROM gl_companies WHERE
+                  gl_companies.id = ' . intval($params['company_id']);
+            $carrier_data = $this->dbh->select_row($sql);
+        }
+        //获取市的信息
+        $city = $this->dbh->select('SELECT cityid,city FROM conf_city');
+        list($min,$sec) = explode(" ",microtime());
+        $orderinfo['number'] =  date("Ymd"). substr($sec,3).mt_rand(100,999);
+        $orderinfo['inquiryprice'] = $params['inquiryprice'];
+
+        return array('orderinfo' => $orderinfo,'goodsdata' => $goodsdata, 'carrier_data' => $carrier_data, 'city' => $city);
+    }
 
 
 }
