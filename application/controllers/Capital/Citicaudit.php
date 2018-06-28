@@ -53,4 +53,17 @@ class Capital_CiticauditController extends Rpc
         $data = $Cc->saveAccountApply($data,$id);
         return $data;
     }
+
+    /**
+     * 获取ca签章信息
+     * @param $data
+     * @param $id
+     * @return mixed
+     */
+    public function getCaSealCustomerIdFunc($carrier_id,$cargo_id)
+    {
+        $Cc = new Capital_CiticauditModel(Yaf_Registry::get("db"),Yaf_Registry::get("gy_db"));
+        $data = $Cc->getCaSealCustomerId($carrier_id,$cargo_id);
+        return $data;
+    }
 }

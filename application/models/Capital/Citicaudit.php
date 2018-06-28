@@ -9,7 +9,7 @@
 class Capital_CiticauditModel
 {
     public $dbh = null;
-    public $mc = null;
+    public $mch = null;
 
     /**
      * @param   object $dbh
@@ -18,7 +18,7 @@ class Capital_CiticauditModel
     public function __construct($dbh, $mch = null)
     {
         $this->dbh = $dbh;
-        $this->mc = Yaf_Registry:: get("mc");
+        $this->mch = $mch;
     }
 
     public function getList($params)
@@ -120,5 +120,28 @@ class Capital_CiticauditModel
     {
         $result = $this->dbh->update('gl_companies_account_apply', $params, 'id=' . $id);
         return $result;
+    }
+
+    /**
+     * 获取ca签章
+     */
+    public function getCaSealCustomerId($carrier_id,$cargo_id){
+
+        //获取承运商ca
+        if($carrier_id){
+            $sql = "SELECT seal_customer_id,privilege_sign,privilege_ca FROM `gl_companies` WHERE `id`={$carrier_id}";
+
+            $carrier = $this->dbh->select_row($sql);
+        }
+        //获取智运用户中心ca
+        if($cargo_id){
+            $sql2 = "SELECT seal_customer_id,privilege_sign,privilege_ca FROM `td_companies` WHERE `id`={$cargo_id}";
+            $cargo = $this->mch->select_row($sql2);
+        }
+
+        $ca['carrier'] = $carrier;
+        $ca['cargo'] = $cargo;
+        return $ca;
+
     }
 }
