@@ -163,6 +163,7 @@ class Payment_MasterModel
     public function updatePaymentMaster($paymentno, $data)
     {
         $data['updatedat'] = '=NOW()';
+        // print_r($data);die;
         return $this->dbh->update('payment_master', $data, "paymentno = '" . $paymentno."'");
     }
     /**
@@ -217,7 +218,7 @@ class Payment_MasterModel
             }
 
             #修改付款单
-            $masterResult =  $this->dbh->update('payment_order',array('status'=>0,'paymentno'=>$data['paymentno'] ),"id = '".$id."'");
+            $masterResult =  $this->dbh->update('payment_order',array('status'=>0,'remark'=>$data['rejectpaymeno'],'paymentno'=>$data['paymentno'] ),"id = '".$id."'");
             if(!$masterResult){
                 $this->dbh->rollback();
                 throw new Yaf_Exception('修改失败！');
@@ -273,14 +274,14 @@ class Payment_MasterModel
         try{
 
             #修改付款单
-            $masterResult =  $this->dbh->update('payment_master',array('paystatus'=>4),"paymentno = '" . $paymentno."'");
+            $masterResult =  $this->dbh->update('payment_master',array('isdel'=>1),"paymentno = '" . $paymentno."'");
             if(!$masterResult){
                 $this->dbh->rollback();
                 throw new Yaf_Exception('修改失败！');
             }
 
             #修改结算单
-            $orderResult = $this->dbh->update('payment_order',['status'=>1,'updated_at'=>'=NOW()'],"paymentno = '" . $paymentno."'");
+            $orderResult = $this->dbh->update('payment_order',array('status'=>3,'updated_at'=>'=NOW()'),"paymentno = '" . $paymentno."'");
             if(!$orderResult){
                 $this->dbh->rollback();
                 throw new Yaf_Exception('修改失败！');
