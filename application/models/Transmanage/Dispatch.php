@@ -91,7 +91,7 @@ class Transmanage_DispatchModel
             $filter[] = " `c_id` = ".$params['company_id'];
         }
         if (isset($params['dispatch_number']) && $params['dispatch_number'] ) {
-            $filter[] = " `dispatch_number` = '".$params['dispatch_number']."'";
+            $filter[] = " `dispatch_number` like '%".$params['dispatch_number']."%'";
         }
         if (isset($params['ids']) && count($params['ids']) ) {
             $filter[] = " `id` in ({$params['ids']}) ";
