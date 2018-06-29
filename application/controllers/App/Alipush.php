@@ -59,7 +59,7 @@ class App_AlipushController extends Rpc
         //$request->setiOSBadge($badge); // iOS应用图标右上角角标
         $request->setiOSSilentNotification("false");//是否开启静默通知
         $request->setiOSMusic("default"); // iOS通知声音
-        $request->setiOSApnsEnv("DEV");//iOS的通知是通过APNs中心来发送的，需要填写对应的环境信息。"DEV" : 表示开发环境 "PRODUCT" : 表示生产环境
+        $request->setiOSApnsEnv("PRODUCT");//iOS的通知是通过APNs中心来发送的，需要填写对应的环境信息。"DEV" : 表示开发环境 "PRODUCT" : 表示生产环境
         $request->setiOSRemind("false"); // 推送时设备不在线（既与移动推送的服务端的长连接通道不通），则这条推送会做为通知，通过苹果的APNs通道送达一次(发送通知时,Summary为通知的内容,Message不起作用)。注意：离线消息转通知仅适用于生产环境
         $request->setiOSRemindBody("iOSRemindBody");//iOS消息转通知时使用的iOS通知内容，仅当iOSApnsEnv=PRODUCT && iOSRemind为true时有效
         $request->setiOSExtParameters("{\"dispatch_number\":\"{$dispatch_number}\",\"k2\":\"v2\"}"); //自定义的kv结构,开发者扩展用 针对iOS设备
