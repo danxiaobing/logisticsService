@@ -170,6 +170,11 @@ class Order_OrderModel
               WHERE
                god.`is_del` = 0 AND  god.`status` NOT IN('6') AND god.`order_id` = ".intval($orderid);
             $res = $this->dbh->select($sql);
+            if( $info['status'] == 9 ){
+                $sql = "SELECT `id` FROM payment_order WHERE `order_id` = ".intval($orderid);
+                $res2= $this->dbh->select_row($sql);
+                $info['accounts_id'] = $res2['id'];
+            }
         }
 
         $Schedule =  $res ? $res:[];
