@@ -81,6 +81,7 @@ class App_Driver_DispatchController extends Rpc
             $res['provinceend'] = $provinceArr[$pe_index];//目的省
             $res['citystart'] = $cityArr[$s_index];//起始城市
             $res['cityend'] = $cityArr[$e_index];//目的城市
+            $res['unit'] = '吨';
              return array_merge($result['info'], $res);
         }
         return array();
