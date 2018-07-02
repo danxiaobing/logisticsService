@@ -65,9 +65,12 @@ class Cargo_GoodsModel
                g.end_provice_id,
                g.end_city_id,
                g.end_area_id,
+               g.start_provice,
+               g.end_provice,
                g.cate_id,
                g.cate_id_two,
                g.product_id,
+               g.product_name,
                g.weights,
                g.price,
                g.offer_status,
@@ -82,36 +85,6 @@ class Cargo_GoodsModel
                LEFT JOIN gl_companies com ON com.id = g.carriers_id
                " . $where . "   ORDER BY {$order} DESC";
         $result['list'] = $this->dbh->select_page($sql);
-        if( count($result['list']) ){
-            foreach ($result['list'] as $k => $v) {
-
-                $type = 'area';
-                if( $v['start_provice_id'] == 0 ){
-                    if( $v['start_city_id'] == 0 ){
-                        $type = 'province';
-                    }else{
-                        $type = 'city';
-                    }
-                }
-                $name = "start_{$type}_id";
-                $sql = "SELECT GROUP_CONCAT(cp.`{$type}`) FROM conf_{$type} cp where cp.`{$type}id` = {$v[$name]}";
-                $data = $this->dbh->select_one($sql);
-                $result['list'][$k]['start_name'] = $data ? $data:'';
-
-                $type = 'area';
-                if( $v['end_area_id'] == 0 ){
-                    if( $v['end_city_id'] == 0 ){
-                        $type = 'province';
-                    }else{
-                        $type = 'city';
-                    }
-                }
-                $name = "end_{$type}_id";
-                $sql = "SELECT GROUP_CONCAT(cp.`{$type}`) FROM conf_{$type} cp where cp.`{$type}id` = {$v[$name]}";
-                $data = $this->dbh->select_one($sql);
-                $result['list'][$k]['end_name'] = $data ? $data:'';
-            }
-        }
         return $result;
     }
     /**
@@ -122,20 +95,12 @@ class Cargo_GoodsModel
     public function getInfo($id = 0)
     {
         $sql = "SELECT
-               g.id,g.start_provice_id,g.start_city_id,g.start_area_id,g.end_provice_id,g.end_city_id,g.end_area_id,g.cate_id,g.cate_id_two,g.product_id,g.weights,g.price,g.companies_name,g.off_starttime,g.off_endtime,g.reach_starttime,
-               g.reach_endtime,g.cars_type,g.pay_type,g.qq,g.loss,g.offer_status,g.carriers_id,g.offer_price,g.off_address,g.off_user,g.off_phone,g.reach_address,g.reach_user,g.reach_phone,g.consign_user,g.consign_phone,g.desc_str,g.status,
-               gl_cars_type.name AS cars_type_name,
-               start_city.`city` as start_city,
-               start_area.`area` as start_area,
-               end_city.`city` as end_city,
-               end_area.`area` as end_area
-               FROM gl_goods g
-                LEFT JOIN conf_city  start_city ON g.`start_city_id` = start_city.`cityid`
-                LEFT JOIN conf_city  end_city  ON g.`end_city_id` = end_city.`cityid`
-                LEFT JOIN conf_area  start_area ON g.`start_area_id` = start_area.`areaid`
-                LEFT JOIN conf_area  end_area  ON g.`end_area_id` = end_area.`areaid`
-            LEFT JOIN gl_cars_type ON gl_cars_type.id = g.cars_type WHERE g.id=".$id;
-
+               g.id,g.start_provice_id,g.start_city_id,g.start_area_id,g.end_provice_id,g.end_city_id,g.end_area_id,
+               g.start_provice,g.start_city,g.start_area,g.end_provice,g.end_city,g.end_area,g.product_name,g.cars_type_name,
+               g.cate_id,g.cate_id_two,g.product_id,g.weights,g.price,g.companies_name,g.off_starttime,g.off_endtime,g.reach_starttime,
+               g.reach_endtime,g.cars_type,g.pay_type,g.qq,g.loss,g.offer_status,g.carriers_id,g.offer_price,g.off_address,g.off_user,
+               g.off_phone,g.reach_address,g.reach_user,g.reach_phone,g.consign_user,g.consign_phone,g.desc_str,g.signing_type,g.status
+               FROM gl_goods g WHERE g.id=".$id;
         return $this->dbh->select_row($sql);
     }
     //添加
