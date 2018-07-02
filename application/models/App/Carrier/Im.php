@@ -36,6 +36,7 @@ class App_Carrier_ImModel
                 'scheduler_mobile'=>addslashes($data['scheduler_mobile']),
                 'created_at'=>'=NOW()',
                 'client_time'=>$data['time']?$data['time']:'=NOW()',
+                'updated_at'=>'=NOW()'
             ];
 
             $map_location_info = $this->dbh->insert('gl_im', $info);
