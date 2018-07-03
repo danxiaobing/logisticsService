@@ -15,7 +15,7 @@ class Cargo_GoodsModel
     public function __construct($dbh, $mch = null)
     {
         $this->dbh = $dbh;
-        $msg = Yaf_Application::app()->getConfig()->get("msg");
+        $msg = Yaf_Application::app()->getConfig()->get("smsrpc");
         $this->Msg  =  Client::create($msg->host.'Wiserun',false);
     }
 
