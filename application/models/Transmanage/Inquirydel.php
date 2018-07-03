@@ -165,11 +165,6 @@ class Transmanage_InquirydelModel
         $sql  = "SELECT
                          gd.id,
                          gd.cid ,
-                         gd.start_provice_id ,
-                         gd.start_city_id ,
-                         gd.end_provice_id ,
-                         gd.end_city_id ,
-                         gd.product_id ,
                          gd.weights ,
                          gd.price ,
                          gd.companies_name ,
@@ -204,16 +199,7 @@ class Transmanage_InquirydelModel
                          FROM gl_goods gd
                          LEFT JOIN gl_cars_type gct ON  gct.id=gd.cars_type WHERE gd.id =".intval($id);
         $res = $this->dbh->select_row($sql);
-        if(!empty($res)){
-            $sql = "SELECT title FROM td_category_goods WHERE id=".intval($res['product_id']);
-            $goodsname = $this->dbh2->select_one($sql);
-            $res['goodsname'] = $goodsname ? $goodsname : '';
-        }
         $result['info'] = $res;
-
-
-        //获取市的信息
-//        $result['city'] = $this->dbh->select('SELECT cityid,city FROM conf_city');
         return $result;
 
     }
@@ -254,7 +240,6 @@ class Transmanage_InquirydelModel
         $sql = "SELECT go.id,go.number,go.cargo_id,go.goods_id,go.estimate_freight,go.status,go.fact_freight FROM gl_order go WHERE go.id=".intval($id);
         $info = $this->dbh->select_row($sql);
         $data['xunjia'] = $info;
-        // unset($data[0]);
         return $data;
     }
 

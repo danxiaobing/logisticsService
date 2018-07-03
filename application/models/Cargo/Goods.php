@@ -2,6 +2,7 @@
 /**
  * User: Daley
  */
+use Hprose\Client;
 class Cargo_GoodsModel
 {
     public $dbh = null;
@@ -14,6 +15,8 @@ class Cargo_GoodsModel
     public function __construct($dbh, $mch = null)
     {
         $this->dbh = $dbh;
+        $msg = Yaf_Application::app()->getConfig()->get("msg");
+        $this->Msg  =  Client::create($msg->host.'Wiserun',false);
     }
 
     //列表
@@ -157,36 +160,36 @@ class Cargo_GoodsModel
     {
         $this->dbh->begin();
         try{
-            $Address = new Cargo_AddressModel($this->dbh);
+          /*  $Address = new Cargo_AddressModel($this->dbh);*/
 
             /**对发货地址进行判断 start**/
-            $fahuo_params['cid'] = $params['cid'];
+          /*  $fahuo_params['cid'] = $params['cid'];
             $fahuo_params['provice_id'] = $params['start_provice_id'];
             $fahuo_params['city_id'] = $params['start_city_id'];
             $fahuo_params['area_id'] = $params['start_area_id'];
             $fahuo_params['address'] = $params['off_address'];
             $fahuo_params['type'] = 2;
-            $res = $Address->getCargoAddres($fahuo_params);
-            if(!$res){
+            $res = $Address->getCargoAddres($fahuo_params);*/
+         /*   if(!$res){
 
             /* 发货地址新增*/
-            $fahuo_params['uid'] = $params['uid'];
+           /* $fahuo_params['uid'] = $params['uid'];
             $fahuo_params['name'] = $params['off_user'];
             $fahuo_params['mobile'] =$params['off_phone'];
-            $fahuo_params['remark'] ='';
-            /*   $fahuo_params['test'] = 1;*/
+            $fahuo_params['remark'] ='';*/
+            /*   $fahuo_params['test'] = 1;
             $Address->addCargoAddress($fahuo_params);
 
             }else{
 
             /*常用地址加一*/
             /* $sql ="update gl_cargo_address set test= test+1 WHERE id=".$res['id'];
-            $this->dbh->exe($sql);*/
-            }
+            $this->dbh->exe($sql);
+            }*/
 
             /**对卸货地址进行判断 start**/
 
-            $xiehuo_params['cid'] = $params['cid'];
+          /*  $xiehuo_params['cid'] = $params['cid'];
             $xiehuo_params['provice_id'] = $params['end_provice_id'];
             $xiehuo_params['city_id'] = $params['end_city_id'];
             $xiehuo_params['area_id'] = $params['end_area_id'];
@@ -197,50 +200,98 @@ class Cargo_GoodsModel
             if(!$res){
 
             /* 发货地址新增*/
-            $xiehuo_params['uid'] = $params['uid'];
+         /*   $xiehuo_params['uid'] = $params['uid'];
             $xiehuo_params['name'] = $params['reach_user'];
             $xiehuo_params['mobile'] =$params['reach_phone'];
-            $xiehuo_params['remark'] = '';
-            /*  $xiehuo_params['test'] =1;*/
+            $xiehuo_params['remark'] = '';*/
+            /*  $xiehuo_params['test'] =1;
             $Address->addCargoAddress($xiehuo_params);
 
             }else{
 
             /*常用地址加一*/
             /*  $sql ="update gl_cargo_address set test= test+1 WHERE id=".$res['id'];
-            $this->dbh->exe($sql);*/
-            }
+            $this->dbh->exe($sql);
+            }*/
 
 
             /**对联系人进行判断 start**/
-            $lianxiren_params['cid'] = $params['cid'];
+         /*   $lianxiren_params['cid'] = $params['cid'];
             $lianxiren_params['name'] = $params['consign_user'];
             $lianxiren_params['mobile'] = $params['consign_phone'];
             $lianxiren_params['type'] = 3;
             $res = $Address->getCargoAddres($lianxiren_params);
-            if(!$res){
+            if(!$res){*/
 
             /* 发货地址新增*/
-            $lianxiren_params['uid'] = $params['uid'];
+          /*  $lianxiren_params['uid'] = $params['uid'];
             $lianxiren_params['remark'] = '';
-            /*  $lianxiren_params['test'] = 1;*/
+            /*  $lianxiren_params['test'] = 1;
             $Address->addCargoAddress($lianxiren_params);
 
-            }else{
+            }else{*/
 
             /*常用地址加一*/
             /*  $sql ="update gl_cargo_address set test= test+1 WHERE id=".$res['id'];
-            $this->dbh->exe($sql);*/
-            }
+            $this->dbh->exe($sql);
+            }*/
 
-            $res = $this->dbh->insert('gl_goods',$params);
-            if(!$res){
+            $goodsres = $this->dbh->insert('gl_goods',$params);
+            if(!$goodsres){
                 $this->dbh->rollback();
                 return false;
             }
 
+            $receiving_params = array(
+                'company_id' => $params['cid'],
+                'product_id' => $params['product_id'],
+                'start_province_id' => $params['start_provice_id'],
+                'start_city_id' => $params['start_city_id'],
+                'start_area_id' => $params['start_area_id'],
+                'end_province_id' => $params['end_provice_id'],
+                'end_city_id' => $params['end_city_id'],
+                'end_area_id' => $params['end_area_id'],
+                'load' => $params['weights'],
+                'car_type' => $params['cars_type'],
+                'loss' => $params['loss']
+            );
+            $T = new Transrange_ReceivingModel(Yaf_Registry::get("db"),Yaf_Registry::get("gy_db"));
+            $company_list = $T->matching($receiving_params);
+            //生成询价单
+            if ($company_list) {
+                foreach ($company_list as $k => $v) {
+                    //生成询价的
+
+                    $item = array(
+                        'gid' => $goodsres,
+                        'status' => 1,//1、等待承运商报价 2、等待货主报价 3、已生成托运单 4、询价取消,
+                        'cid' => $v['cid'],
+                        'created_at' => '=NOW()',
+                        'updated_at' => '=NOW()',
+                    );
+                    $L = new Cargo_InquiryModel(Yaf_Registry::get("db"));
+                     $L->addInquiry($item);
+                }
+            }
+
+            //获取匹配的运输范围的承运商
+            $parameter = array(
+                'companyid' => $params['cid'],
+                'start_area_id' => $params['start_area_id'],
+                'end_area_id' => $params['end_area_id'],
+            );
+
+            $T = new Transrange_TransModel(Yaf_Registry::get("db"));
+            $info =  $T->getTransMatch($parameter);
+
+            if (count($info)) {
+                foreach ($info as $k => $val) {
+                    $this->Msg->sendFunc(array('mobile' => $val['mobile']));
+                }
+            }
+
             $this->dbh->commit();
-            return $res;
+            return $goodsres;
 
         }catch (Exception $e){
             $this->dbh->rollback();

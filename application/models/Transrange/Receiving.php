@@ -401,7 +401,6 @@ class Transrange_ReceivingModel
             ORDER BY
                 r.`updated_at` desc;
         ";
-        // return $sql;
         return $this->dbh->select($sql);
     }
 }
