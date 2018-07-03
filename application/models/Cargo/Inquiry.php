@@ -95,7 +95,12 @@ class Cargo_InquiryModel
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
-        $sql = "SELECT i.id,g.start_provice_id,g.end_provice_id,g.product_id,g.weights,g.price,i.order_id,i.status,i.created_at
+        $sql = "SELECT i.id,g.start_provice,
+               g.start_city,
+               g.start_area,
+               g.end_provice,
+               g.end_city,
+               g.end_area,g.product_name,g.weights,g.price,i.order_id,i.status,i.created_at
                 FROM gl_goods g
                 LEFT JOIN gl_inquiry i ON i.gid = g.id
                 WHERE  {$where}

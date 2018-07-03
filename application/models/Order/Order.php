@@ -109,8 +109,13 @@ class Order_OrderModel
 
         $sql = "SELECT
                 o.id,
-                g.start_provice_id,
-                g.end_provice_id,
+                g.start_provice,
+                g.end_provice,
+                g.start_city,
+                g.end_city,
+                g.start_area,
+                g.end_area,
+                g.product_name,
                 g.product_id,
                 g.weights,
                 g.companies_name,
