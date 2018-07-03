@@ -134,6 +134,12 @@ class Transmanage_OrderModel
       $sql = "SELECT
                      gd.id,
                      gd.cid,
+                     gd.start_provice_id,
+                     gd.start_city_id,
+                     gd.start_area_id,
+                     gd.end_provice_id,
+                     gd.end_city_id,
+                     gd.end_area_id,
                      gd.start_provice,
                      gd.start_city,
                      gd.start_area,
