@@ -339,10 +339,10 @@ class Order_OrderModel
     public function getOrderInfo($orderid)
     {
         //获取托运单基本信息
-        $sql = "SELECT go.id,go.number,go.cargo_id,go.company_id,go.goods_id,go.estimate_freight,go.status,go.fact_freight,gl_in.price as inquiryprice
-          FROM gl_order go
-          LEFT JOIN gl_inquiry gl_in ON  gl_in.order_id=go.id
-          WHERE go.id=" . intval($orderid);
+        $sql = "SELECT go.id,go.number,go.cargo_id,go.company_id,go.goods_id,go.estimate_freight,go.status,go.fact_freight,gl_in.price as inquiryprice,go.pdf_url
+                FROM gl_order go
+                LEFT JOIN gl_inquiry gl_in ON  gl_in.order_id=go.id
+               WHERE go.id=" . intval($orderid);
 
         $orderinfo = $this->dbh->select_row($sql);
 
@@ -351,13 +351,15 @@ class Order_OrderModel
             $sql = "SELECT
                      gd.id,
                      gd.cid,
-                     gd.start_provice_id,
-                     gd.start_city_id,
-                     gd.start_area_id,
-                     gd.end_provice_id,
-                     gd.end_city_id ,
-                     gd.end_area_id ,
-                     gd.product_id,
+                     gd.start_provice,
+                     gd.start_city,
+                     gd.start_area,
+                     gd.end_provice,
+                     gd.end_city,
+                     gd.end_area,
+                     gd.product_name,
+                     gd.cars_type,
+                     gd.cars_type_name,
                      gd.weights,
                      gd.weights_done,
                      gd.price ,
@@ -380,11 +382,10 @@ class Order_OrderModel
                      gd.reach_phone ,
                      gd.consign_user ,
                      gd.consign_phone,
-                     gct.`name`,
                      gd.created_at,
                      gd.`status`
                      FROM gl_goods gd
-                     LEFT JOIN gl_cars_type gct ON  gct.id=gd.cars_type WHERE gd.id =" . $orderinfo['goods_id'];
+                     WHERE gd.id =" . $orderinfo['goods_id'];
             $goodsdata = $this->dbh->select_row($sql);
             if (!empty($orderinfo)) {
                 #sql语句
@@ -399,10 +400,7 @@ class Order_OrderModel
             }
         }
 
-        //获取市的信息
-        $city = $this->dbh->select('SELECT cityid,city FROM conf_city');
-
-        return array('orderinfo' => $orderinfo, 'goodsdata' => $goodsdata, 'carrier_data' => $carrier_data, 'city' => $city);
+        return array('orderinfo' => $orderinfo, 'goodsdata' => $goodsdata, 'carrier_data' => $carrier_data);
     }
 
     /**
@@ -422,13 +420,15 @@ class Order_OrderModel
         $sql = "SELECT
                      gd.id,
                      gd.cid,
-                     gd.start_provice_id,
-                     gd.start_city_id,
-                     gd.start_area_id,
-                     gd.end_provice_id,
-                     gd.end_city_id ,
-                     gd.end_area_id ,
-                     gd.product_id,
+                     gd.start_provice,
+                     gd.start_city,
+                     gd.start_area,
+                     gd.end_provice,
+                     gd.end_city,
+                     gd.end_area,
+                     gd.product_name,
+                     gd.cars_type,
+                     gd.cars_type_name,
                      gd.weights,
                      gd.weights_done,
                      gd.price ,
@@ -451,11 +451,10 @@ class Order_OrderModel
                      gd.reach_phone ,
                      gd.consign_user ,
                      gd.consign_phone,
-                     gct.`name`,
                      gd.created_at,
                      gd.`status`
                      FROM gl_goods gd
-                     LEFT JOIN gl_cars_type gct ON  gct.id=gd.cars_type WHERE gd.id =" . intval($params['goods_id']);
+                     WHERE gd.id =" . intval($params['goods_id']);
         $goodsdata = $this->dbh->select_row($sql);
         if (!empty($goodsdata)) {
             #sql语句
@@ -468,13 +467,12 @@ class Order_OrderModel
                   gl_companies.id = ' . intval($params['company_id']);
             $carrier_data = $this->dbh->select_row($sql);
         }
-        //获取市的信息
-        $city = $this->dbh->select('SELECT cityid,city FROM conf_city');
+
         list($min,$sec) = explode(" ",microtime());
         $orderinfo['number'] =  date("Ymd"). substr($sec,3).mt_rand(100,999);
         $orderinfo['inquiryprice'] = $params['inquiryprice'];
 
-        return array('orderinfo' => $orderinfo,'goodsdata' => $goodsdata, 'carrier_data' => $carrier_data, 'city' => $city);
+        return array('orderinfo' => $orderinfo,'goodsdata' => $goodsdata, 'carrier_data' => $carrier_data);
     }
 
 
