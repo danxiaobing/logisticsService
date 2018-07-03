@@ -38,6 +38,18 @@ class Cargo_GoodsController extends Rpc {
         $data = $L->getlist($params);
         return $data;
     }
+
+    /**
+     * 同步数据列表专用
+     * @return 数组
+     */
+    public function getGoodsTongbuListFunc($params)
+    {
+
+        $L = new Cargo_GoodsModel(Yaf_Registry::get("db"));
+        $data = $L->getGoodsTongbuList($params);
+        return $data;
+    }
     /**
      * 新增
      */

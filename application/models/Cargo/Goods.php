@@ -66,7 +66,11 @@ class Cargo_GoodsModel
                g.end_city_id,
                g.end_area_id,
                g.start_provice,
+               g.start_city,
+               g.start_area,
                g.end_provice,
+               g.end_city,
+               g.end_area,
                g.cate_id,
                g.cate_id_two,
                g.product_id,
@@ -80,10 +84,55 @@ class Cargo_GoodsModel
                g.off_starttime,
                g.reach_starttime,
                g.desc_str,
+               g.cars_type,
+               g.cars_type_name,
                g.status
                FROM gl_goods g
                LEFT JOIN gl_companies com ON com.id = g.carriers_id
                " . $where . "   ORDER BY {$order} DESC";
+        $result['list'] = $this->dbh->select_page($sql);
+        return $result;
+    }
+    
+     //同步数据列表专用
+    public function getGoodsTongbuList($params)
+    {
+
+        $where = 'WHERE 1=1';
+        $result = array(
+            'totalRow' => 0,
+            'list' => array()
+        );
+
+        $sql = "SELECT count(1) FROM `gl_goods` g {$where}";
+        $result['totalRow'] = $this->dbh->select_one($sql);
+
+        $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
+        $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
+
+        $sql = "SELECT
+               g.id,
+               g.start_provice_id,
+               g.start_city_id,
+               g.start_area_id,
+               g.end_provice_id,
+               g.end_city_id,
+               g.end_area_id,
+               g.start_provice,
+               g.start_city,
+               g.start_area,
+               g.end_provice,
+               g.end_city,
+               g.end_area,
+               g.cate_id,
+               g.cate_id_two,
+               g.product_id,
+               g.product_name,
+               g.cars_type,
+               g.cars_type_name
+               FROM gl_goods g
+               LEFT JOIN gl_companies com ON com.id = g.carriers_id
+               " . $where . "   ORDER BY id DESC";
         $result['list'] = $this->dbh->select_page($sql);
         return $result;
     }
