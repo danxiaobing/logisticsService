@@ -38,6 +38,15 @@ class CityModel
         $data = $this->dbh->select($sql);
         return $data;
     }
+    /**
+     * 获取市的参数
+     */
+    public function getcityByCityId($id)
+    {
+        $sql = " SELECT * FROM conf_city WHERE cityid=".$id;
+        $data = $this->dbh->select($sql);
+        return $data;
+    }
 
     /**
      * 获取县的参数
@@ -45,6 +54,15 @@ class CityModel
     public function getareaById($id)
     {
         $sql = "SELECT * FROM  conf_area WHERE father = ".$id;
+        $data = $this->dbh->select($sql);
+        return $data;
+    }
+    /**
+     * 获取县的参数
+     */
+    public function getareaByAreaId($id)
+    {
+        $sql = "SELECT * FROM  conf_area WHERE areaid = ".$id;
         $data = $this->dbh->select($sql);
         return $data;
     }

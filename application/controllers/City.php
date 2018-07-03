@@ -31,6 +31,15 @@ class CityController extends Rpc {
         $data = $C->getcityById($id);
         return $data;
     }
+    /**
+     * 获取市的参数
+     */
+    public function getcityByCityIdFunc($id)
+    {
+    	$C = new CityModel(Yaf_Registry::get("db"));
+        $data = $C->getcityByCityId($id);
+        return $data;
+    }
 
     /**
      * 获取县的参数
@@ -39,6 +48,16 @@ class CityController extends Rpc {
     {
     	$C = new CityModel(Yaf_Registry::get("db"));
         $data = $C->getareaById($id);
+        return $data;
+    }
+
+    /**
+     * 获取县的参数
+     */
+    public function getareaByAreaIdFunc($id)
+    {
+    	$C = new CityModel(Yaf_Registry::get("db"));
+        $data = $C->getareaByAreaId($id);
         return $data;
     }
 
