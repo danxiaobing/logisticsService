@@ -393,9 +393,12 @@ class Order_OrderModel
                   gl_companies.id,
                   gl_companies.company_user,
                   gl_companies.company_telephone,
-                  gl_companies.company_name
-                  FROM gl_companies WHERE
-                  gl_companies.id = ' . intval($orderinfo['company_id']);
+                  gl_companies.company_name,
+                  account.bankname as bank_name,
+                  account.bankaccountno as bank_num
+                  FROM gl_companies
+                  LEFT JOIN gl_companies_account account ON  account.companies_id=gl_companies.id
+                  WHERE gl_companies.id = ' . intval($orderinfo['company_id']);
                 $carrier_data = $this->dbh->select_row($sql);
             }
         }
