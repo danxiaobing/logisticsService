@@ -95,10 +95,10 @@ class Transmanage_OrderModel
 
 
         $sql = "SELECT 
-               g.start_provice_id,
-               g.start_city_id,
-               g.end_provice_id,
-               g.end_city_id,
+               g.start_provice,
+               g.start_city,
+               g.end_provice,
+               g.end_city,
                g.cate_id,
                g.cate_id_two,
                g.product_id,
@@ -124,17 +124,7 @@ class Transmanage_OrderModel
         }else{
             $result['list'] = $this->dbh->select_page($sql);
         }
-
-
-        if(!empty($result['list'])){
-            $city = array_column($this->dbh->select('SELECT cityid,city FROM conf_city'),'city','cityid');
-            foreach($result['list'] as $key=>$value){
-                $result['list'][$key]['start_city'] = $city[$value['start_city_id']];
-                $result['list'][$key]['end_city'] = $city[$value['end_city_id']];
-            }
-            unset($city);
-        }
-
+        
         return $result;
     }
 
@@ -147,12 +137,12 @@ class Transmanage_OrderModel
       $sql = "SELECT
                      gd.id,
                      gd.cid,
-                     gd.start_provice_id,
-                     gd.start_city_id,
-                     gd.start_area_id,
-                     gd.end_provice_id,
-                     gd.end_city_id ,
-                     gd.end_area_id ,
+                     gd.start_provice,
+                     gd.start_city,
+                     gd.start_area,
+                     gd.end_provice,
+                     gd.end_city,
+                     gd.end_area,
                      gd.product_id,
                      gd.weights,
                      gd.weights_done,
@@ -188,10 +178,10 @@ class Transmanage_OrderModel
         $data['zh_name'] = $goodsname ? $goodsname : '无';
       }
 
-      //获取城市信息
-      $city = $this->dbh->select('SELECT cityid,city FROM conf_city');
-      //获取省的信息
-      $province = $this->dbh->select('SELECT province,provinceid FROM conf_province');
+//      //获取城市信息
+//      $city = $this->dbh->select('SELECT cityid,city FROM conf_city');
+//      //获取省的信息
+//      $province = $this->dbh->select('SELECT province,provinceid FROM conf_province');
       //获取托运单的调度信息
       $sql = "SELECT
                 god.`id`,
@@ -213,7 +203,7 @@ class Transmanage_OrderModel
                 god.`order_id` = ".intval($orderid);
       $res = $this->dbh->select($sql);
       $Schedule =  $res ? $res:[];
-      return array('info'=>$info,'data'=>$data,'city'=>$city,'province'=>$province,'schedule'=>$Schedule);
+      return array('info'=>$info,'data'=>$data,'schedule'=>$Schedule);
     }
 
 

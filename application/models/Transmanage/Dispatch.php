@@ -22,34 +22,34 @@ class Transmanage_DispatchModel
         $filter = array();
 
         if (isset($params['company_id']) && count($params['company_id']) ) {
-            $filter[] = " `c_id` = ".$params['company_id'];
+            $filter[] = " god.`c_id` = ".$params['company_id'];
         }
         if (isset($params['ids']) && count($params['ids']) ) {
-            $filter[] = " `id` in ({$params['ids']}) ";
+            $filter[] = " god.`id` in ({$params['ids']}) ";
         }
 
         if (isset($params['start_time']) && $params['start_time'] != '') {
-            $filter[] = " `created_at` >= '{$params['start_time']} 00:00:00'";
+            $filter[] = " god.`created_at` >= '{$params['start_time']} 00:00:00'";
         }
 
         if (isset($params['end_time']) && $params['end_time'] != '') {
-            $filter[] = " `created_at` <= '{$params['end_time']} 23:59:59'";
+            $filter[] = " god.`created_at` <= '{$params['end_time']} 23:59:59'";
         }
 
 
         if (isset($params['keyworks']) && $params['keyworks'] != '') {
-            $filter[] = " ( `dispatch_number` like '%{$params['keyworks']}%' OR `cars_number` like '%{$params['keyworks']}%' OR `driver_name` like '%{$params['keyworks'] }%'  OR `supercargo_name` like '%{$params['keyworks']}%')";
+            $filter[] = " ( god.`dispatch_number` like '%{$params['keyworks']}%' OR god.`cars_number` like '%{$params['keyworks']}%' OR god.`driver_name` like '%{$params['keyworks'] }%'  OR god.`supercargo_name` like '%{$params['keyworks']}%')";
         }
 
         if (isset($params['status']) && $params['status'] != '') {
-            $filter[] = " `status` =".$params['status'];
+            $filter[] = " god.`status` =".$params['status'];
         }
         if (isset($params['statusarr']) && $params['statusarr'] != '') {
-            $filter[] = " `status` in (".$params['statusarr'].")";
+            $filter[] = " god.`status` in (".$params['statusarr'].")";
         }
 
         if(isset($params['order_id']) && $params['order_id'] != 0){
-            $filter[] = " `order_id` =".$params['order_id'];
+            $filter[] = " god.`order_id` =".$params['order_id'];
         }
 
 
@@ -59,31 +59,57 @@ class Transmanage_DispatchModel
             $where .= ' AND '.implode(" AND ", $filter);
         }
 
-        $sql = "SELECT count(1) FROM gl_order_dispatch  WHERE {$where}";
+        $sql = "SELECT count(1) FROM gl_order_dispatch  as god LEFT JOIN gl_goods as g ON g.id = god.goods_id WHERE {$where}";
 
         // return $sql;
         $result['totalRow'] = $this->dbh->select_one($sql);
 
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 8);
-
         $sql = "SELECT 
-               *
-                FROM gl_order_dispatch
+                god.id,
+                god.dispatch_number,
+                god.order_number,
+                god.c_name,
+                g.start_provice,
+                g.end_provice,
+                g.start_city,
+                g.end_city,
+                g.start_area,
+                g.end_area,
+                god.ctype_name,
+                god.driver_name,
+                god.supercargo_name,
+                god.cars_number,
+                god.end_time,
+                god.start_time,
+                god.weights,
+                god.start_weights,
+                god.end_weights,
+                god.status,
+                g.companies_name,
+                g.product_id,
+                g.loss,
+                g.desc_str,
+                g.off_address,
+                g.off_user,
+                g.off_phone,
+                g.reach_user,
+                g.reach_phone,
+                g.reach_address,
+                g.consign_user,
+                g.consign_phone,
+                god.created_at
+                FROM gl_order_dispatch as god
+                LEFT JOIN gl_goods as g ON g.id = god.goods_id
                 WHERE  {$where}
-                ORDER BY id DESC 
+                ORDER BY id DESC
                 ";
         $result['list'] = $this->dbh->select_page($sql);
-        if(!empty($result['list'])){
-            $city = array_column($this->dbh->select('SELECT cityid,city FROM conf_city'),'city','cityid');
-            foreach($result['list'] as $key=>$value){
-                $result['list'][$key]['start_city'] = $city[$value['start_city_id']];
-                $result['list'][$key]['end_city'] = $city[$value['end_city_id']];
-            }
-            unset($city);
-        }
         return $result;
     }
+
+
     public function getListForApp($params){
         $filter = array();
 
@@ -353,6 +379,7 @@ class Transmanage_DispatchModel
         return $data ? $data : [];
 
     }
+
     public function getInfoForApp($dispatch_id)
     {
         $sql = "SELECT d.mobile as driver_mobile,god.id,god.dispatch_number,god.order_number,god.order_id,god.ctype_name,god.driver_name,god.supercargo_name,god.cars_number,god.end_time,god.start_time,god.weights,go.cargo_id,god.cars_id,god.driver_id,god.supercargo_id,god.ctype_id,god.status,god.start_weights,god.end_weights,god.end_time 
