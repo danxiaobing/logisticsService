@@ -533,8 +533,7 @@ class Cargo_GoodsModel
                g.end_city,
                g.end_area,
                g.product_name,
-               g.cars_type_name,
-               IFNULL(gl_cars_type.name,'')  AS carname
+               g.cars_type_name  AS carname
                 FROM gl_goods g
                 LEFT JOIN gl_cars_type ON gl_cars_type.id =g.cars_type
                 WHERE  {$where}
@@ -543,9 +542,9 @@ class Cargo_GoodsModel
 
 
         $result['list'] = $this->dbh->select_page($sql);
-        if(!empty($result['list'])){
-            $result['list'] = $this->city($result['list']);
-        }
+        // if(!empty($result['list'])){
+        //     $result['list'] = $this->city($result['list']);
+        // }
 
         return $result;
     }
