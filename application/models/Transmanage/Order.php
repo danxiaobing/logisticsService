@@ -89,19 +89,16 @@ class Transmanage_OrderModel
 
 
         $sql = "SELECT count(1) FROM gl_order AS o LEFT JOIN gl_goods AS g ON g.`id` = o.`goods_id`  WHERE {$where}";
-//        var_dump($sql);die;
 
         $result['totalRow'] = $this->dbh->select_one($sql);
 
 
         $sql = "SELECT 
-               g.start_provice_id,
-               g.start_city_id,
-               g.end_provice_id,
-               g.end_city_id,
-               g.cate_id,
-               g.cate_id_two,
-               g.product_id,
+               g.start_provice,
+               g.start_city,
+               g.end_provice,
+               g.end_city,
+               g.product_name,
                g.weights,
                g.companies_name,
                g.off_starttime,
@@ -123,16 +120,6 @@ class Transmanage_OrderModel
             $result['list'] = $this->dbh->select($sql);
         }else{
             $result['list'] = $this->dbh->select_page($sql);
-        }
-
-
-        if(!empty($result['list'])){
-            $city = array_column($this->dbh->select('SELECT cityid,city FROM conf_city'),'city','cityid');
-            foreach($result['list'] as $key=>$value){
-                $result['list'][$key]['start_city'] = $city[$value['start_city_id']];
-                $result['list'][$key]['end_city'] = $city[$value['end_city_id']];
-            }
-            unset($city);
         }
 
         return $result;
