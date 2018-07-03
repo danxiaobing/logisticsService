@@ -98,9 +98,7 @@ class Transmanage_OrderModel
                g.start_city,
                g.end_provice,
                g.end_city,
-               g.cate_id,
-               g.cate_id_two,
-               g.product_id,
+               g.product_name,
                g.weights,
                g.companies_name,
                g.off_starttime,
@@ -123,7 +121,7 @@ class Transmanage_OrderModel
         }else{
             $result['list'] = $this->dbh->select_page($sql);
         }
-        
+
         return $result;
     }
 
