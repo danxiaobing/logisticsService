@@ -89,7 +89,6 @@ class Transmanage_OrderModel
 
 
         $sql = "SELECT count(1) FROM gl_order AS o LEFT JOIN gl_goods AS g ON g.`id` = o.`goods_id`  WHERE {$where}";
-//        var_dump($sql);die;
 
         $result['totalRow'] = $this->dbh->select_one($sql);
 
@@ -144,6 +143,8 @@ class Transmanage_OrderModel
                      gd.end_city,
                      gd.end_area,
                      gd.product_id,
+                     gd.product_name,
+                     gd.cars_type_name,
                      gd.weights,
                      gd.weights_done,
                      gd.price ,
@@ -164,26 +165,18 @@ class Transmanage_OrderModel
                      gd.reach_phone ,
                      gd.consign_user ,
                      gd.consign_phone,
-                     gct.`name`,
                      gd.created_at,
                      gd.`status`,
                      gd.pay_type,
                      gd.`qq`
-                     FROM gl_goods gd
-                     LEFT JOIN gl_cars_type gct ON  gct.id=gd.cars_type WHERE gd.id =".$info['goods_id'];
+                     FROM gl_goods gd WHERE gd.id =".$info['goods_id'];
       $data = $this->dbh->select_row($sql);
-      if(!empty($data)){
-        $sql ="SELECT title FROM td_category_goods WHERE id=".intval($data['product_id']);
-        $goodsname = $this->dbh2->select_one($sql);
-        $data['zh_name'] = $goodsname ? $goodsname : '无';
-      }
 
-//      //获取城市信息
-//      $city = $this->dbh->select('SELECT cityid,city FROM conf_city');
-//      //获取省的信息
-//      $province = $this->dbh->select('SELECT province,provinceid FROM conf_province');
+
       //获取托运单的调度信息
-      $sql = "SELECT
+
+        if(!empty($data)){
+            $sql = "SELECT
                 god.`id`,
                 god.`order_id`,
                 god.`cars_number` ,
@@ -195,13 +188,15 @@ class Transmanage_OrderModel
                 god.`status`
               FROM
                 gl_order_dispatch god
-              LEFT JOIN 
-                gl_driver gd 
-              ON 
+              LEFT JOIN
+                gl_driver gd
+              ON
                 gd.id = god.driver_id
               WHERE
                 god.`order_id` = ".intval($orderid);
-      $res = $this->dbh->select($sql);
+            $res = $this->dbh->select($sql);
+        }
+
       $Schedule =  $res ? $res:[];
       return array('info'=>$info,'data'=>$data,'schedule'=>$Schedule);
     }

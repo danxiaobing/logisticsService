@@ -286,7 +286,7 @@ class Examine_CarrierModel
     public function examineCarrier($status,$where){
 
         //审核通过后
-        if($status['status'] = 2){
+        if($status['status'] == 2){
             #开启事物
             $this->dbh->begin();
             try{
