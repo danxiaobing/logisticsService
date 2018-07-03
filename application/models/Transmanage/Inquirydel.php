@@ -122,7 +122,15 @@ class Transmanage_InquirydelModel
             g.`end_provice_id`,
             g.`end_city_id`,
             g.`product_id`,
-            g.`weights`
+            g.`weights`,
+            g.start_provice,
+            g.start_city,
+            g.start_area,
+            g.end_provice,
+            g.end_city,
+            g.end_area,
+            g.product_name,
+            g.cars_type_name
             FROM
             gl_inquiry as l 
             LEFT JOIN gl_goods as g ON g.id = l.gid
@@ -184,7 +192,15 @@ class Transmanage_InquirydelModel
                          gct.`name`,
                          gd.created_at,
                          gd.`status`,
-                         gd.`qq`
+                         gd.`qq`,
+                         gd.start_provice,
+                         gd.start_city,
+                         gd.start_area,
+                         gd.end_provice,
+                         gd.end_city,
+                         gd.end_area,
+                         gd.product_name,
+                         gd.cars_type_name
                          FROM gl_goods gd
                          LEFT JOIN gl_cars_type gct ON  gct.id=gd.cars_type WHERE gd.id =".intval($id);
         $res = $this->dbh->select_row($sql);
@@ -197,7 +213,7 @@ class Transmanage_InquirydelModel
 
 
         //获取市的信息
-        $result['city'] = $this->dbh->select('SELECT cityid,city FROM conf_city');
+//        $result['city'] = $this->dbh->select('SELECT cityid,city FROM conf_city');
         return $result;
 
     }

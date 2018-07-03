@@ -526,6 +526,14 @@ class Cargo_GoodsModel
                g.consign_phone,
                g.desc_str,
                g.status,
+               g.start_provice,
+               g.start_city,
+               g.start_area,
+               g.end_provice,
+               g.end_city,
+               g.end_area,
+               g.product_name,
+               g.cars_type_name,
                IFNULL(gl_cars_type.name,'')  AS carname
                 FROM gl_goods g
                 LEFT JOIN gl_cars_type ON gl_cars_type.id =g.cars_type
