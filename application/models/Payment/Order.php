@@ -98,18 +98,12 @@ class Payment_OrderModel
         $params['dealno'] = $this->get_random($len=4);
         $params['created_at'] = '=NOW()';
         $params['status'] = 3;
-
-        //计算货损率
-        $sql = 'SELECT sum(start_weights) as s,sum(end_weights) as e FROM gl_order_dispatch WHERE order_id='.intval($params['order_id']);
-        $nums = $this->dbh->select_row($sql);
-        $loss = $nums['s'] != 0? ($nums['s']-$nums['e'])/$nums['s']:0.00;
-        $loss = round($loss*100,1);
-        $params['loss'] = $loss;
-
+        $params['loss'] = trim($params['loss'],'‰');
         //事务
         $this->dbh->begin();
         try{
             $res = $this->dbh->insert('payment_order',$params);
+
             if(!$res){
              $this->dbh->rollback();
              return array('code'=>'300','msg'=>'生成结算单失败'); 
@@ -198,6 +192,7 @@ class Payment_OrderModel
         unset($params['id']);
         $params['updated_at'] = '=NOW()';
         $params['status'] = 3;
+        $params['loss'] = trim($params['loss'],'‰');
         $res = $this->dbh->update('payment_order',$params,'id='.intval($id));
         return $res ? true : false;
     }
@@ -218,7 +213,7 @@ class Payment_OrderModel
 
 
     public function infoByorderid($orderid){
-        $sql = 'SELECT gy.`id`,gy.`c_id`,gy.`cargo_id`,gy.`order_id`,gy.`goods_id`,gy.`paymentno`,gy.`number`,gy.`freightamount`,gy.`estimate_freight`,gy.`start_weights`,gy.`end_weights`,gy.`cost_weights`,gy.`cname`,gy.`bankname`,gy.`bankcode`,gy.`status`,gy.`pay_type`,gy.`created_at`,gy.`dealno` FROM payment_order gy WHERE order_id='.intval($orderid).' order by id asc limit 1';
+        $sql = 'SELECT gy.`id`,gy.`c_id`,gy.`cargo_id`,gy.`order_id`,gy.`goods_id`,gy.`paymentno`,gy.`number`,gy.`freightamount`,gy.`estimate_freight`,gy.`start_weights`,gy.`end_weights`,gy.`cost_weights`,gy.`cname`,gy.`bankname`,gy.`bankcode`,gy.`status`,gy.`pay_type`,gy.`created_at`,gy.`dealno`,gy.`loss` FROM payment_order gy WHERE order_id='.intval($orderid).' order by id asc limit 1';
         $data = $this->dbh->select_row($sql);
 
         return $data ? $data : array() ;        

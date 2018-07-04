@@ -128,7 +128,7 @@ class Transmanage_OrderModel
     /*获取单个托运单的详情*/
     public function getOrderInfo($orderid){
       //获取托运单基本信息
-      $sql = "SELECT go.id,go.number,go.cargo_id,go.company_id,go.goods_id,go.estimate_freight,go.status,go.fact_freight FROM gl_order go WHERE go.id=".intval($orderid);
+      $sql = "SELECT go.id,go.number,go.cargo_id,go.company_id,go.goods_id,go.estimate_freight,go.status,go.fact_freight,gi.price FROM gl_order go LEFT JOIN gl_inquiry gi ON go.id = gi.order_id  WHERE go.id=".intval($orderid);
       $info = $this->dbh->select_row($sql);
       //获取goods基本信息
       $sql = "SELECT
