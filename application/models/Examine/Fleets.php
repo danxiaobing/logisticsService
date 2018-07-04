@@ -94,7 +94,7 @@ class Examine_FleetsModel
 
     public function getFleets($cid)
     {
-        $sql = "SELECT id,name FROM `gl_fleets`  WHERE `company_id` = {$cid} ";
+        $sql = "SELECT id,name FROM `gl_fleets`  WHERE `is_use` = 1 AND `company_id` = {$cid} ";
         return $this->dbh->select($sql);
     }
 
