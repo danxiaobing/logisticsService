@@ -221,6 +221,13 @@ class Transmanage_DispatchModel
                 return array('flag'=>false);
             }
 
+            #判断是否有插入相同的日志
+            $dispatchlog = $this->dbh->select_row('SELECT * FROM gl_order_dispatch_log WHERE dispatch_id = '.$params['id'].'  AND status = '.intval($params['status']));
+            if($dispatchlog){
+                $this->dbh->rollback();
+                return array('flag'=>false);
+            }
+
             #插入日志表
             $dispatch_log = $this->dbh->insert('gl_order_dispatch_log',['status'=>intval($params['status']),'dispatch_id'=>$params['id'],'created_at'=>'=NOW()','updated_at'=>'=NOW()']);
             if(!$dispatch_log){
