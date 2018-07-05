@@ -96,7 +96,7 @@ class Examine_CarController extends Rpc {
      */
     public function getBackAndLineCarPageFunc($params)
     {
-        $L = new Examine_CarModel(Yaf_Registry::get("db"));
+        $L = new Examine_CarModel(Yaf_Registry::get("db"),Yaf_Registry::get("gy_db"));
         $data = $L->getBackAndLineCarPage($params);
         return $data;
     }

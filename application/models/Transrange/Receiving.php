@@ -171,8 +171,21 @@ class Transrange_ReceivingModel
         if($product_id!=0){
             $where.= " AND p.`product_id` = {$product_id}";
         }
-        $sql = "SELECT gl_rule.*,p.`category_id`,p.`product_id`,p.`produce_id` FROM `gl_rule`
-                 LEFT JOIN gl_rule_product AS p ON p.rule_id = gl_rule.id WHERE gl_rule.`id` = {$id} {$where}";
+        $sql = " SELECT gl_rule.*,
+                         start_city.`city` as start_city,
+                         start_area.`area` as start_area,
+                         end_city.`city` as end_city,
+                         end_area.`area` as end_area,
+                         p.`category_id`,
+                         p.`product_id`,
+                         p.`produce_id`
+                 FROM `gl_rule`
+                 LEFT JOIN conf_city  start_city ON gl_rule.`start_city_id` = start_city.`cityid`
+                 LEFT JOIN conf_city  end_city  ON gl_rule.`end_city_id` = end_city.`cityid`
+                 LEFT JOIN conf_area  start_area ON gl_rule.`start_area_id` = start_area.`areaid`
+                 LEFT JOIN conf_area  end_area  ON gl_rule.`end_area_id` = end_area.`areaid`
+                 LEFT JOIN gl_rule_product AS p ON p.rule_id = gl_rule.id
+                 WHERE gl_rule.`id` = {$id} {$where}";
         return $this->dbh->select_row($sql);
     }
 
