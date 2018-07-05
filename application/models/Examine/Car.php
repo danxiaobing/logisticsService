@@ -6,6 +6,7 @@
 class Examine_CarModel
 {
     public $dbh = null;
+    public $dbh2 = null;
 
     /**
      * Constructor
@@ -15,6 +16,7 @@ class Examine_CarModel
     public function __construct($dbh, $mch = null)
     {
         $this->dbh = $dbh;
+        $this->dbh2 = $mch;
     }
 
 
@@ -309,14 +311,16 @@ class Examine_CarModel
             'list' => array()
         );
 
+        $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
+        $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
+
         /** 新增对回程车发车时间判断  **/
         $date = date('Y-m-d');
-        $filter_where = "WHERE  com.`is_del` = 0 AND r.`is_del` = 0 AND r.`status` = 1  AND r.`end_time`<'{$date}'";
-        if (isset($params['cid']) && $params['cid'] != '') {
-            $filter_where .= " AND r.`cid`=" . $params['cid'];
-        }
-        $sql = "SELECT r.id,r.end_time,r.status FROM gl_return_car AS r LEFT JOIN gl_companies AS com ON com.id = r.cid {$filter_where}";
-        $list = $this->dbh->select($sql);
+        $filter_where = "WHERE  r.`is_del` = 0 AND r.`status` = 1  AND r.`end_time`<'{$date}'";
+
+        $sql = "SELECT r.id,r.end_time,r.status FROM gl_return_car AS r {$filter_where}";
+
+        $list = $this->dbh->select_page($sql);
 
         if($list){
             foreach($list as $key=>$val){
@@ -338,8 +342,6 @@ class Examine_CarModel
                  LEFT JOIN gl_companies AS com ON com.id = r.cid {$where_r}
                 ) AS ss ";
         $result['totalRow'] = $this->dbh->select_one($sql);
-        $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
-        $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 15);
 
         $sql = "SELECT '' as starttime,z.start_province_id,z.start_city_id,z.end_province_id,z.end_city_id,z.id,z.cid,z.car_type,z.price_type,z.price,z.min_load,z.max_load,z.loss,p.product_id,1 AS ctype,com.company_name
                  FROM gl_rule AS z
@@ -350,9 +352,17 @@ class Examine_CarModel
                  FROM gl_return_car AS r
                  LEFT JOIN gl_companies AS com ON com.id = r.cid {$where_r}
                 ORDER BY id DESC ";
+
         $result['list'] = $this->dbh->select_page($sql);
+
         if( count($result['list']) ){
-            foreach ($result['list'] as $k => $v) {
+            foreach ($result['list'] as $k => &$v) {
+            $v['unit'] = '吨';
+            $sql = "SELECT title FROM td_category_goods WHERE td_category_goods.id=".$v['product_id'];
+            $product_name = $this->dbh2->select_one($sql);
+            $v['product_name'] = $product_name;
+        }
+          /*  foreach ($result['list'] as $k => $v) {
 
                 $type = 'area';
                 if( $v['start_area_id'] == 0 ){
@@ -379,7 +389,7 @@ class Examine_CarModel
                 $sql = "SELECT GROUP_CONCAT(cp.`{$type}`) FROM conf_{$type} cp where cp.`{$type}id` = {$v[$name]}";
                 $data = $this->dbh->select_one($sql);
                 $result['list'][$k]['end_name'] = $data ? $data:'';
-            }
+            }*/
         }
         return $result;
     }
