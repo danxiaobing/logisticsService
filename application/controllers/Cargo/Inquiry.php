@@ -73,10 +73,10 @@ class Cargo_InquiryController extends Rpc {
     /**
      * 货主同意报价
      */
-    public function agreeOfferFunc($id,$params){
+    public function agreeOfferFunc($id){
 
         $L = new Cargo_InquiryModel(Yaf_Registry::get("db"));
-        $data = $L->agreeOffer($id,$params);
+        $data = $L->agreeOffer($id);
         return $data;
     }
     /**
