@@ -203,7 +203,7 @@ class Cargo_InquiryModel
      * $id 询价单id
      * $params 托运单信息
      */
-    public function agreeOffer($id,$params){
+    public function agreeOffer($id){
 
         if (empty($id)) {
             return false;
@@ -248,17 +248,17 @@ class Cargo_InquiryModel
                 return false;
             }
 
-
-
             //新增托运单信息
-            //货源id
-            $params['goods_id'] = $inquiry['gid'];
-            //托运方
-            $params['cargo_id'] = $inquiry['cargo_id'];
-            //承运方
-            $params['company_id'] = $inquiry['company_id'];
-            //预成交运费
-            $params['estimate_freight'] = round($inquiry_info['minprice'] * $inquiry['weights'],2);
+            $params = array(
+                'number' => COMMON::getCodeId('').mt_rand(100,999),
+                'goods_id'=>$inquiry['gid'],//货源id
+                'cargo_id'=>$inquiry['cargo_id'],//托运方
+                'company_id'=>$inquiry['company_id'], //承运方
+                'estimate_freight'=>round($inquiry_info['minprice'] * $inquiry['weights'],2),//预成交运费
+                'updated_at'=>'=NOW()',
+                'created_at'=>'=NOW()'
+            );
+
             if(!empty($inquiry['car_id'])){
                 $params['car_id'] = $inquiry['car_id'];
             }
@@ -293,7 +293,7 @@ class Cargo_InquiryModel
             }
 
             $this->dbh->commit();
-            return true;
+            return $order;
 
         }catch (Exception $e){
             $this->dbh->rollback();

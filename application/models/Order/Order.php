@@ -151,6 +151,7 @@ class Order_OrderModel
                         go.reasons,
                         go.estimate_freight,
                         go.fact_freight,
+                        go.pdf_url,
                         go.pay_time
                      FROM gl_order go WHERE go.id=".intval($orderid);
         $info = $this->dbh->select_row($sql);
