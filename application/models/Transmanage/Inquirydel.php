@@ -184,10 +184,11 @@ class Transmanage_InquirydelModel
                          gd.reach_phone ,
                          gd.consign_user ,
                          gd.consign_phone,
-                         gct.`name`,
                          gd.created_at,
                          gd.`status`,
                          gd.`qq`,
+                         gd.`pay_type`,
+                         gd.`signing_type`,
                          gd.start_provice,
                          gd.start_city,
                          gd.start_area,
@@ -197,7 +198,7 @@ class Transmanage_InquirydelModel
                          gd.product_name,
                          gd.cars_type_name
                          FROM gl_goods gd
-                         LEFT JOIN gl_cars_type gct ON  gct.id=gd.cars_type WHERE gd.id =".intval($id);
+                         WHERE gd.id =".intval($id);
         $res = $this->dbh->select_row($sql);
         $result['info'] = $res;
         return $result;
@@ -486,9 +487,9 @@ class Transmanage_InquirydelModel
                 $order_info['car_id'] = $inquiry['car_id'];
 
             }
-            $resid = $this->dbh->insert('gl_order',$order_info);  
+            $order_id = $this->dbh->insert('gl_order',$order_info);
 
-            if(!$resid){
+            if(!$order_id){
                 $this->dbh->rollback();
                 return false;
             }
@@ -497,7 +498,7 @@ class Transmanage_InquirydelModel
 
                 //修改回程车信息状态
                 $info['status']  = 6;//已生成托运单
-                $info['order_id']  = $resid;//已生成托运单
+                $info['order_id']  = $order_id;//已生成托运单
                 $result = $this->dbh->update('gl_return_car',$info,'id ='.$inquiry['car_id']);
                 if(!$result){
                     $this->dbh->rollback();
@@ -507,7 +508,7 @@ class Transmanage_InquirydelModel
 
             //更新询价单 托运单：order_id=$resid
             $info['status']=3;
-            $info['order_id']=$resid;
+            $info['order_id']=$order_id;
             $res = $this->dbh->update('gl_inquiry',$info,'id='.intval($id));
             if(!$res){
                 $this->dbh->rollback();
@@ -518,7 +519,7 @@ class Transmanage_InquirydelModel
             //修改goods表状态
             $this->dbh->update('gl_goods',array('status'=>4),'id='.intval($data['goodsid']));  
             $this->dbh->commit();
-            return $id;     
+            return $order_id;
             /*生成托运单流程end*/
             
         }catch (Excaption $e){
