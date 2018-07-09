@@ -68,7 +68,7 @@ class Transmanage_DispatchModel
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 8);
 
         $sql = "SELECT 
-               *
+                *
                 FROM gl_order_dispatch
                 WHERE  {$where}
                 ORDER BY id DESC 
@@ -79,6 +79,17 @@ class Transmanage_DispatchModel
             foreach($result['list'] as $key=>$value){
                 $result['list'][$key]['start_city'] = $city[$value['start_city_id']];
                 $result['list'][$key]['end_city'] = $city[$value['end_city_id']];
+
+                //
+
+                $temp = $this->dbh->select_row('SELECT off_address,reach_address FROM gl_goods where id = '.$value['goods_id']);
+                // print_r($temp);die;
+                if($temp){
+                    $result['list'][$key]['off_address'] =  $temp['off_address'];
+                    $result['list'][$key]['reach_address'] =  $temp['reach_address'];                    
+                }
+
+
             }
             unset($city);
         }
