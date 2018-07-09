@@ -84,8 +84,13 @@ class App_Driver_DispatchModel
                 god.start_weights,
                 god.end_weights,
                 god.status,
+                g.start_provice,
+                g.start_city,
+                g.end_provice,
+                g.end_city,
                 g.companies_name,
                 g.product_id,
+                g.product_name,
                 g.loss,
                 g.desc_str,
                 g.off_address,
@@ -102,21 +107,6 @@ class App_Driver_DispatchModel
                 ORDER BY id ASC 
                 ";
         $result['list'] = $this->dbh->select_page($sql);
-        if(!empty($result['list'])){
-
-            $city = array_column($this->dbh->select('SELECT cityid,city FROM conf_city'),'city','cityid');
-            $provice = array_column($this->dbh->select('SELECT provinceid,province FROM conf_province'),'province','provinceid');
-
-            foreach($result['list'] as $key=>$value){
-                $result['list'][$key]['start_provice'] = $provice[$value['start_provice_id']];
-                $result['list'][$key]['end_provice'] = $provice[$value['end_provice_id']];
-
-                $result['list'][$key]['start_city'] = $city[$value['start_city_id']];
-                $result['list'][$key]['end_city'] = $city[$value['end_city_id']];
-            }
-            unset($city);
-            unset($provice);
-        }
         return $result;
     }
 
