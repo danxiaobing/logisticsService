@@ -106,6 +106,16 @@ class Transmanage_DispatchModel
                 ORDER BY id DESC
                 ";
         $result['list'] = $this->dbh->select_page($sql);
+        if(!$result['list']){
+            foreach($result['list'] as $key=>$value){
+
+                $temp = $this->dbh->select_row('SELECT off_address,reach_address FROM gl_goods where id = '.$value['goods_id']);
+                if($temp){
+                    $result['list'][$key]['off_address'] =  $temp['off_address'];
+                    $result['list'][$key]['reach_address'] =  $temp['reach_address'];
+                }
+            }
+        }
         return $result;
     }
 
@@ -160,10 +170,11 @@ class Transmanage_DispatchModel
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 8);
 
-        $sql = "SELECT 
+        $sql = "SELECT
                d.*,dr.mobile as driver_mobile,goods.off_address,goods.reach_address 
                 FROM gl_order_dispatch d LEFT JOIN gl_driver dr on d.driver_id = dr.id 
                 LEFT JOIN gl_goods goods on goods.id=d.goods_id
+                FROM gl_order_dispatch
                 WHERE  {$where}
                 ORDER BY d.id DESC 
                 ";
@@ -179,6 +190,7 @@ class Transmanage_DispatchModel
             foreach($result['list'] as $key=>$value){
                 $result['list'][$key]['start_city'] = $city[$value['start_city_id']];
                 $result['list'][$key]['end_city'] = $city[$value['end_city_id']];
+
             }
             unset($city);
             $area = array_column($this->dbh->select('SELECT areaid,area FROM conf_area'),'area','areaid');

@@ -529,11 +529,12 @@ class Examine_CarrierModel
 
             $pic = array(
                 0=>['path'=>$params['danger_file'],'type'=>2,'cid'=>$id,'created_at'=>'=NOW()','updated_at'=>'=NOW()'],
-                1=>['path'=>$params['business_license'],'type'=>1,'cid'=>$id,'created_at'=>'=NOW()','updated_at'=>'=NOW()']
+                1=>['path'=>$params['business_license'],'type'=>1,'cid'=>$id,'created_at'=>'=NOW()','updated_at'=>'=NOW()'],
+                2=>['path'=>$params['corporation_card'],'type'=>4,'cid'=>$id,'created_at'=>'=NOW()','updated_at'=>'=NOW()'],
             ) ;
 
             $params['other_file'] = array_filter($params['other_file']);
-            $n = 2;
+            $n = 3;
             if(1 <= count($params['other_file'])){
                 foreach ($params['other_file'] as $v){
                     $pic[$n] = ['path'=>$v,'type'=>3,'cid'=>$id,'created_at'=>'=NOW()','updated_at'=>'=NOW()'];
