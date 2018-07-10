@@ -170,15 +170,14 @@ class Transmanage_DispatchModel
         $this->dbh->set_page_num($params['page'] ? $params['page'] : 1);
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 8);
 
-        $sql = "SELECT
+        $sql_fix = "SELECT 
                d.*,dr.mobile as driver_mobile,goods.off_address,goods.reach_address 
                 FROM gl_order_dispatch d LEFT JOIN gl_driver dr on d.driver_id = dr.id 
                 LEFT JOIN gl_goods goods on goods.id=d.goods_id
-                FROM gl_order_dispatch
                 WHERE  {$where}
                 ORDER BY d.id DESC 
                 ";
-        $result['list'] = $this->dbh->select_page($sql);
+        $result['list'] = $this->dbh->select_page($sql_fix);
         if(!empty($result['list'])){
             $pro = array_column($this->dbh->select('SELECT provinceid,province FROM conf_province'),'province','provinceid');
             foreach($result['list'] as $key=>$value){
