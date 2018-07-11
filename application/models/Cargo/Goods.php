@@ -554,13 +554,13 @@ class Cargo_GoodsModel
             $filter[] = " unix_timestamp(g.`off_starttime`) >= unix_timestamp('{$params['off_starttime']} 00:00:00')";
         }
         if (isset($params['off_endtime']) && $params['off_endtime'] != '') {
-            $filter[] = " unix_timestamp(g.`off_starttime`) <= unix_timestamp('{$params['off_endtime']} 00:00:00')";
+            $filter[] = " unix_timestamp(g.`off_starttime`) <= unix_timestamp('{$params['off_endtime']} 23:59:59')";
         }
         if (isset($params['reach_starttime']) && $params['reach_starttime'] != '') {
             $filter[] = " unix_timestamp(g.`reach_starttime`) >= unix_timestamp('{$params['reach_starttime']} 00:00:00')";
         }
         if (isset($params['reach_endtime']) && $params['reach_endtime'] != '') {
-            $filter[] = " unix_timestamp(g.`reach_starttime`) <= unix_timestamp('{$params['reach_endtime']} 00:00:00')";
+            $filter[] = " unix_timestamp(g.`reach_starttime`) <= unix_timestamp('{$params['reach_endtime']} 23:59:59')";
         }
         if (isset($params['cate_id']) && !empty($params['cate_id'])) {
             $filter[] = "g.`cate_id`=".intval($params['cate_id']);
