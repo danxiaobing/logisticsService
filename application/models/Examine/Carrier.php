@@ -83,10 +83,12 @@ class Examine_CarrierModel
                   conf_province.province,
                   conf_city.city,
                   gl_companies.business,
-                  gl_companies.products 
+                  gl_companies.products,
+                  cooperation.company_name as name 
                   FROM gl_companies 
                 LEFT JOIN conf_area ON conf_area.areaid = gl_companies.area_id
                 LEFT JOIN conf_province ON conf_province.provinceid = gl_companies.province_id
+                LEFT JOIN gl_companies as cooperation ON cooperation.id = gl_companies.pid
                 LEFT JOIN conf_city ON conf_city.cityid = gl_companies.city_id WHERE 
                 {$where} 
                 ORDER BY gl_companies.`updated_at` DESC";
@@ -484,7 +486,7 @@ class Examine_CarrierModel
             'company_user'      =>$params['company_user'],
             'company_telephone' =>$params['company_telephone'],
             'status'            =>$params['status'],
-            'code'              =>$params['code'],
+            'social_code'       =>$params['social_code'],
             'pid'               =>$params['pid'],
             'created_at' => '=NOW()',
             'updated_at' => '=NOW()',

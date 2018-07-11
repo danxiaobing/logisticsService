@@ -76,7 +76,10 @@ class Examine_DriverModel
             $this ->dbh ->set_page_num($serach['pageCurrent']);
             $this ->dbh ->set_page_rows($serach['pageSize']); 
             //数据获取
-            $sql = "SELECT id,name,mobile,sex,cid,type,driver_start,driver_end,practitioners,driver_status,company_id,is_use,status FROM gl_driver gd {$WHERE} ORDER BY updated_at DESC ";
+            $sql = "SELECT gd.id,gd.name,gd.mobile,gd.sex,gd.cid,gd.type,gd.driver_start,gd.driver_end,gd.practitioners,gd.driver_status,gd.company_id,gd.is_use,gd.status,gl_companies.company_name FROM gl_driver gd
+  LEFT JOIN gl_companies ON gl_companies.id = gd.company_id
+ {$WHERE} ORDER BY gd.updated_at DESC ";
+
             $result['list'] = $this->dbh->select_page($sql);
         }
 
