@@ -284,4 +284,15 @@ class Examine_UsersModel
         return $this->dbh->select($sql);
     }
 
+
+    /**
+     * 验证用户名是否存在
+     * @param $name
+     * @return mixed
+     */
+    public function getUserInfoName($name){
+        $sql = "SELECT id FROM gl_companies WHERE `company_name`= '{$name}'";
+        return $this->dbh->select($sql);
+    }
+
 }

@@ -72,5 +72,12 @@ class Examine_UserInfoController extends Rpc
         return $data;
     }
 
+    public function getUserInfoNameFunc($name){
+
+        $L = new Examine_UsersModel(Yaf_Registry::get("db"));
+        $data = $L->getUserInfoName($name);
+        return $data;
+    }
+
 
 }
