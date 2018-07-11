@@ -98,12 +98,14 @@ class Examine_CarModel
                 d.`name` as driver_name,
                 d.`mobile` as driver_mobile,
                 d2.`name` as escort_name,
-                d2.`mobile` as escort_mobile
+                d2.`mobile` as escort_mobile,
+                cartype.`name` as car_name
                 FROM `gl_cars` AS c
                 LEFT JOIN `gl_companies` AS com ON com.`id` = c.`company_id`
                 LEFT JOIN `gl_fleets` AS f ON f.`id` = c.`fleets_id`
                 LEFT JOIN `gl_driver` AS d ON d.`id` = c.`driver_id`
                 LEFT JOIN `gl_driver` AS d2 ON d2.`id` = c.`escort_id`
+                LEFT JOIN `gl_cars_type` AS cartype ON cartype.`id` = c.`type`
                 {$where} 
                 ORDER BY c.`updated_at` DESC";
         $result['list'] = $this->dbh->select_page($sql);
