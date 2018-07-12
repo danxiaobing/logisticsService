@@ -200,7 +200,7 @@ class Transmanage_OrderModel
               ON
                 gd.id = god.driver_id
               WHERE
-                god.`order_id` = ".intval($orderid);
+                god.`order_id` = ".intval($orderid)." AND god.`status` != 6";
             $res = $this->dbh->select($sql);
         }
 
