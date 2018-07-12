@@ -51,6 +51,12 @@ class Examine_UsersModel
         if (isset($params['company']) && $params['company'] != '') {
             $filter[] = " ( gl_companies.`company_user` LIKE  '%{$params['company']}%' OR gl_companies.`company_telephone` LIKE  '%{$params['company']}%' )";
         }
+        if (isset($params['contact']) && $params['contact'] != '') {
+            $filter[] = " ( gl_companies.`company_user` LIKE  '%{$params['contact']}%' OR gl_companies.`company_telephone` LIKE  '%{$params['contact']}%' )";
+        }
+        if (isset($params['company_name']) && $params['company_name'] != '') {
+            $filter[] = " gl_companies.`company_name` LIKE  '%{$params['company_name']}%'";
+        }
         if (isset($params['is_con']) && $params['is_con'] != '') {
             $filter[] = "gl_user_info.`is_con` = {$params['is_con']}";
         }
