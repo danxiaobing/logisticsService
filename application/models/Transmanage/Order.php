@@ -73,6 +73,11 @@ class Transmanage_OrderModel
             $filter[] = " g.`weights` <= '{$params['max']}'";
         }
 
+        if (isset($params['keyworks']) && $params['keyworks'] != '') {
+            $filter[] = " o.`number` like '%{$params['keyworks']}%' ";
+        }
+
+
         if(isset($params['id']) && $params['id'] != ''){
             $order = substr($params['id'],0,strlen($params['id'])-1);
             $filter[] = "o.`id` in({$order})";
@@ -106,6 +111,7 @@ class Transmanage_OrderModel
                g.reach_starttime,
                g.reach_endtime,
                g.companies_name,
+               g.weights_done,
                o.status,
                o.id,
                o.created_at,
