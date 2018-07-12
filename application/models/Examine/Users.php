@@ -162,14 +162,16 @@ class Examine_UsersModel
     public function getUser($param,$password = ''){
         $where = 'gl_user_info.is_del != 1 AND';
 
+
         if(is_numeric($param) && strlen($param) >10){
             $where .= ' gl_user_info.`mobile` = '.$param;
         }elseif(preg_match('/^[0-9a-zA-Z]+@(([0-9a-zA-Z]+)[.])+[a-z]{2,4}$/i',$param)){
             $where .= " gl_user_info.`email` = '{$param}'";
         }elseif(is_numeric($param)){
             $where .= " gl_user_info.`id` = '{$param}'";
+        }else{
+            return false;
         }
-
 
 
         $sql = "SELECT 
