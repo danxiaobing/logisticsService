@@ -413,6 +413,16 @@ class Transmanage_DispatchModel
      * @return bool
      */
     public function editDispatch($params){
+        $sql = " SELECT * FROM gl_goods WHERE id =  ".intval($params['goods_id']);
+        $goods_info =  $this->dbh->select_row( $sql );
+        // print_r( $goods_info['weights']-$goods_info['weights_done']-$params['weights_this'] );die;
+        if( ($goods_info['weights']-$goods_info['weights_done']) <= 0 ){
+            return false;
+        }
+        if( ($goods_info['weights']-$goods_info['weights_done']-$params['weights_this']) < 0 ){
+            return false;
+        }
+
         if(!empty($params['id'])){
             $res = $this->dbh->update('gl_order_dispatch', $params,' id = '.intval($params['id']).' AND c_id = '.intval($params['c_id']));
             if($res){

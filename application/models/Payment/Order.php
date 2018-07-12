@@ -147,15 +147,15 @@ class Payment_OrderModel
         $where = '';
 
         if(isset($params['dealno']) && $params['dealno'] != ''){
-            $filter[] = 'dealno = "'.$params['dealno'].'"';
+            $filter[] = "gy.dealno like '%{$params['dealno']}%' ";
         }
 
         if(isset($params['status']) && $params['status'] != -100){
-            $filter[] = 'status = '.intval($params['status']);
+            $filter[] = 'gy.status = '.intval($params['status']);
         }
 
         if(isset($params['c_id']) && $params['c_id'] != 0){
-            $filter[] = 'c_id = '.intval($params['c_id']);
+            $filter[] = 'gy.c_id = '.intval($params['c_id']);
         }
 
         if(count($filter)){
@@ -164,7 +164,8 @@ class Payment_OrderModel
         }
 
         //计算总数
-        $sql = "SELECT count(1) FROM payment_order WHERE {$where}";
+        $sql = "SELECT count(1) FROM payment_order gy  WHERE {$where}";
+
 
         $data = $this->dbh->select_one($sql);
 
@@ -174,7 +175,7 @@ class Payment_OrderModel
         $this->dbh->set_page_rows($params['rows'] ? $params['rows'] : 8);
 
         $sql = "SELECT gy.`id`,gy.`c_id`,gy.`cargo_id`,gy.`order_id`,gy.`goods_id`,gy.`paymentno`,gy.`number`,gy.`freightamount`,gy.`estimate_freight`,gy.`start_weights`,gy.`end_weights`,gy.`cost_weights`,gy.`cname`,gy.`bankname`,gy.`bankcode`,gy.`status`,gy.`pay_type`,gy.`created_at`,gy.`dealno`,gy.`remark`,gy.`dealno`,god.`companies_name` FROM payment_order gy LEFT JOIN gl_goods god on god.id=gy.goods_id WHERE {$where} ORDER BY gy.`id` DESC";
-    // var_dump($sql);die;
+//     var_dump($sql);die;
         $result['list'] = $this->dbh->select_page($sql);
         return $result;
     }
