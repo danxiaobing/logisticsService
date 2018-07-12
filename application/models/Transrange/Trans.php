@@ -33,7 +33,7 @@ class Transrange_TransModel
         }
 
         if(isset($search['mobile']) && $search['mobile'] != ''){
-            $filter[] = " gcr.mobile ='{$search['mobile']}' "; 
+            $filter[] = " gcr.mobile like '%{$search['mobile']}%' ";
         }
 
         //获取合作承运商公司id
