@@ -51,6 +51,12 @@ class Examine_UsersModel
         if (isset($params['company']) && $params['company'] != '') {
             $filter[] = " ( gl_companies.`company_user` LIKE  '%{$params['company']}%' OR gl_companies.`company_telephone` LIKE  '%{$params['company']}%' )";
         }
+        if (isset($params['contact']) && $params['contact'] != '') {
+            $filter[] = " ( gl_companies.`company_user` LIKE  '%{$params['contact']}%' OR gl_companies.`company_telephone` LIKE  '%{$params['contact']}%' )";
+        }
+        if (isset($params['company_name']) && $params['company_name'] != '') {
+            $filter[] = " gl_companies.`company_name` LIKE  '%{$params['company_name']}%'";
+        }
         if (isset($params['is_con']) && $params['is_con'] != '') {
             $filter[] = "gl_user_info.`is_con` = {$params['is_con']}";
         }
@@ -156,14 +162,16 @@ class Examine_UsersModel
     public function getUser($param,$password = ''){
         $where = 'gl_user_info.is_del != 1 AND';
 
+
         if(is_numeric($param) && strlen($param) >10){
             $where .= ' gl_user_info.`mobile` = '.$param;
         }elseif(preg_match('/^[0-9a-zA-Z]+@(([0-9a-zA-Z]+)[.])+[a-z]{2,4}$/i',$param)){
             $where .= " gl_user_info.`email` = '{$param}'";
         }elseif(is_numeric($param)){
             $where .= " gl_user_info.`id` = '{$param}'";
+        }else{
+            return false;
         }
-
 
 
         $sql = "SELECT 
