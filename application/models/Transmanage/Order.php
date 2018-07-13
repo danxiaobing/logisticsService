@@ -112,6 +112,8 @@ class Transmanage_OrderModel
                g.reach_endtime,
                g.companies_name,
                g.weights_done,
+               g.reach_address,
+               g.off_address,
                o.status,
                o.id,
                o.created_at,
