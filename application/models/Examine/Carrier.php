@@ -306,41 +306,53 @@ class Examine_CarrierModel
                 //如果申请开通支付功能
                 if($companiesdata['privilege_pay']==1){
 
-                    $bankApply = [
+                    $sql = "SELECT COUNT(*) FROM gl_companies_account_apply  WHERE companies_id=".$companiesdata['id'];
+                    $account_apply_count =  $this->dbh->select_one($sql);
+
+                    if(empty($account_apply_count)){
+                        $bankApply = [
+                            'companies_id' => $companiesdata['id'],
+                            'companyname' => $companiesdata['company_name'],
+                            'legalpersonname' => '',
+                            'certtype' => $companiesdata['type'],
+                            'certno'   => $companiesdata['social_code'],
+                            'commaddress' => $companiesdata['company_address'],
+                            'contactname' => $companiesdata['company_user'],
+                            'contactphone' => $companiesdata['company_telephone'],
+                            'mailaddress'  => $companiesdata['company_mail'],
+                            'auditstatus' => 1,
+                            'created_at' => '=NOW()',
+                            'updated_at' => '=NOW()'
+                        ];
+
+                        //插入资金账户申请
+                        $account_apply_res = $this->dbh->insert('gl_companies_account_apply',$bankApply);
+                        if(empty($account_apply_res)) {
+                            $this->dbh->rollback();
+                            return false;
+                        }
+                    }
+
+
+                }
+                $sql = "SELECT COUNT(*) FROM gl_companies_contract_apply  WHERE companies_id =".$companiesdata['id'];
+                $contract_apply_count =  $this->dbh->select_one($sql);
+
+                if(empty($contract_apply_count)){
+                    $caApply = [
                         'companies_id' => $companiesdata['id'],
-                        'companyname' => $companiesdata['company_name'],
-                        'legalpersonname' => '',
-                        'certtype' => $companiesdata['type'],
-                        'certno'   => $companiesdata['social_code'],
-                        'commaddress' => $companiesdata['company_address'],
-                        'contactname' => $companiesdata['company_user'],
-                        'contactphone' => $companiesdata['company_telephone'],
-                        'mailaddress'  => $companiesdata['company_mail'],
-                        'auditstatus' => 1,
+                        'apply_status' =>  1,
                         'created_at' => '=NOW()',
                         'updated_at' => '=NOW()'
                     ];
-
-                    //插入资金账户申请
-                    $account_apply_res = $this->dbh->insert('gl_companies_account_apply',$bankApply);
-                    if(empty($account_apply_res)) {
+                    $contract_apply_res = $this->dbh->insert('gl_companies_contract_apply',$caApply);
+                    if(empty($contract_apply_res)) {
                         $this->dbh->rollback();
                         return false;
                     }
                 }
 
 
-                $caApply = [
-                    'companies_id' => $companiesdata['id'],
-                    'apply_status' =>  1,
-                    'created_at' => '=NOW()',
-                    'updated_at' => '=NOW()'
-                ];
-                $contract_apply_res = $this->dbh->insert('gl_companies_contract_apply',$caApply);
-                if(empty($contract_apply_res)) {
-                    $this->dbh->rollback();
-                    return false;
-                }
                 $this->dbh->commit();
                 return true;
 
