@@ -171,4 +171,14 @@ class CityModel
         $sql = "SELECT * FROM conf_city ORDER BY zm";
         return $this->dbh->select($sql);
     }
+
+    /**
+     * 获取全部县的参数
+     */
+    public function getArea()
+    {
+        $sql = "SELECT * FROM  conf_area";
+        $data = $this->dbh->select($sql);
+        return $data;
+    }
 }

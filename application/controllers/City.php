@@ -87,4 +87,16 @@ class CityController extends Rpc {
         $city = $L->getConfCity();
         return $city;
     }
+
+    /**
+     * 获取所有县参数
+     * @author Alan
+     */
+
+    public function getConfAreaFunc()
+    {
+        $L = new CityModel(Yaf_Registry::get("db"));
+        $city = $L->getArea();
+        return $city;
+    }
 }
