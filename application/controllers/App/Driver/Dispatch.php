@@ -69,21 +69,7 @@ class App_Driver_DispatchController extends Rpc
 
         $L = new App_Driver_DispatchModel(Yaf_Registry::get("db"));
         $result = $L->getInfo($params);
-        if(!empty($result['info'])){
-            $cityArr = array_column($result['city'],'city','cityid');//城市数据 cityid-city
-            $provinceArr = array_column($result['province'],'province','provinceid');//省数据 provinceid-province
-
-            $ps_index = $result['info']['start_provice_id'];//起始省id
-            $pe_index = $result['info']['end_provice_id'];//目的省id
-            $s_index = $result['info']['start_city_id'];//起始城市id
-            $e_index = $result['info']['end_city_id'];//起始城市id
-            $res['provincestart'] = $provinceArr[$ps_index];//起始省
-            $res['provinceend'] = $provinceArr[$pe_index];//目的省
-            $res['citystart'] = $cityArr[$s_index];//起始城市
-            $res['cityend'] = $cityArr[$e_index];//目的城市
-             return array_merge($result['info'], $res);
-        }
-        return array();
+        return $result['info'];
 
     }
 
