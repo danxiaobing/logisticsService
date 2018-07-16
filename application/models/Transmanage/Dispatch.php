@@ -354,7 +354,7 @@ class Transmanage_DispatchModel
     }
     public function getInfoForApp($dispatch_id)
     {
-        $sql = "SELECT d.mobile as driver_mobile,god.id,god.dispatch_number,god.order_number,god.order_id,god.ctype_name,god.driver_name,god.supercargo_name,god.cars_number,god.end_time,god.start_time,god.weights,go.cargo_id,god.cars_id,god.driver_id,god.supercargo_id,god.ctype_id,god.status,god.start_weights,god.end_weights,god.end_time 
+        $sql = "SELECT d.mobile as driver_mobile,god.id,god.dispatch_number,god.order_number,god.order_id,god.ctype_name,god.driver_name,god.supercargo_name,god.cars_number,god.end_time,god.start_time,god.weights,go.cargo_id,god.cars_id,god.driver_id,god.supercargo_id,god.ctype_id,god.status,god.start_weights,god.end_weights,god.end_time,god.status 
               FROM gl_order_dispatch god 
               LEFT JOIN gl_driver d  on d.id=god.driver_id 
               LEFT JOIN gl_order go ON go.id=god.order_id WHERE god.id=".intval($dispatch_id);
