@@ -318,6 +318,16 @@ class App_Driver_DispatchModel
                 g.off_address,
                 g.off_user,
                 g.off_phone,
+
+                g.off_starttime as actually_start_time,
+                g.reach_starttime as actually_end_time,
+                g.start_provice as provincestart,
+                g.start_city as citystart,
+                g.start_area,
+                g.end_provice as provinceend,
+                g.end_city as cityend,
+                g.end_area,
+
                 g.reach_user,
                 g.reach_phone,
                 g.reach_address,
@@ -329,10 +339,7 @@ class App_Driver_DispatchModel
 
         $data =  $this->dbh->select_row($sql);
         if(!empty($data)){
-            //获取城市信息
-            $city = $this->dbh->select('SELECT cityid,city FROM conf_city');
-            //获取省的信息
-            $province = $this->dbh->select('SELECT province,provinceid FROM conf_province');
+
             //更新消息通知状态为已读
             if(isset($params['is_push']) && !empty($params['is_push'])){
                 $this->dbh->update('gl_message', array('status'=>1),'dispatch_id = "'.$data['id'].'"');
@@ -340,7 +347,7 @@ class App_Driver_DispatchModel
 
         }
 
-        return array('info'=>$data,'city'=>$city,'province'=>$province);
+        return array('info'=>$data);
 
     }
 
