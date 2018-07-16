@@ -331,13 +331,11 @@ class App_Driver_DispatchModel
 
                 g.off_starttime as actually_start_time,
                 g.reach_starttime as actually_end_time,
-
-
                 g.start_provice as provincestart,
-                g.start_city as conf_province,
+                g.start_city as citystart,
                 g.start_area,
-                g.end_provice,
-                g.end_city,
+                g.end_provice as provinceend,
+                g.end_city as cityend,
                 g.end_area,
 
                 g.reach_user,
