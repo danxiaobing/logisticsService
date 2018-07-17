@@ -400,11 +400,25 @@ class Transmanage_DispatchModel
 
     public function getInfoForApp($dispatch_id)
     {
-        $sql = "SELECT d.mobile as driver_mobile,god.id,god.dispatch_number,god.order_number,god.order_id,god.ctype_name,god.driver_name,god.supercargo_name,god.cars_number,god.end_time,god.start_time,god.weights,god.start_weights,go.cargo_id,god.cars_id,god.driver_id,god.supercargo_id,god.ctype_id,god.status,god.start_weights,god.end_weights,god.end_time,god.status 
+        $sql = "SELECT d.mobile as driver_mobile,god.id,god.dispatch_number,god.order_number,god.order_id,god.ctype_name,god.driver_name,god.supercargo_name,god.cars_number,god.end_time,god.start_time,god.weights,god.start_weights,go.cargo_id,god.cars_id,god.driver_id,god.supercargo_id,god.ctype_id,god.status,god.start_weights,god.end_weights,god.end_time,god.status,god.start_provice_id,god.start_city_id,god.start_area_id,god.end_provice_id,god.end_city_id,god.end_area_id 
               FROM gl_order_dispatch god 
               LEFT JOIN gl_driver d  on d.id=god.driver_id 
               LEFT JOIN gl_order go ON go.id=god.order_id WHERE god.id=".intval($dispatch_id);
-        $data =  $this->dbh->select_row($sql);
+        $data =  $this->dbh->select_row($sql); 
+        if(!empty($data)){
+            $pro = array_column($this->dbh->select('SELECT provinceid,province FROM conf_province'),'province','provinceid');
+            $data['start_province'] = $pro[$data['start_provice_id']];
+            $data['end_province'] = $pro[$data['end_provice_id']];
+            unset($pro);
+            $city = array_column($this->dbh->select('SELECT cityid,city FROM conf_city'),'city','cityid');
+            $data['start_city'] = $city[$data['start_city_id']];
+            $data['end_city'] = $city[$data['end_city_id']];
+            unset($city);
+            $area = array_column($this->dbh->select('SELECT areaid,area FROM conf_area'),'area','areaid');
+            $data['start_area'] = $area[$data['start_area_id']];
+            $data['end_area'] = $area[$data['end_area_id']];
+            unset($area);
+        } 
         return $data ? $data : [];
     }
     /**
