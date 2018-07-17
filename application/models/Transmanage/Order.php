@@ -58,7 +58,11 @@ class Transmanage_OrderModel
         }
 
         if (isset($params['status']) && $params['status'] != '') {
-            $filter[] = " o.`status` = '{$params['status']}'";
+            if($params['status'] == 2){
+                $filter[] = " o.`status` in(2,3,8)";
+            }else{
+                $filter[] = " o.`status` = '{$params['status']}'";
+            }
         }
 
         if (isset($params['cid']) && $params['cid'] != '') {

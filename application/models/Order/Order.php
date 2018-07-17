@@ -75,10 +75,13 @@ class Order_OrderModel
             }
         }
 
-        if (isset($params['status']) && !empty($params['status'])) {
-            $filter[] = " o.`status` = '{$params['status']}'";
+        if (isset($params['status']) && $params['status'] != '') {
+            if($params['status'] == 2){
+                $filter[] = " o.`status` in(2,3,8)";
+            }else{
+                $filter[] = " o.`status` = '{$params['status']}'";
+            }
         }
-
         if (isset($params['orderno']) && !empty($params['orderno'])) {
             $filter[] = " g.`orderno` = '{$params['orderno']}'";
         }
