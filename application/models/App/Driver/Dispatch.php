@@ -329,8 +329,8 @@ class App_Driver_DispatchModel
                 g.off_user,
                 g.off_phone,
 
-                g.off_starttime as actually_start_time,
-                g.reach_starttime as actually_end_time,
+                god.start_time as actually_start_time,
+                god.end_time as actually_end_time,
                 g.start_provice as provincestart,
                 g.start_city as citystart,
                 g.start_area,
