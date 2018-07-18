@@ -44,13 +44,18 @@ class App_Carrier_MapController extends Rpc
             "reach_address"=>$res[0]['reach_address'], //卸货地址
             "zoom"=>19,          //默认缩放比
         ];
+        $data['locations'] = [];
         foreach ($res as $key => $val){
-            $data['locations'][] = [
-                "lng"=>$val['lng'],  //纬度
-                "lat"=>$val['lat'],  //经度
-                "created_at"=>$val['created_at']
-            ];
-        }      
+            if($val['lng'] || $val['lat'] ){
+                $data['locations'][] = [
+                    "lng"=>$val['lng'],  //纬度
+                    "lat"=>$val['lat'],  //经度
+                    "created_at"=>$val['created_at']
+                ];
+            }
+
+        }
+
         
         return $data?$data:[];
     }
