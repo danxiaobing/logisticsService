@@ -54,7 +54,7 @@ class App_Carrier_MapModel
      */
     public function getLocus($dispatch_id){
 
-        $where = 'god.is_del=0 and gml.is_del=0 and gd.is_use=1 and gd.status=1 and gd.isdelete=0';
+        $where = 'god.is_del=0 ';
 
         if($dispatch_id && is_numeric($dispatch_id)){
             $where .= ' AND god.`id` = '.$dispatch_id;
