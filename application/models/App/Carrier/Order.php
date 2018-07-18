@@ -64,7 +64,7 @@ class App_Carrier_OrderModel
                 LEFT JOIN gl_companies com ON com.id = o.company_id
                 LEFT JOIN gl_cars_type car ON car.id = g.cars_type
                 LEFT JOIN gl_order_dispatch god ON o.id = god.order_id
-                WHERE  {$where} GROUP BY order_id
+                WHERE  {$where} GROUP BY o.id
                 ORDER BY order_id DESC";
         $result['list']  = $this->dbh->select_page($sql);
         if(!empty($result['list'])){
