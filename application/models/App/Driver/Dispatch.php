@@ -99,7 +99,7 @@ class App_Driver_DispatchModel
                 FROM gl_order_dispatch as god
                 LEFT JOIN gl_goods as g ON g.id = god.goods_id
                 WHERE  {$where}
-                ORDER BY id ASC 
+                ORDER BY id DESC 
                 ";
         $result['list'] = $this->dbh->select_page($sql);
         if(!empty($result['list'])){
